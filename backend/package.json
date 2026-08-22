@@ -1,0 +1,27 @@
+{
+  "name": "sistema-familiar-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Backend serverless do sistema familiar (baralho de tarefas, rodízio e agenda)",
+  "scripts": {
+    "build": "sam build",
+    "deploy": "sam deploy --guided",
+    "typecheck": "tsc --noEmit",
+    "seed": "ts-node scripts/seed.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.600.0",
+    "@aws-sdk/lib-dynamodb": "^3.600.0",
+    "@aws-sdk/client-sns": "^3.600.0",
+    "@aws-sdk/util-dynamodb": "^3.600.0",
+    "zod": "^3.23.8",
+    "ulid": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.138",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.5",
+    "esbuild": "^0.21.4",
+    "ts-node": "^10.9.2"
+  }
+}

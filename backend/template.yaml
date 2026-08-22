@@ -1,0 +1,302 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Sistema Familiar — backend serverless (baralho de tarefas, rodízio e agenda).
+  Uso pessoal / uma única família por deploy (ver FamilyId abaixo).
+
+Parameters:
+  FamilyId:
+    Type: String
+    Default: minha-familia
+    Description: Identificador da família usado pelo job diário de geração do baralho.
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Architectures: [arm64]
+    Timeout: 10
+    MemorySize: 256
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref FamilyTable
+        SNS_TOPIC_ARN: !Ref TaskEventsTopic
+
+Resources:
+  FamilyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: FAMILY-APP-TABLE
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+        - AttributeName: GSI1PK
+          AttributeType: S
+        - AttributeName: GSI1SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: GSI1
+          KeySchema:
+            - AttributeName: GSI1PK
+              KeyType: HASH
+            - AttributeName: GSI1SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  TaskEventsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: sistema-familiar-task-events
+      DisplayName: Sistema Familiar - eventos de tarefa
+
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: sistema-familiar-api
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'*'"
+      # Sem autenticação nesta versão — ver README ("Segurança / próximos passos").
+
+  # ---------- Baralho / tarefas do dia ----------
+
+  GetDeckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: GET-DECK
+      CodeUri: src/handlers/deck/
+      Handler: getDeck.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref FamilyTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /families/{familyId}/deck
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [getDeck.ts]
+
+  DecideTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: DECIDE-TASK
+      CodeUri: src/handlers/deck/
+      Handler: decideTask.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FamilyTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /families/{familyId}/deck/{taskId}/decide
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [decideTask.ts]
+
+  # ---------- Tarefas (definição / gestão) ----------
+
+  ListTasksFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: LIST-TASKS
+      CodeUri: src/handlers/tasks/
+      Handler: listTasks.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref FamilyTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /families/{familyId}/tasks
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [listTasks.ts]
+
+  CreateTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CREATE-TASK
+      CodeUri: src/handlers/tasks/
+      Handler: createTask.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FamilyTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /families/{familyId}/tasks
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [createTask.ts]
+
+  # ---------- Membros ----------
+
+  ListMembersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: LIST-MEMBERS
+      CodeUri: src/handlers/members/
+      Handler: listMembers.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref FamilyTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /families/{familyId}/members
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [listMembers.ts]
+
+  # ---------- Agenda ----------
+
+  ListEventsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: LIST-EVENTS
+      CodeUri: src/handlers/events/
+      Handler: listEvents.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref FamilyTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /families/{familyId}/events
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [listEvents.ts]
+
+  CreateEventFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CREATE-EVENT
+      CodeUri: src/handlers/events/
+      Handler: createEvent.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FamilyTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /families/{familyId}/events
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [createEvent.ts]
+
+  # ---------- Job diário (EventBridge) ----------
+
+  GenerateDailyDeckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: GENERATE-DAILY-DECK
+      CodeUri: src/handlers/jobs/
+      Handler: generateDailyDeck.handler
+      Environment:
+        Variables:
+          FAMILY_ID: !Ref FamilyId
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FamilyTable
+      Events:
+        DailySchedule:
+          Type: Schedule
+          Properties:
+            Schedule: "cron(0 6 * * ? *)"
+            Description: "Gera as instâncias de tarefa do dia às 03:00 (America/Sao_Paulo, UTC-3)"
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [generateDailyDeck.ts]
+
+  # ---------- DynamoDB Streams -> notificações ----------
+
+  OnInstanceChangeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ON-INSTANCE-CHANGE
+      CodeUri: src/streams/
+      Handler: onInstanceChange.handler
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt TaskEventsTopic.TopicName
+      Events:
+        Stream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt FamilyTable.StreamArn
+            StartingPosition: LATEST
+            BatchSize: 10
+            MaximumRetryAttempts: 3
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [onInstanceChange.ts]
+
+Outputs:
+  ApiUrl:
+    Description: URL base da API
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/prod"
+  TableName:
+    Value: !Ref FamilyTable
+  TopicArn:
+    Value: !Ref TaskEventsTopic
