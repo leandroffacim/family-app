@@ -5,22 +5,21 @@ import { Avatar } from "./Avatar";
 export function TaskDefinitionRow({ task, membersById }: { task: Task; membersById: Record<string, Member> }) {
   const currentId = task.rotationOrder[task.currentIndex % task.rotationOrder.length];
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "#FFFFFF", borderRadius: 12, border: "1px solid #E7E2D2" }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontFamily: "'IBM Plex Sans', sans-serif", fontWeight: 600, fontSize: 14.5, color: "#22281F" }}>
+    <Paper variant="outlined" sx={{ display: "flex", alignItems: "center", gap: 1.25, p: "10px 12px", borderRadius: 3 }}>
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Typography noWrap sx={{ fontWeight: 600, fontSize: 14.5 }}>
           {task.name}
-        </div>
-        <div style={{ display: "flex", gap: 6, marginTop: 2 }}>
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: "#8A8571", background: "#F2EFE3", padding: "1px 6px", borderRadius: 999 }}>
-            {freqLabel(task.freq)}
-          </span>
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: "#8A8571" }}>
+        </Typography>
+        <Stack direction="row" spacing={0.75} sx={{ mt: 0.25, alignItems: "center" }}>
+          <Chip label={freqLabel(task.freq)} size="small" sx={{ height: 20, fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, bgcolor: "#F2EFE3", color: "text.secondary" }} />
+          <Typography sx={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: "text.secondary" }}>
             {"●".repeat(task.weight)}
             {"○".repeat(3 - task.weight)}
-          </span>
-        </div>
-      </div>
+          </Typography>
+        </Stack>
+      </Box>
       <Avatar member={membersById[currentId]} size={28} />
-    </div>
+    </Paper>
   );
 }
+import { Box, Chip, Paper, Stack, Typography } from "@mui/material";

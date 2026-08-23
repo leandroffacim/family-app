@@ -1,5 +1,6 @@
+import { Box, Chip, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { CheckCircle2, Clock3, PartyPopper, SkipForward } from "lucide-react";
 import { useRef, useState } from "react";
-import { PartyPopper, CheckCircle2, SkipForward, Clock3 } from "lucide-react";
 import { Member, TaskInstance } from "../types";
 import { Avatar } from "./Avatar";
 
@@ -7,16 +8,14 @@ type Action = "done" | "pass" | "defer";
 
 function StackCard({ depth }: { depth: number }) {
   return (
-    <div
-      style={{
+    <Paper
+      variant="outlined"
+      sx={{
         position: "absolute",
         inset: 0,
-        background: "#FFFFFF",
-        borderRadius: 20,
-        border: "1px solid #E7E2D2",
+        borderRadius: 5,
         transform: `translateY(${-depth * 10}px) scale(${1 - depth * 0.045})`,
         opacity: 1 - depth * 0.35,
-        boxShadow: "0 6px 16px rgba(30,58,50,0.08)",
       }}
     />
   );
@@ -46,7 +45,10 @@ export function TaskCardDeck({
   };
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragging || exit) return;
-    setDrag({ x: e.clientX - startRef.current.x, y: e.clientY - startRef.current.y });
+    setDrag({
+      x: e.clientX - startRef.current.x,
+      y: e.clientY - startRef.current.y,
+    });
   };
   const finishDrag = () => {
     if (!dragging || exit) return;
@@ -72,33 +74,41 @@ export function TaskCardDeck({
 
   if (!top) {
     return (
-      <div
-        style={{
+      <Paper
+        variant="outlined"
+        sx={{
           height: 300,
-          borderRadius: 20,
-          background: "#FFFFFF",
-          border: "1.5px dashed #D8D2BE",
+          borderRadius: 5,
+          borderStyle: "dashed",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 8,
+          gap: 1,
           textAlign: "center",
-          padding: 20,
+          p: 2.5,
         }}
       >
         <PartyPopper size={26} color="#D9A441" />
-        <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 16, color: "#22281F" }}>
+        <Typography variant="h1" sx={{ fontSize: 16 }}>
           Baralho de hoje zerado
-        </div>
-        <div style={{ fontFamily: "'IBM Plex Sans', sans-serif", fontSize: 12.5, color: "#8A8571", maxWidth: 220 }}>
+        </Typography>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ maxWidth: 220 }}
+        >
           Volta amanhã com um baralho novo.
-        </div>
-      </div>
+        </Typography>
+      </Paper>
     );
   }
 
-  const dirMap: Record<Action, "right" | "left" | "up"> = { done: "right", pass: "left", defer: "up" };
+  const dirMap: Record<Action, "right" | "left" | "up"> = {
+    done: "right",
+    pass: "left",
+    defer: "up",
+  };
   const dir = exit ? dirMap[exit] : null;
 
   const tx = dir === "right" ? 420 : dir === "left" ? -420 : drag.x;
@@ -108,34 +118,34 @@ export function TaskCardDeck({
   const transition = exit
     ? "transform 240ms ease-in, opacity 240ms ease-in"
     : dragging
-    ? "none"
-    : "transform 320ms cubic-bezier(.2,.9,.3,1)";
+      ? "none"
+      : "transform 320ms cubic-bezier(.2,.9,.3,1)";
 
   const rightStamp = Math.max(0, Math.min(1, drag.x / 100));
   const leftStamp = Math.max(0, Math.min(1, -drag.x / 100));
   const upStamp = Math.max(0, Math.min(1, -drag.y / 90));
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <div style={{ position: "relative", height: 300 }}>
+    <Stack spacing={1.5}>
+      <Box sx={{ position: "relative", height: 300 }}>
         {queue[2] && <StackCard depth={2} />}
         {queue[1] && <StackCard depth={1} />}
 
-        <div
+        <Paper
+          component="article"
+          variant="outlined"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={finishDrag}
           onPointerCancel={finishDrag}
-          style={{
+          sx={{
             position: "absolute",
             inset: 0,
-            background: "#FFFFFF",
-            borderRadius: 20,
-            border: "1px solid #E7E2D2",
+            borderRadius: 5,
             boxShadow: "0 14px 30px rgba(30,58,50,0.16)",
             display: "flex",
             flexDirection: "column",
-            padding: 20,
+            p: 2.5,
             touchAction: "none",
             cursor: dragging ? "grabbing" : "grab",
             transform: `translate(${tx}px, ${ty}px) rotate(${rot}deg)`,
@@ -144,61 +154,169 @@ export function TaskCardDeck({
             userSelect: "none",
           }}
         >
-          <div style={{ display: "flex", gap: 8 }}>
-            <span
-              style={{
+          <Stack direction="row" spacing={1}>
+            <Chip
+              label={
+                top.freq === "DAILY"
+                  ? "Diária"
+                  : top.freq === "WEEKLY"
+                    ? "Semanal"
+                    : "Mensal"
+              }
+              size="small"
+              sx={{
+                height: 22,
                 fontFamily: "'IBM Plex Mono', monospace",
                 fontSize: 10.5,
-                color: "#8A8571",
-                background: "#F2EFE3",
-                padding: "2px 8px",
-                borderRadius: 999,
+                bgcolor: "#F2EFE3",
+                color: "text.secondary",
+              }}
+            />
+            <Typography
+              sx={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: 10.5,
+                color: "text.secondary",
+                alignSelf: "center",
               }}
             >
-              {top.freq === "DAILY" ? "Diária" : top.freq === "WEEKLY" ? "Semanal" : "Mensal"}
-            </span>
-            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: "#8A8571", alignSelf: "center" }}>
               {"●".repeat(top.weight)}
               {"○".repeat(3 - top.weight)}
-            </span>
-          </div>
+            </Typography>
+          </Stack>
 
-          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 6px" }}>
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 26, color: "#22281F", lineHeight: 1.2 }}>
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              px: 0.75,
+            }}
+          >
+            <Typography variant="h4" sx={{ fontSize: 26, lineHeight: 1.2 }}>
               {top.name}
-            </span>
-          </div>
+            </Typography>
+          </Box>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 8, alignSelf: "center" }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ alignSelf: "center", alignItems: "center" }}
+          >
             <Avatar member={membersById[top.assignee]} size={24} />
-            <span style={{ fontFamily: "'IBM Plex Sans', sans-serif", fontSize: 12.5, color: "#6B7268" }}>
+            <Typography variant="body2" color="text.secondary">
               Sugestão: {membersById[top.assignee]?.name ?? top.assignee}
-            </span>
-          </div>
+            </Typography>
+          </Stack>
 
-          <div style={{ position: "absolute", top: 22, right: 18, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 22, color: "#6B8F71", border: "3px solid #6B8F71", borderRadius: 10, padding: "2px 10px", transform: "rotate(12deg)", opacity: rightStamp }}>
+          <Typography
+            sx={{
+              position: "absolute",
+              top: 2.75,
+              right: 2.25,
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 800,
+              fontSize: 22,
+              color: "#6B8F71",
+              border: "3px solid #6B8F71",
+              borderRadius: 2.5,
+              px: 1.25,
+              py: 0.25,
+              transform: "rotate(12deg)",
+              opacity: rightStamp,
+            }}
+          >
             FEITO
-          </div>
-          <div style={{ position: "absolute", top: 22, left: 18, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 22, color: "#8A8571", border: "3px solid #8A8571", borderRadius: 10, padding: "2px 10px", transform: "rotate(-12deg)", opacity: leftStamp }}>
+          </Typography>
+          <Typography
+            sx={{
+              position: "absolute",
+              top: 2.75,
+              left: 2.25,
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 800,
+              fontSize: 22,
+              color: "#8A8571",
+              border: "3px solid #8A8571",
+              borderRadius: 2.5,
+              px: 1.25,
+              py: 0.25,
+              transform: "rotate(-12deg)",
+              opacity: leftStamp,
+            }}
+          >
             PASSA
-          </div>
-          <div style={{ position: "absolute", bottom: 22, left: "50%", transform: "translateX(-50%)", fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 20, color: "#D9A441", border: "3px solid #D9A441", borderRadius: 10, padding: "2px 10px", opacity: upStamp }}>
+          </Typography>
+          <Typography
+            sx={{
+              position: "absolute",
+              bottom: 2.75,
+              left: "50%",
+              transform: "translateX(-50%)",
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 800,
+              fontSize: 20,
+              color: "#D9A441",
+              border: "3px solid #D9A441",
+              borderRadius: 2.5,
+              px: 1.25,
+              py: 0.25,
+              opacity: upStamp,
+            }}
+          >
             ADIA
-          </div>
-        </div>
-      </div>
+          </Typography>
+        </Paper>
+      </Box>
 
-      <div style={{ display: "flex", justifyContent: "center", gap: 18 }}>
-        <button onClick={() => !exit && triggerExit("pass")} style={{ width: 46, height: 46, borderRadius: "50%", border: "none", background: "#FFFFFF", boxShadow: "0 3px 8px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+      <Stack
+        direction="row"
+        spacing={2.25}
+        sx={{ justifyContent: "center", alignItems: "center" }}
+      >
+        <IconButton
+          aria-label="Passar tarefa"
+          onClick={() => !exit && triggerExit("pass")}
+          sx={{
+            width: 46,
+            height: 46,
+            bgcolor: "background.paper",
+            boxShadow: "0 3px 8px rgba(0,0,0,0.1)",
+            "&:hover": { bgcolor: "background.paper" },
+          }}
+        >
           <SkipForward size={19} color="#8A8571" />
-        </button>
-        <button onClick={() => !exit && triggerExit("defer")} style={{ width: 40, height: 40, borderRadius: "50%", border: "none", background: "#FFFFFF", boxShadow: "0 3px 8px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", alignSelf: "center" }}>
+        </IconButton>
+        <IconButton
+          aria-label="Adiar tarefa"
+          onClick={() => !exit && triggerExit("defer")}
+          sx={{
+            width: 40,
+            height: 40,
+            bgcolor: "background.paper",
+            boxShadow: "0 3px 8px rgba(0,0,0,0.1)",
+            "&:hover": { bgcolor: "background.paper" },
+          }}
+        >
           <Clock3 size={16} color="#D9A441" />
-        </button>
-        <button onClick={() => !exit && triggerExit("done")} style={{ width: 46, height: 46, borderRadius: "50%", border: "none", background: "#6B8F71", boxShadow: "0 3px 8px rgba(107,143,113,0.4)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+        </IconButton>
+        <IconButton
+          aria-label="Concluir tarefa"
+          onClick={() => !exit && triggerExit("done")}
+          sx={{
+            width: 46,
+            height: 46,
+            color: "common.white",
+            bgcolor: "#6B8F71",
+            boxShadow: "0 3px 8px rgba(107,143,113,0.4)",
+            "&:hover": { bgcolor: "#5D8063" },
+          }}
+        >
           <CheckCircle2 size={20} color="#FFFFFF" />
-        </button>
-      </div>
-    </div>
+        </IconButton>
+      </Stack>
+    </Stack>
   );
 }

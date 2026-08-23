@@ -15,7 +15,13 @@ export const WEEKDAYS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
 // Datas (YYYY-MM-DD) de segunda a domingo da semana atual.
 export function currentWeekDates(): string[] {
-  const anchor = new Date(`${todayISO()}T12:00:00`);
+  return weekDatesFor(todayISO());
+}
+
+// Datas (YYYY-MM-DD) de segunda a domingo da semana da data informada.
+// A âncora ao meio-dia evita mudanças inesperadas em transições de timezone.
+export function weekDatesFor(date: string): string[] {
+  const anchor = new Date(`${date}T12:00:00`);
   const dow = anchor.getDay(); // 0=domingo..6=sábado
   const mondayOffset = dow === 0 ? -6 : 1 - dow;
   const monday = new Date(anchor);
@@ -25,6 +31,12 @@ export function currentWeekDates(): string[] {
     d.setDate(monday.getDate() + i);
     return d.toISOString().slice(0, 10);
   });
+}
+
+export function shiftISO(date: string, days: number): string {
+  const shifted = new Date(`${date}T12:00:00`);
+  shifted.setDate(shifted.getDate() + days);
+  return shifted.toISOString().slice(0, 10);
 }
 
 // Converte índice de exibição (0=Seg..6=Dom, igual a WEEKDAYS) para o

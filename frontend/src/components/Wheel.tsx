@@ -1,3 +1,4 @@
+import { Box, Typography } from "@mui/material";
 import { Member, Task } from "../types";
 
 // Mostra o rodízio atual de uma tarefa (quem é a vez). Somente
@@ -50,41 +51,22 @@ export function Wheel({ task, members }: { task: Task; members: Member[] }) {
   });
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-      <div style={{ position: "relative", width: center * 2, height: center * 2 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
+      <Box sx={{ position: "relative", width: center * 2, height: center * 2 }}>
         <svg width={center * 2} height={center * 2}>
           {segments}
           <circle cx={center} cy={center} r="20" fill="#F2EFE3" stroke="#1E3A32" strokeWidth="2" />
         </svg>
-        <div
-          style={{
-            position: "absolute",
-            top: -6,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: 0,
-            height: 0,
-            borderLeft: "7px solid transparent",
-            borderRight: "7px solid transparent",
-            borderTop: "12px solid #22281F",
-          }}
-        />
-      </div>
-      <div style={{ textAlign: "center" }}>
-        <div
-          style={{
-            fontFamily: "'IBM Plex Mono', monospace",
-            fontSize: 11,
-            color: "#6B7268",
-            letterSpacing: 1,
-          }}
-        >
+        <Box sx={{ position: "absolute", top: -0.75, left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "7px solid transparent", borderRight: "7px solid transparent", borderTop: "12px solid #22281F" }} />
+      </Box>
+      <Box sx={{ textAlign: "center" }}>
+        <Typography sx={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: "#6B7268", letterSpacing: 1 }}>
           RODÍZIO · {task.name.toUpperCase()}
-        </div>
-        <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 15, color: "#22281F" }}>
+        </Typography>
+        <Typography sx={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 15, color: "#22281F" }}>
           Vez de {current?.name ?? "?"}
-        </div>
-      </div>
-    </div>
+        </Typography>
+      </Box>
+    </Box>
   );
 }

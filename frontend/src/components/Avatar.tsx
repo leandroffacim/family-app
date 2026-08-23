@@ -1,30 +1,19 @@
+import MuiAvatar from "@mui/material/Avatar";
 import { Member } from "../types";
 
 export function Avatar({ member, size = 32 }: { member?: Member; size?: number }) {
   if (!member) {
     return (
-      <div
-        style={{
-          width: size,
-          height: size,
-          borderRadius: "50%",
-          background: "#D8D2BE",
-          flexShrink: 0,
-        }}
-      />
+      <MuiAvatar sx={{ width: size, height: size, bgcolor: "#D8D2BE", flexShrink: 0 }} />
     );
   }
   return (
-    <div
-      style={{
+    <MuiAvatar
+      sx={{
         width: size,
         height: size,
-        borderRadius: "50%",
-        background: member.color,
+        bgcolor: member.color,
         color: "#F2EFE3",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         fontFamily: "'Space Grotesk', sans-serif",
         fontWeight: 600,
         fontSize: size * 0.42,
@@ -34,6 +23,6 @@ export function Avatar({ member, size = 32 }: { member?: Member; size?: number }
       }}
     >
       {member.name.charAt(0).toUpperCase()}
-    </div>
+    </MuiAvatar>
   );
 }
