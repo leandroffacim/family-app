@@ -41,7 +41,7 @@ export const muiTheme = createTheme({
         "html, body, #root": { minHeight: "100%" },
         body: {
           minWidth: 0,
-          backgroundColor: "#12211A",
+          backgroundColor: colors.pine,
         },
         "*": { boxSizing: "border-box" },
       },

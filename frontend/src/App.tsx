@@ -34,7 +34,6 @@ import { EventCard } from "./components/EventCard";
 import { TaskCardDeck } from "./components/TaskCardDeck";
 import { TaskDefinitionRow } from "./components/TaskDefinitionRow";
 import { Wheel } from "./components/Wheel";
-import "./global.css";
 import {
   WEEKDAYS,
   displayIndexToApiWeekday,
@@ -247,7 +246,7 @@ export default function App() {
           borderRadius: { xs: 0, sm: 7 },
           border: { xs: 0, sm: "1px solid rgba(231, 226, 210, 0.22)" },
           boxShadow: { xs: "none", sm: "0 30px 70px rgba(0, 0, 0, 0.32)" },
-          // bgcolor: "background.default",
+          backgroundColor: "background.default",
         }}
       >
         <AppBar
@@ -256,7 +255,7 @@ export default function App() {
           sx={{
             flexShrink: 0,
             overflow: "hidden",
-
+            backgroundColor: "background.main",
             boxShadow: "inset 0 -1px rgba(255,255,255,0.12)",
           }}
         >
