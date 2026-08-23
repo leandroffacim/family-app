@@ -233,7 +233,7 @@ export default function App() {
         alignItems: "center",
         justifyContent: "center",
         p: { xs: 0, sm: 3 },
-        bgcolor: { xs: "background.default", sm: "#12211A" },
+        bgcolor: { xs: "background.default", sm: "#f2efe3" },
       }}
     >
       <Paper
@@ -247,7 +247,7 @@ export default function App() {
           borderRadius: { xs: 0, sm: 7 },
           border: { xs: 0, sm: "1px solid rgba(231, 226, 210, 0.22)" },
           boxShadow: { xs: "none", sm: "0 30px 70px rgba(0, 0, 0, 0.32)" },
-          bgcolor: "background.default",
+          // bgcolor: "background.default",
         }}
       >
         <AppBar
@@ -256,8 +256,7 @@ export default function App() {
           sx={{
             flexShrink: 0,
             overflow: "hidden",
-            background:
-              "linear-gradient(118deg, #183229 0%, #1E3A32 56%, #285143 100%)",
+
             boxShadow: "inset 0 -1px rgba(255,255,255,0.12)",
           }}
         >
@@ -694,7 +693,7 @@ export default function App() {
 
         {!loading && !loadError && (
           <Fab
-            color="secondary"
+            color="default"
             aria-label={
               tab === "agenda" ? "Adicionar compromisso" : "Adicionar tarefa"
             }
@@ -713,7 +712,7 @@ export default function App() {
               "&:hover": { boxShadow: "0 10px 22px rgba(217,164,65,0.48)" },
             }}
           >
-            <Plus size={22} strokeWidth={2.5} />
+            <Plus size={22} strokeWidth={2.5} className="" />
           </Fab>
         )}
 
