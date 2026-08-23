@@ -149,19 +149,130 @@ export default function App() {
   const featuredTask = tasks.find((t) => t.rotationOrder.length > 1) ?? tasks[0];
 
   return (
-    <div style={{ minHeight: "100vh", background: "#12211A", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'IBM Plex Sans', sans-serif" }}>
+    <div className="family-page" style={{ minHeight: "100dvh", background: "#12211A", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'IBM Plex Sans', sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+        :root { color: #22281F; background: #12211A; font-synthesis: none; }
+        html, body, #root { width: 100%; min-width: 0; min-height: 100%; margin: 0; }
+        body { min-height: 100dvh; }
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { display: none; }
+        button, input { -webkit-tap-highlight-color: transparent; }
+        button { touch-action: manipulation; }
+
+        .family-app {
+          width: min(1180px, 100%);
+          height: min(900px, calc(100dvh - 48px));
+          background: #F2EFE3;
+          border-radius: 28px;
+          border: 1px solid rgba(231, 226, 210, 0.22);
+          box-shadow: 0 30px 70px rgba(0, 0, 0, 0.32);
+        }
+        .family-header {
+          position: relative;
+          overflow: hidden;
+          padding: 22px 32px 24px !important;
+          background: linear-gradient(118deg, #183229 0%, #1E3A32 56%, #285143 100%) !important;
+          box-shadow: inset 0 -1px rgba(255,255,255,0.12);
+        }
+        .family-header::after {
+          content: "";
+          position: absolute;
+          width: 260px;
+          height: 260px;
+          right: -85px;
+          top: -190px;
+          border: 1px solid rgba(242,239,227,0.22);
+          border-radius: 50%;
+          box-shadow: 0 0 0 34px rgba(242,239,227,0.045), 0 0 0 68px rgba(242,239,227,0.035);
+        }
+        .family-header > * { position: relative; z-index: 1; }
+        .family-eyebrow { opacity: 0.86; }
+        .family-title { font-size: 28px !important; letter-spacing: -0.6px; }
+        .family-content {
+          width: min(100%, 920px);
+          align-self: center;
+          padding: 24px 28px 28px !important;
+          scroll-behavior: smooth;
+        }
+        .family-nav { padding: 0 22px; }
+        .family-nav button {
+          flex-direction: row !important;
+          justify-content: center;
+          gap: 7px !important;
+          padding: 14px 10px !important;
+          margin: 7px 3px;
+          border-radius: 12px !important;
+          transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+        }
+        .family-nav button:hover { background: rgba(30,58,50,0.06) !important; }
+        .family-nav button:active { transform: scale(0.96); }
+        .family-nav-item.is-active {
+          background: rgba(30,58,50,0.1) !important;
+          box-shadow: inset 0 -2px #1E3A32;
+        }
+        .family-fab {
+          right: max(28px, calc((100% - 920px) / 2 + 12px)) !important;
+          bottom: 76px !important;
+          transition: transform 160ms ease, box-shadow 160ms ease;
+        }
+        .family-fab:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(217,164,65,0.48) !important; }
+        .family-sheet {
+          max-width: 720px;
+          margin: 0 auto;
+          border-radius: 22px 22px 0 0 !important;
+          box-shadow: 0 -14px 42px rgba(18,33,26,0.2);
+        }
+        button:focus-visible, input:focus-visible {
+          outline: 3px solid rgba(217,164,65,0.55);
+          outline-offset: 2px;
+        }
+
+        @media (max-width: 640px) {
+          .family-page {
+            padding: 0 !important;
+            align-items: stretch !important;
+            background: #F2EFE3 !important;
+          }
+          .family-app {
+            width: 100% !important;
+            height: 100dvh !important;
+            min-height: 100dvh !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+          }
+          .family-header {
+            padding: calc(16px + env(safe-area-inset-top)) 20px 18px !important;
+          }
+          .family-header::after { right: -134px; top: -204px; }
+          .family-title { font-size: 23px !important; }
+          .family-content {
+            width: 100%;
+            padding: 16px 16px 20px !important;
+          }
+          .family-nav { padding: 0 4px env(safe-area-inset-bottom) !important; }
+          .family-nav button {
+            flex-direction: column !important;
+            gap: 3px !important;
+            padding: 10px 0 11px !important;
+            margin: 3px 0;
+            border-radius: 10px !important;
+          }
+          .family-fab {
+            right: 18px !important;
+            bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+          }
+          .family-sheet { max-height: min(88dvh, 760px) !important; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)) !important; }
+        }
       `}</style>
 
-      <div style={{ width: 360, height: 720, background: "#F2EFE3", borderRadius: 36, border: "10px solid #1E3A32", overflow: "hidden", display: "flex", flexDirection: "column", position: "relative", boxShadow: "0 30px 60px rgba(0,0,0,0.4)" }}>
-        <div style={{ background: "#1E3A32", padding: "20px 20px 24px", flexShrink: 0 }}>
-          <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: "#B7C4BC", letterSpacing: 1 }}>
+      <div className="family-app" style={{ width: "min(1180px, 100%)", height: "min(900px, calc(100dvh - 48px))", background: "#F2EFE3", borderRadius: 28, border: "1px solid rgba(231, 226, 210, 0.22)", overflow: "hidden", display: "flex", flexDirection: "column", position: "relative", boxShadow: "0 30px 70px rgba(0,0,0,0.32)" }}>
+        <div className="family-header" style={{ background: "#1E3A32", padding: "22px 32px 24px", flexShrink: 0 }}>
+          <div className="family-eyebrow" style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: "#B7C4BC", letterSpacing: 1 }}>
             SISTEMA FAMILIAR
           </div>
-          <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 22, color: "#F2EFE3", marginTop: 2 }}>
+          <div className="family-title" style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 22, color: "#F2EFE3", marginTop: 2 }}>
             {tab === "hoje" && "Baralho de hoje"}
             {tab === "tarefas" && "Tarefas"}
             {tab === "agenda" && "Agenda"}
@@ -169,7 +280,7 @@ export default function App() {
           </div>
         </div>
 
-        <div style={{ flex: 1, overflowY: "auto", padding: 16, display: "flex", flexDirection: "column", gap: 16 }}>
+        <div className="family-content" style={{ flex: 1, overflowY: "auto", padding: "24px 28px 28px", display: "flex", flexDirection: "column", gap: 16 }}>
           {loading && (
             <div style={{ textAlign: "center", padding: 40, fontFamily: "'IBM Plex Sans', sans-serif", color: "#8A8571", fontSize: 13 }}>
               Carregando…
@@ -311,19 +422,19 @@ export default function App() {
         </div>
 
         {!loading && !loadError && (
-          <button onClick={openSheet} style={{ position: "absolute", right: 18, bottom: 90, width: 48, height: 48, borderRadius: "50%", background: "#D9A441", border: "none", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 16px rgba(217,164,65,0.5)", cursor: "pointer" }}>
+          <button className="family-fab" onClick={openSheet} style={{ position: "absolute", right: 28, bottom: 76, width: 48, height: 48, borderRadius: "50%", background: "#D9A441", border: "none", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 16px rgba(217,164,65,0.5)", cursor: "pointer" }}>
             <Plus size={22} color="#1E3A32" strokeWidth={2.5} />
           </button>
         )}
 
-        <div style={{ display: "flex", borderTop: "1px solid #E7E2D2", background: "#FFFFFF", flexShrink: 0 }}>
+        <div className="family-nav" style={{ display: "flex", borderTop: "1px solid #E7E2D2", background: "#FFFFFF", flexShrink: 0, padding: "0 22px" }}>
           {[
             { id: "hoje" as const, label: "Hoje", icon: Sun },
             { id: "tarefas" as const, label: "Tarefas", icon: ListChecks },
             { id: "agenda" as const, label: "Agenda", icon: CalendarDays },
             { id: "familia" as const, label: "Família", icon: Users },
           ].map(({ id, label, icon: Icon }) => (
-            <button key={id} onClick={() => setTab(id)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "10px 0 14px", background: "transparent", border: "none", cursor: "pointer", color: tab === id ? "#1E3A32" : "#A6A08D" }}>
+            <button key={id} className={`family-nav-item${tab === id ? " is-active" : ""}`} aria-current={tab === id ? "page" : undefined} onClick={() => setTab(id)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "10px 0 14px", background: "transparent", border: "none", cursor: "pointer", color: tab === id ? "#1E3A32" : "#A6A08D" }}>
               <Icon size={19} strokeWidth={tab === id ? 2.4 : 2} />
               <span style={{ fontFamily: "'IBM Plex Sans', sans-serif", fontSize: 10.5, fontWeight: 600 }}>{label}</span>
             </button>
@@ -331,8 +442,8 @@ export default function App() {
         </div>
 
         {sheetOpen && (
-          <div style={{ position: "absolute", inset: 0, background: "rgba(18,33,26,0.55)", display: "flex", alignItems: "flex-end" }}>
-            <div style={{ background: "#F2EFE3", width: "100%", borderRadius: "20px 20px 0 0", padding: 20, maxHeight: "90%", overflowY: "auto" }}>
+          <div className="family-sheet-overlay" style={{ position: "absolute", inset: 0, background: "rgba(18,33,26,0.55)", display: "flex", alignItems: "flex-end" }}>
+            <div className="family-sheet" style={{ background: "#F2EFE3", width: "100%", borderRadius: "22px 22px 0 0", padding: 20, maxHeight: "90%", overflowY: "auto" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                 <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 16, color: "#22281F" }}>
                   {sheetType === "task" ? "Nova tarefa" : "Novo compromisso"}
