@@ -12,10 +12,10 @@ export const colors = {
 };
 
 export const fonts = {
-  display: "'Space Grotesk', sans-serif",
-  body: "'IBM Plex Sans', sans-serif",
-  mono: "'IBM Plex Mono', monospace",
-};
+  display: "Manrope, sans-serif",
+  body: "Inter, sans-serif",
+  mono: '"JetBrains Mono", monospace',
+} as const;
 
 export const muiTheme = createTheme({
   palette: {
