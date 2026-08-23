@@ -8,7 +8,7 @@ export function EventCard({ ev, membersById }: { ev: FamilyEvent; membersById: R
     <Paper variant="outlined" sx={{ display: "flex", gap: 1.5, p: 1.5, borderRadius: 3 }}>
       <Stack sx={{ minWidth: 46, alignItems: "center", justifyContent: "center" }}>
         <Clock size={13} color="#8A8571" />
-        <Typography sx={{ mt: 0.25, fontFamily: "'IBM Plex Mono', monospace", fontSize: 12.5, fontWeight: 500 }}>
+        <Typography sx={{ mt: 0.25, fontSize: 12.5, fontWeight: 500 }}>
           {ev.time}
         </Typography>
       </Stack>

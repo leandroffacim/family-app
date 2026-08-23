@@ -11,8 +11,8 @@ export function TaskDefinitionRow({ task, membersById }: { task: Task; membersBy
           {task.name}
         </Typography>
         <Stack direction="row" spacing={0.75} sx={{ mt: 0.25, alignItems: "center" }}>
-          <Chip label={freqLabel(task.freq)} size="small" sx={{ height: 20, fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, bgcolor: "#F2EFE3", color: "text.secondary" }} />
-          <Typography sx={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: "text.secondary" }}>
+          <Chip label={freqLabel(task.freq)} size="small" sx={{ height: 20, fontSize: 10.5, bgcolor: "#F2EFE3", color: "text.secondary" }} />
+          <Typography sx={{  fontSize: 10.5, color: "text.secondary" }}>
             {"●".repeat(task.weight)}
             {"○".repeat(3 - task.weight)}
           </Typography>

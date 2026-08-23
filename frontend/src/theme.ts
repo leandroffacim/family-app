@@ -34,7 +34,7 @@ export const muiTheme = createTheme({
     h3: { fontFamily: fonts.display, fontWeight: 700 },
     button: { fontWeight: 700, textTransform: "none" },
   },
-  shape: { borderRadius: 12 },
+  shape: { borderRadius: 2 },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
@@ -62,7 +62,12 @@ export const muiTheme = createTheme({
       styleOverrides: { root: { borderRadius: 10, textTransform: "none" } },
     },
     MuiPaper: {
-      styleOverrides: { root: { boxShadow: "0 8px 20px rgba(30,58,50,0.06)" } },
+      styleOverrides: {
+        root: ({theme}) => ({
+          boxShadow: "0 8px 20px rgba(30,58,50,0.06)",
+          borderRadius: theme.shape.borderRadius,
+        }),
+      },
     },
   },
 });

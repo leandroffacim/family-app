@@ -286,7 +286,6 @@ export default function App() {
                 zIndex: 1,
                 color: "#B7C4BC",
                 opacity: 0.9,
-                fontFamily: "'IBM Plex Mono', monospace",
                 fontSize: 11,
                 letterSpacing: 1,
               }}
@@ -371,11 +370,7 @@ export default function App() {
                     <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                       Baralho de hoje
                     </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ fontFamily: "'IBM Plex Mono', monospace" }}
-                    >
+                    <Typography variant="caption" color="text.secondary">
                       {deckQueue.length} restantes
                     </Typography>
                   </Stack>
@@ -445,7 +440,7 @@ export default function App() {
                 <Stack spacing={2}>
                   <Paper
                     variant="outlined"
-                    sx={{ p: { xs: 1.25, sm: 1.5 }, borderRadius: 4 }}
+                    sx={{ p: { xs: 1.25, sm: 1.5, borderRadius: 8 } }}
                   >
                     <Stack
                       direction="row"
@@ -469,7 +464,6 @@ export default function App() {
                           color="text.secondary"
                           sx={{
                             display: "block",
-                            fontFamily: "'IBM Plex Mono', monospace",
                             fontSize: 10,
                             lineHeight: 1.1,
                             letterSpacing: 0.7,
@@ -569,7 +563,6 @@ export default function App() {
                             <Typography
                               component="span"
                               sx={{
-                                fontFamily: "'IBM Plex Mono', monospace",
                                 fontSize: 10,
                                 opacity: 0.72,
                                 letterSpacing: 0.4,
@@ -581,7 +574,6 @@ export default function App() {
                               component="span"
                               sx={{
                                 mt: 0.5,
-                                fontFamily: "'Space Grotesk', sans-serif",
                                 fontSize: 20,
                                 lineHeight: 1,
                               }}
@@ -841,7 +833,6 @@ export default function App() {
                         key={day}
                         value={index}
                         sx={{
-                          fontFamily: "'IBM Plex Mono', monospace",
                           fontSize: 11,
                         }}
                       >
@@ -878,7 +869,6 @@ export default function App() {
                       key={weight}
                       value={weight}
                       sx={{
-                        fontFamily: "'IBM Plex Mono', monospace",
                         "&.Mui-selected": {
                           bgcolor: "rgba(217,164,65,0.18)",
                           borderColor: "secondary.main",
@@ -925,7 +915,6 @@ export default function App() {
                       key={day}
                       value={index}
                       sx={{
-                        fontFamily: "'IBM Plex Mono', monospace",
                         fontSize: 11,
                       }}
                     >

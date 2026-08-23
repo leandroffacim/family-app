@@ -166,7 +166,6 @@ export function TaskCardDeck({
               size="small"
               sx={{
                 height: 22,
-                fontFamily: "'IBM Plex Mono', monospace",
                 fontSize: 10.5,
                 bgcolor: "#F2EFE3",
                 color: "text.secondary",
@@ -174,7 +173,6 @@ export function TaskCardDeck({
             />
             <Typography
               sx={{
-                fontFamily: "'IBM Plex Mono', monospace",
                 fontSize: 10.5,
                 color: "text.secondary",
                 alignSelf: "center",
@@ -216,7 +214,6 @@ export function TaskCardDeck({
               position: "absolute",
               top: 2.75,
               right: 2.25,
-              fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 800,
               fontSize: 22,
               color: "#6B8F71",
@@ -235,7 +232,6 @@ export function TaskCardDeck({
               position: "absolute",
               top: 2.75,
               left: 2.25,
-              fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 800,
               fontSize: 22,
               color: "#8A8571",
@@ -255,7 +251,6 @@ export function TaskCardDeck({
               bottom: 2.75,
               left: "50%",
               transform: "translateX(-50%)",
-              fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 800,
               fontSize: 20,
               color: "#D9A441",

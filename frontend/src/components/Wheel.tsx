@@ -10,7 +10,8 @@ export function Wheel({ task, members }: { task: Task; members: Member[] }) {
   const radius = 72;
   const center = 84;
   const segAngle = 360 / members.length;
-  const currentId = task.rotationOrder[task.currentIndex % task.rotationOrder.length];
+  const currentId =
+    task.rotationOrder[task.currentIndex % task.rotationOrder.length];
   const current = members.find((m) => m.id === currentId);
 
   const segments = members.map((m, i) => {
@@ -38,7 +39,6 @@ export function Wheel({ task, members }: { task: Task; members: Member[] }) {
           x={lx}
           y={ly}
           fill="#F2EFE3"
-          fontFamily="'Space Grotesk', sans-serif"
           fontWeight="700"
           fontSize="13"
           textAnchor="middle"
@@ -51,19 +51,45 @@ export function Wheel({ task, members }: { task: Task; members: Member[] }) {
   });
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 1,
+      }}
+    >
       <Box sx={{ position: "relative", width: center * 2, height: center * 2 }}>
         <svg width={center * 2} height={center * 2}>
           {segments}
-          <circle cx={center} cy={center} r="20" fill="#F2EFE3" stroke="#1E3A32" strokeWidth="2" />
+          <circle
+            cx={center}
+            cy={center}
+            r="20"
+            fill="#F2EFE3"
+            stroke="#1E3A32"
+            strokeWidth="2"
+          />
         </svg>
-        <Box sx={{ position: "absolute", top: -0.75, left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "7px solid transparent", borderRight: "7px solid transparent", borderTop: "12px solid #22281F" }} />
+        <Box
+          sx={{
+            position: "absolute",
+            top: -0.75,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: 0,
+            height: 0,
+            borderLeft: "7px solid transparent",
+            borderRight: "7px solid transparent",
+            borderTop: "12px solid #22281F",
+          }}
+        />
       </Box>
       <Box sx={{ textAlign: "center" }}>
-        <Typography sx={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: "#6B7268", letterSpacing: 1 }}>
+        <Typography sx={{ fontSize: 11, color: "#6B7268", letterSpacing: 1 }}>
           RODÍZIO · {task.name.toUpperCase()}
         </Typography>
-        <Typography sx={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 15, color: "#22281F" }}>
+        <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#22281F" }}>
           Vez de {current?.name ?? "?"}
         </Typography>
       </Box>

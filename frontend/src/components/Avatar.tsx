@@ -14,7 +14,6 @@ export function Avatar({ member, size = 32 }: { member?: Member; size?: number }
         height: size,
         bgcolor: member.color,
         color: "#F2EFE3",
-        fontFamily: "'Space Grotesk', sans-serif",
         fontWeight: 600,
         fontSize: size * 0.42,
         flexShrink: 0,
