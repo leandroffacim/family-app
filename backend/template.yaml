@@ -118,6 +118,29 @@ Resources:
         Target: es2022
         EntryPoints: [decideTask.ts]
 
+  UndoDecisionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: UNDO-DECISION
+      CodeUri: src/handlers/deck/
+      Handler: undoDecision.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FamilyTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /families/{familyId}/deck/{taskId}/undo
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [undoDecision.ts]
+
   # ---------- Tarefas (definição / gestão) ----------
 
   ListTasksFunction:

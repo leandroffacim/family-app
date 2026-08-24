@@ -47,6 +47,11 @@ export const api = {
       body: JSON.stringify({ action }),
     }),
 
+  undo: (taskId: string) =>
+    request<{ status: string; assignee?: string }>(`/deck/${taskId}/undo`, {
+      method: "POST",
+    }),
+
   listTasks: () => request<{ items: Task[] }>("/tasks"),
 
   createTask: (payload: NewTaskPayload) =>

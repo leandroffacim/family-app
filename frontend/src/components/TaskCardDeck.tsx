@@ -50,18 +50,29 @@ export function TaskCardDeck({
       y: e.clientY - startRef.current.y,
     });
   };
-  const finishDrag = () => {
+  // Solta a captura do ponteiro e conclui o gesto. `commit=false` é usado
+  // pelo pointercancel (gesto interrompido pelo navegador/SO) — nesse caso
+  // a carta sempre volta pro centro, nunca "completa" o swipe sozinha, que
+  // era o que deixava o comportamento imprevisível ao arrastar.
+  const endDrag = (e: React.PointerEvent, commit: boolean) => {
     if (!dragging || exit) return;
+    try {
+      (e.currentTarget as Element).releasePointerCapture(e.pointerId);
+    } catch {
+      // ignora se a captura já não existir mais
+    }
     setDragging(false);
     const { x, y } = drag;
-    if (y < -90 && Math.abs(y) > Math.abs(x)) {
+    if (commit && y < -90 && Math.abs(y) > Math.abs(x)) {
       triggerExit("defer");
-    } else if (Math.abs(x) > 100) {
+    } else if (commit && Math.abs(x) > 100) {
       triggerExit(x > 0 ? "done" : "pass");
     } else {
       setDrag({ x: 0, y: 0 });
     }
   };
+  const onPointerUp = (e: React.PointerEvent) => endDrag(e, true);
+  const onPointerCancel = (e: React.PointerEvent) => endDrag(e, false);
 
   const triggerExit = (action: Action) => {
     setExit(action);
@@ -113,7 +124,8 @@ export function TaskCardDeck({
 
   const tx = dir === "right" ? 420 : dir === "left" ? -420 : drag.x;
   const ty = dir === "up" ? -640 : drag.y;
-  const rot = dir === "right" ? 22 : dir === "left" ? -22 : drag.x / 18;
+  const rot =
+    dir === "right" ? 22 : dir === "left" ? -22 : dir === "up" ? 0 : drag.x / 18;
   const cardOpacity = exit ? 0 : 1;
   const transition = exit
     ? "transform 240ms ease-in, opacity 240ms ease-in"
@@ -136,8 +148,8 @@ export function TaskCardDeck({
           variant="outlined"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
-          onPointerUp={finishDrag}
-          onPointerCancel={finishDrag}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
           sx={{
             position: "absolute",
             inset: 0,

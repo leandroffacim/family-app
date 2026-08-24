@@ -11,6 +11,7 @@ import {
   FormLabel,
   IconButton,
   Paper,
+  Snackbar,
   Stack,
   TextField,
   ToggleButton,
@@ -72,6 +73,11 @@ export default function App() {
   const [members, setMembers] = useState<Member[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [deckQueue, setDeckQueue] = useState<TaskInstance[]>([]);
+  const [lastDecision, setLastDecision] = useState<{
+    taskId: string;
+    name: string;
+  } | null>(null);
+  const [undoing, setUndoing] = useState(false);
   const [events, setEvents] = useState<FamilyEvent[]>([]);
   const [tab, setTab] = useState<Tab>("hoje");
   const [weekAnchor, setWeekAnchor] = useState(todayISO);
@@ -140,16 +146,44 @@ export default function App() {
     action: "done" | "pass" | "defer",
   ) => {
     setActionError(null);
+    const decided = deckQueue.find((item) => item.taskId === taskId);
     try {
       await api.decide(taskId, action);
       setDeckQueue((queue) => queue.filter((item) => item.taskId !== taskId));
       if (action === "pass") setTasks((await api.listTasks()).items);
+      // guarda a última decisão pra permitir "Desfazer" na hora, sem
+      // precisar esperar o baralho de amanhã recriar a tarefa
+      setLastDecision(decided ? { taskId, name: decided.name } : null);
     } catch (error) {
       setActionError(
         error instanceof Error
           ? error.message
           : "Não foi possível registrar a decisão",
       );
+    }
+  };
+
+  const handleUndo = async () => {
+    if (!lastDecision) return;
+    setUndoing(true);
+    setActionError(null);
+    try {
+      await api.undo(lastDecision.taskId);
+      const [deckRes, tasksRes] = await Promise.all([
+        api.getDeck(),
+        api.listTasks(),
+      ]);
+      setDeckQueue(deckRes.items);
+      setTasks(tasksRes.items);
+      setLastDecision(null);
+    } catch (error) {
+      setActionError(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível desfazer a decisão",
+      );
+    } finally {
+      setUndoing(false);
     }
   };
 
@@ -976,6 +1010,26 @@ export default function App() {
           )}
         </Stack>
       </Drawer>
+
+      <Snackbar
+        open={!!lastDecision}
+        onClose={() => setLastDecision(null)}
+        autoHideDuration={8000}
+        message={
+          lastDecision ? `"${lastDecision.name}" saiu do baralho` : ""
+        }
+        action={
+          <Button
+            color="inherit"
+            size="small"
+            disabled={undoing}
+            onClick={handleUndo}
+          >
+            Desfazer
+          </Button>
+        }
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
     </Box>
   );
 }

@@ -78,14 +78,18 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             Update: {
               TableName: TABLE_NAME,
               Key: { PK: pk, SK: instanceSK(date, taskId) },
+              // guarda previousAssignee/previousIndex para permitir desfazer
+              // (undoDecision.ts) sem precisar recalcular o rodízio ao contrário
               UpdateExpression:
-                "SET #s = :passed, assignee = :next, GSI1PK = :gsi1pk, GSI1SK = :date",
+                "SET #s = :passed, assignee = :next, GSI1PK = :gsi1pk, GSI1SK = :date, previousAssignee = :prevAssignee, previousIndex = :prevIndex",
               ExpressionAttributeNames: { "#s": "status" },
               ExpressionAttributeValues: {
                 ":passed": "passed",
                 ":next": nextAssignee,
                 ":gsi1pk": gsi1pkMember(familyId, nextAssignee),
                 ":date": date,
+                ":prevAssignee": task.Item.rotationOrder[task.Item.currentIndex],
+                ":prevIndex": task.Item.currentIndex,
               },
               ConditionExpression: "attribute_exists(PK)",
             },
