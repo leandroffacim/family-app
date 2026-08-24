@@ -14,24 +14,30 @@
 // e, se quiser, troque depois pelo próprio Cognito.
 
 import {
-  CognitoIdentityProviderClient,
   AdminCreateUserCommand,
   AdminSetUserPasswordCommand,
+  CognitoIdentityProviderClient,
 } from "@aws-sdk/client-cognito-identity-provider";
 
-const USER_POOL_ID = process.env.USER_POOL_ID;
+const USER_POOL_ID = process.env.USER_POOL_ID || "us-east-1_AphfqQmaR";
 const [, , email, memberId, password] = process.argv;
 
 if (!USER_POOL_ID) {
-  console.error("Defina USER_POOL_ID antes de rodar (veja o output do `sam deploy`).");
+  console.error(
+    "Defina USER_POOL_ID antes de rodar (veja o output do `sam deploy`).",
+  );
   process.exit(1);
 }
 if (!email || !memberId || !password) {
-  console.error("Uso: npm run create-user -- <email> <memberId> <senha-inicial>");
+  console.error(
+    "Uso: npm run create-user -- <email> <memberId> <senha-inicial>",
+  );
   process.exit(1);
 }
 if (password.length < 8) {
-  console.error("A senha precisa ter pelo menos 8 caracteres (política do User Pool).");
+  console.error(
+    "A senha precisa ter pelo menos 8 caracteres (política do User Pool).",
+  );
   process.exit(1);
 }
 
@@ -49,7 +55,7 @@ async function main() {
       ],
       MessageAction: "SUPPRESS",
       TemporaryPassword: password,
-    })
+    }),
   );
 
   await cognito.send(
@@ -58,10 +64,12 @@ async function main() {
       Username: email,
       Password: password,
       Permanent: true,
-    })
+    }),
   );
 
-  console.log(`Conta criada para ${email} (memberId=${memberId}). Já pode logar no app com essa senha.`);
+  console.log(
+    `Conta criada para ${email} (memberId=${memberId}). Já pode logar no app com essa senha.`,
+  );
 }
 
 main().catch((e) => {
