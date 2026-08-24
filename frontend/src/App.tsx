@@ -30,8 +30,10 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "./api/client";
+import { useAuth } from "./auth/AuthContext";
 import { Avatar } from "./components/Avatar";
 import { EventCard } from "./components/EventCard";
+import { LoginScreen } from "./components/LoginScreen";
 import { TaskCardDeck } from "./components/TaskCardDeck";
 import { TaskDefinitionRow } from "./components/TaskDefinitionRow";
 import { Wheel } from "./components/Wheel";
@@ -67,6 +69,7 @@ const frequencyOptions: { id: TaskFrequency; label: string }[] = [
 ];
 
 export default function App() {
+  const { status, memberId, logout } = useAuth();
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -138,8 +141,8 @@ export default function App() {
   }
 
   useEffect(() => {
-    loadAll();
-  }, []);
+    if (status === "authenticated") loadAll();
+  }, [status]);
 
   const handleDeckDecide = async (
     taskId: string,
@@ -257,6 +260,26 @@ export default function App() {
     new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "short" }).format(
       new Date(`${date}T12:00:00`),
     );
+
+  if (status === "loading") {
+    return (
+      <Box
+        sx={{
+          minHeight: "100dvh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "primary.main",
+        }}
+      >
+        <CircularProgress sx={{ color: "#F2EFE3" }} />
+      </Box>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return <LoginScreen />;
+  }
 
   return (
     <Box
@@ -706,10 +729,31 @@ export default function App() {
                         <Avatar member={member} size={34} />
                         <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
                           {member.name}
+                          {member.id === memberId && (
+                            <Typography
+                              component="span"
+                              sx={{
+                                fontWeight: 500,
+                                fontSize: 12.5,
+                                color: "text.secondary",
+                              }}
+                            >
+                              {" "}
+                              (você)
+                            </Typography>
+                          )}
                         </Typography>
                       </Paper>
                     ))}
                   </Stack>
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    onClick={logout}
+                    sx={{ alignSelf: "flex-start" }}
+                  >
+                    Sair
+                  </Button>
                 </Stack>
               )}
             </>

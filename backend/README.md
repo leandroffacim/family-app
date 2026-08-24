@@ -26,6 +26,7 @@ src/
     jobs/generateDailyDeck.ts # EventBridge (cron diário, 03:00 -03:00)
   streams/onInstanceChange.ts # DynamoDB Streams -> SNS
 scripts/seed.ts              # popula membros + tarefas de exemplo
+scripts/createUser.ts        # cria a conta de login (Cognito) de um membro
 ```
 
 ## Modelo de dados (DynamoDB, single-table)
@@ -95,18 +96,41 @@ aws sns subscribe --topic-arn <TopicArn-do-output> --protocol email --notificati
 
 ## Segurança / próximos passos
 
-- **Sem autenticação nesta versão.** A API fica aberta (com CORS
-  liberado) — ok pra testar, mas antes de expor a URL de verdade pra
-  família usar, adicione um authorizer (Cognito) ou pelo menos uma
-  API key + usage plan no `template.yaml`.
+- **Autenticação via Cognito.** A API inteira exige um `idToken` válido
+  do User Pool (`Authorization: Bearer <idToken>`) — ver seção
+  "Autenticação (Cognito)" abaixo. Não tem self sign-up: só quem roda
+  `npm run create-user` consegue criar conta.
 - Rate limit / usage plan: nenhum configurado ainda.
 - O streak da família (`METADATA.streak`) existe no modelo mas ainda
   não é atualizado por nenhuma função — é o próximo pedaço de lógica
   a implementar (provavelmente na própria `onInstanceChange` ou num
   job que roda quando o baralho zera).
+- A senha criada por `create-user` já sai permanente (sem forçar
+  troca no primeiro login), pra manter o fluxo simples. Se quiser
+  forçar troca de senha ou um "esqueci minha senha", isso ainda não
+  está implementado no frontend.
+
+## Autenticação (Cognito)
+
+Cada membro da família precisa de uma conta pra logar — não existe
+cadastro pelo próprio app. Depois do `sam deploy`, com o `UserPoolId`
+do output:
+
+```bash
+export USER_POOL_ID=<valor do output UserPoolId>
+npm run create-user -- ana@familia.com ana "umaSenh4Boa"
+```
+
+O terceiro argumento (`ana` acima) precisa ser o mesmo `id` do membro
+em `MEMBER#{id}` (o que você usou no seed ou criou depois) — é isso
+que liga a conta do Cognito ao membro certo. Esse vínculo vai no
+token como `custom:memberId`, e o frontend usa ele pra saber quem
+está logado.
 
 ## Conectando o frontend
 
 O protótipo React do baralho (artifact separado) espera consumir uma
 API assim. Aponte as chamadas pra `ApiUrl` do output do stack,
-usando `familyId` = valor de `FamilyId` do deploy.
+usando `familyId` = valor de `FamilyId` do deploy, e configure
+`VITE_COGNITO_USER_POOL_ID` / `VITE_COGNITO_CLIENT_ID` com os outputs
+`UserPoolId` / `UserPoolClientId` (ver `frontend/.env.example`).

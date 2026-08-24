@@ -7,12 +7,14 @@
     "build": "sam build",
     "deploy": "sam deploy --guided",
     "typecheck": "tsc --noEmit",
-    "seed": "ts-node scripts/seed.ts"
+    "seed": "ts-node scripts/seed.ts",
+    "create-user": "ts-node scripts/createUser.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.600.0",
     "@aws-sdk/lib-dynamodb": "^3.600.0",
     "@aws-sdk/client-sns": "^3.600.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.600.0",
     "@aws-sdk/util-dynamodb": "^3.600.0",
     "zod": "^3.23.8",
     "ulid": "^2.3.0"

@@ -66,9 +66,63 @@ Resources:
       StageName: prod
       Cors:
         AllowMethods: "'GET,POST,OPTIONS'"
-        AllowHeaders: "'Content-Type'"
+        AllowHeaders: "'Content-Type,Authorization'"
         AllowOrigin: "'*'"
-      # Sem autenticação nesta versão — ver README ("Segurança / próximos passos").
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt FamilyUserPool.Arn
+
+  FamilyUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: sistema-familiar-users
+      # Só admin cria conta (via script scripts/createUser.ts) — sem
+      # self sign-up, é uma família fechada.
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Required: true
+          Mutable: true
+        # Liga a conta do Cognito a um Member específico (id do
+        # MEMBER#{memberId} na tabela) — vem no idToken como
+        # custom:memberId depois do login.
+        - Name: memberId
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireUppercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+
+  FamilyUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: sistema-familiar-web
+      UserPoolId: !Ref FamilyUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      PreventUserExistenceErrors: ENABLED
+      AccessTokenValidity: 12
+      IdTokenValidity: 12
+      RefreshTokenValidity: 30
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
 
   # ---------- Baralho / tarefas do dia ----------
 
@@ -323,3 +377,9 @@ Outputs:
     Value: !Ref FamilyTable
   TopicArn:
     Value: !Ref TaskEventsTopic
+  UserPoolId:
+    Description: Id do User Pool (usar em scripts/createUser.ts e no VITE_COGNITO_USER_POOL_ID do frontend)
+    Value: !Ref FamilyUserPool
+  UserPoolClientId:
+    Description: Id do App Client (VITE_COGNITO_CLIENT_ID do frontend)
+    Value: !Ref FamilyUserPoolClient

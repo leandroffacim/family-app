@@ -1,4 +1,5 @@
 import { Member, Task, TaskInstance, FamilyEvent, TaskFrequency, TaskWeight } from "../types";
+import { getToken, notifyUnauthorized } from "../auth/tokenStore";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const FAMILY_ID = import.meta.env.VITE_FAMILY_ID;
@@ -9,10 +10,18 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
       "VITE_API_URL / VITE_FAMILY_ID não configurados — copie .env.example para .env e preencha."
     );
   }
+  const token = getToken();
   const res = await fetch(`${API_URL}/families/${FAMILY_ID}${path}`, {
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     ...options,
   });
+  if (res.status === 401) {
+    notifyUnauthorized();
+    throw new Error("Sessão expirada — faça login de novo.");
+  }
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(`API ${res.status}: ${text || res.statusText}`);
