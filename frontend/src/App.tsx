@@ -303,7 +303,7 @@ export default function App() {
                 letterSpacing: -0.6,
               }}
             >
-              {tab === "hoje" && "Baralho de hoje"}
+              {tab === "hoje" && "Hoje em casa"}
               {tab === "tarefas" && "Tarefas"}
               {tab === "agenda" && "Agenda"}
               {tab === "familia" && "Família"}
@@ -368,7 +368,7 @@ export default function App() {
                     }}
                   >
                     <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                      Baralho de hoje
+                      Hoje em casa
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {deckQueue.length} restantes
@@ -692,7 +692,7 @@ export default function App() {
             sx={{
               position: "absolute",
               right: {
-                xs: 2.25,
+                xs: 8,
                 sm: "max(28px, calc((100% - 920px) / 2 + 12px))",
               },
               bottom: {
