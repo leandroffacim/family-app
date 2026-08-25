@@ -1,4 +1,4 @@
-import { Member, Task, TaskInstance, FamilyEvent, TaskFrequency, TaskWeight } from "../types";
+import { Member, Task, TaskInstance, FamilyEvent, TaskFrequency, TaskWeight, Family } from "../types";
 import { getToken, notifyUnauthorized } from "../auth/tokenStore";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -47,6 +47,8 @@ export interface NewEventPayload {
 }
 
 export const api = {
+  getFamily: () => request<Family>(""),
+
   getDeck: (date?: string) =>
     request<{ date: string; items: TaskInstance[] }>(`/deck${date ? `?date=${date}` : ""}`),
 

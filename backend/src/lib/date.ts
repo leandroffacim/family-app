@@ -16,3 +16,9 @@ export function weekdayIndex(dateISO: string): number {
 export function dayOfMonthOf(dateISO: string): number {
   return Number(dateISO.slice(8, 10));
 }
+
+export function shiftISO(dateISO: string, days: number): string {
+  const shifted = new Date(`${dateISO}T12:00:00Z`);
+  shifted.setUTCDate(shifted.getUTCDate() + days);
+  return shifted.toISOString().slice(0, 10);
+}

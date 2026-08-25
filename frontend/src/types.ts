@@ -37,3 +37,8 @@ export interface FamilyEvent {
   members: string[];
   location?: string;
 }
+
+export interface Family {
+  name: string;
+  streak: number;
+}

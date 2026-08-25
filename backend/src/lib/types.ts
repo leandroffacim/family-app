@@ -37,3 +37,11 @@ export interface FamilyEvent {
   members: string[];
   location?: string;
 }
+
+export interface FamilyMetadata {
+  name: string;
+  streak: number;
+  // último dia (YYYY-MM-DD) em que o streak foi recalculado — evita
+  // contar o mesmo dia duas vezes se o job diário rodar de novo
+  streakUpdatedDate?: string;
+}

@@ -5,6 +5,7 @@ import {
   BottomNavigationAction,
   Box,
   Button,
+  Chip,
   CircularProgress,
   Drawer,
   Fab,
@@ -22,6 +23,7 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  Flame,
   ListChecks,
   Plus,
   Sun,
@@ -45,6 +47,7 @@ import {
   weekDatesFor,
 } from "./lib/date";
 import {
+  Family,
   FamilyEvent,
   Member,
   Task,
@@ -76,6 +79,7 @@ export default function App() {
   const [members, setMembers] = useState<Member[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [deckQueue, setDeckQueue] = useState<TaskInstance[]>([]);
+  const [family, setFamily] = useState<Family | null>(null);
   const [lastDecision, setLastDecision] = useState<{
     taskId: string;
     name: string;
@@ -120,16 +124,18 @@ export default function App() {
     setLoading(true);
     setLoadError(null);
     try {
-      const [membersRes, tasksRes, deckRes, eventsRes] = await Promise.all([
+      const [membersRes, tasksRes, deckRes, eventsRes, familyRes] = await Promise.all([
         api.listMembers(),
         api.listTasks(),
         api.getDeck(),
         api.listEvents(),
+        api.getFamily(),
       ]);
       setMembers(membersRes.items);
       setTasks(tasksRes.items);
       setDeckQueue(deckRes.items);
       setEvents(eventsRes.items);
+      setFamily(familyRes);
       setNewEventMembers(membersRes.items.map((member) => member.id));
     } catch (error) {
       setLoadError(
@@ -421,12 +427,27 @@ export default function App() {
                     direction="row"
                     sx={{
                       justifyContent: "space-between",
-                      alignItems: "baseline",
+                      alignItems: "center",
                     }}
                   >
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                      Hoje em casa
-                    </Typography>
+                    <Stack direction="row" spacing={1} sx={{ alignItems: "baseline" }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                        Hoje em casa
+                      </Typography>
+                      {!!family && family.streak > 0 && (
+                        <Chip
+                          size="small"
+                          icon={<Flame size={14} />}
+                          label={`${family.streak} ${family.streak === 1 ? "dia" : "dias"}`}
+                          sx={{
+                            bgcolor: "secondary.main",
+                            color: "secondary.contrastText",
+                            fontWeight: 700,
+                            "& .MuiChip-icon": { color: "inherit" },
+                          }}
+                        />
+                      )}
+                    </Stack>
                     <Typography variant="caption" color="text.secondary">
                       {deckQueue.length} restantes
                     </Typography>

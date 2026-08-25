@@ -18,9 +18,11 @@ src/
   handlers/
     deck/getDeck.ts          # GET  /families/{id}/deck
     deck/decideTask.ts       # POST /families/{id}/deck/{taskId}/decide
+    deck/undoDecision.ts     # POST /families/{id}/deck/{taskId}/undo
     tasks/listTasks.ts       # GET  /families/{id}/tasks
     tasks/createTask.ts      # POST /families/{id}/tasks
     members/listMembers.ts   # GET  /families/{id}/members
+    family/getFamily.ts      # GET  /families/{id}  (nome + streak)
     events/listEvents.ts     # GET  /families/{id}/events
     events/createEvent.ts    # POST /families/{id}/events
     jobs/generateDailyDeck.ts # EventBridge (cron diário, 03:00 -03:00)
@@ -101,14 +103,20 @@ aws sns subscribe --topic-arn <TopicArn-do-output> --protocol email --notificati
   "Autenticação (Cognito)" abaixo. Não tem self sign-up: só quem roda
   `npm run create-user` consegue criar conta.
 - Rate limit / usage plan: nenhum configurado ainda.
-- O streak da família (`METADATA.streak`) existe no modelo mas ainda
-  não é atualizado por nenhuma função — é o próximo pedaço de lógica
-  a implementar (provavelmente na própria `onInstanceChange` ou num
-  job que roda quando o baralho zera).
 - A senha criada por `create-user` já sai permanente (sem forçar
   troca no primeiro login), pra manter o fluxo simples. Se quiser
   forçar troca de senha ou um "esqueci minha senha", isso ainda não
   está implementado no frontend.
+
+## Streak da família
+
+`GET /families/{familyId}` retorna `{ name, streak }`. O streak é
+recalculado todo dia pelo `GenerateDailyDeckFunction`, antes de criar
+o baralho do dia: ele olha as instâncias de ontem e soma +1 se
+nenhuma ficou `pending` (passar/adiar conta como "zerado", só ficar
+sem decidir quebra o streak). Um dia sem nenhuma tarefa devida não
+mexe no streak. `METADATA.streakUpdatedDate` evita recalcular 2x se
+o job rodar de novo no mesmo dia.
 
 ## Autenticação (Cognito)
 

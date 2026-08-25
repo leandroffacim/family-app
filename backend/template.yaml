@@ -244,6 +244,31 @@ Resources:
         Target: es2022
         EntryPoints: [createTask.ts]
 
+  # ---------- Família (metadata / streak) ----------
+
+  GetFamilyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: GET-FAMILY
+      CodeUri: src/handlers/family/
+      Handler: getFamily.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref FamilyTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /families/{familyId}
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [getFamily.ts]
+
   # ---------- Membros ----------
 
   ListMembersFunction:
