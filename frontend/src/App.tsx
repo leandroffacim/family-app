@@ -36,6 +36,7 @@ import { useAuth } from "./auth/AuthContext";
 import { Avatar } from "./components/Avatar";
 import { EventCard } from "./components/EventCard";
 import { LoginScreen } from "./components/LoginScreen";
+import { SetPasswordScreen } from "./components/SetPasswordScreen";
 import { TaskCardDeck } from "./components/TaskCardDeck";
 import { TaskDefinitionRow } from "./components/TaskDefinitionRow";
 import { Wheel } from "./components/Wheel";
@@ -285,6 +286,10 @@ export default function App() {
 
   if (status === "unauthenticated") {
     return <LoginScreen />;
+  }
+
+  if (status === "newPasswordRequired") {
+    return <SetPasswordScreen />;
   }
 
   return (

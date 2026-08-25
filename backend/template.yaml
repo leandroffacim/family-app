@@ -79,10 +79,17 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: sistema-familiar-users
-      # Só admin cria conta (via script scripts/createUser.ts) — sem
-      # self sign-up, é uma família fechada.
+      # Só admin cria conta (via script scripts/inviteUser.ts) — sem
+      # self sign-up, é uma família fechada. O Cognito manda o e-mail
+      # de convite sozinho (cota padrão ~50/dia, sem precisar de SES).
       AdminCreateUserConfig:
         AllowAdminCreateUserOnly: true
+        InviteMessageTemplate:
+          EmailSubject: "Seu convite pro Sistema Familiar"
+          EmailMessage: >-
+            Você foi convidado pro Sistema Familiar! Login: {username} —
+            senha temporária: {####}. Entre no app e escolha sua senha
+            definitiva no primeiro acesso.
       UsernameAttributes:
         - email
       AutoVerifiedAttributes:

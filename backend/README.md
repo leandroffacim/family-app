@@ -28,7 +28,8 @@ src/
     jobs/generateDailyDeck.ts # EventBridge (cron diário, 03:00 -03:00)
   streams/onInstanceChange.ts # DynamoDB Streams -> SNS
 scripts/seed.ts              # popula membros + tarefas de exemplo
-scripts/createUser.ts        # cria a conta de login (Cognito) de um membro
+scripts/createUser.ts        # cria login (Cognito) com senha definitiva na hora
+scripts/inviteUser.ts        # convida membro por e-mail (senha temporária)
 ```
 
 ## Modelo de dados (DynamoDB, single-table)
@@ -103,10 +104,11 @@ aws sns subscribe --topic-arn <TopicArn-do-output> --protocol email --notificati
   "Autenticação (Cognito)" abaixo. Não tem self sign-up: só quem roda
   `npm run create-user` consegue criar conta.
 - Rate limit / usage plan: nenhum configurado ainda.
-- A senha criada por `create-user` já sai permanente (sem forçar
-  troca no primeiro login), pra manter o fluxo simples. Se quiser
-  forçar troca de senha ou um "esqueci minha senha", isso ainda não
-  está implementado no frontend.
+- "Esqueci minha senha" ainda não está implementado — só a troca de
+  senha do primeiro acesso (convite). Se alguém esquecer a senha
+  definitiva, por enquanto o jeito é reenviar convite (o Cognito
+  aceita convidar de novo por cima de um usuário existente) ou usar
+  `create-user` pra forçar uma nova senha definitiva.
 
 ## Streak da família
 
@@ -122,18 +124,32 @@ o job rodar de novo no mesmo dia.
 
 Cada membro da família precisa de uma conta pra logar — não existe
 cadastro pelo próprio app. Depois do `sam deploy`, com o `UserPoolId`
-do output:
+do output, tem dois jeitos de criar a conta:
+
+**Convite por e-mail (recomendado)** — o Cognito gera a senha
+temporária e manda o convite sozinho:
+
+```bash
+export USER_POOL_ID=<valor do output UserPoolId>
+npm run invite-user -- ana@familia.com ana
+```
+
+A pessoa recebe o e-mail, loga com a senha temporária e o app pede
+pra ela escolher a senha definitiva na hora (tela "Escolha sua
+senha", primeiro acesso).
+
+**Senha definida na hora (alternativa, sem depender de e-mail)**:
 
 ```bash
 export USER_POOL_ID=<valor do output UserPoolId>
 npm run create-user -- ana@familia.com ana "umaSenh4Boa"
 ```
 
-O terceiro argumento (`ana` acima) precisa ser o mesmo `id` do membro
-em `MEMBER#{id}` (o que você usou no seed ou criou depois) — é isso
-que liga a conta do Cognito ao membro certo. Esse vínculo vai no
-token como `custom:memberId`, e o frontend usa ele pra saber quem
-está logado.
+Nos dois casos, o segundo argumento (`ana` acima) precisa ser o
+mesmo `id` do membro em `MEMBER#{id}` (o que você usou no seed ou
+criou depois) — é isso que liga a conta do Cognito ao membro certo.
+Esse vínculo vai no token como `custom:memberId`, e o frontend usa
+ele pra saber quem está logado.
 
 ## Conectando o frontend
 

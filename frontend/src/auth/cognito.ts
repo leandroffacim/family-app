@@ -42,25 +42,56 @@ export function restoreSession(): Promise<Session | null> {
   });
 }
 
-export function login(email: string, password: string): Promise<Session> {
+export type LoginResult =
+  | { status: "success"; session: Session }
+  | { status: "newPasswordRequired" };
+
+// Guarda o CognitoUser do login em andamento — o SDK exige chamar
+// completeNewPasswordChallenge na MESMA instância que recebeu o
+// desafio, não dá pra recriar um CognitoUser novo pra isso.
+let pendingNewPasswordUser: CognitoUser | null = null;
+
+export function login(email: string, password: string): Promise<LoginResult> {
   return new Promise((resolve, reject) => {
     const user = new CognitoUser({ Username: email, Pool: userPool });
     user.authenticateUser(
       new AuthenticationDetails({ Username: email, Password: password }),
       {
-        onSuccess: (session) => resolve(sessionFromCognito(session)),
+        onSuccess: (session) =>
+          resolve({ status: "success", session: sessionFromCognito(session) }),
         onFailure: (error) => reject(error),
-        newPasswordRequired: () =>
-          reject(
-            new Error(
-              "Essa conta precisa trocar a senha antes de continuar — fale com quem administra o app.",
-            ),
-          ),
+        // conta recém-convidada (scripts/inviteUser.ts) — senha
+        // temporária ainda não foi trocada pela definitiva
+        newPasswordRequired: () => {
+          pendingNewPasswordUser = user;
+          resolve({ status: "newPasswordRequired" });
+        },
+      },
+    );
+  });
+}
+
+export function completeNewPassword(newPassword: string): Promise<Session> {
+  return new Promise((resolve, reject) => {
+    if (!pendingNewPasswordUser) {
+      reject(new Error("Nenhum login pendente de troca de senha."));
+      return;
+    }
+    pendingNewPasswordUser.completeNewPasswordChallenge(
+      newPassword,
+      {},
+      {
+        onSuccess: (session) => {
+          pendingNewPasswordUser = null;
+          resolve(sessionFromCognito(session));
+        },
+        onFailure: (error) => reject(error),
       },
     );
   });
 }
 
 export function logout() {
+  pendingNewPasswordUser = null;
   userPool.getCurrentUser()?.signOut();
 }

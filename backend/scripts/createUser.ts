@@ -1,6 +1,10 @@
 // Cria a conta de login (Cognito) de um membro da família e vincula ela
-// ao MEMBER#{memberId} já existente na tabela via custom:memberId.
-// Só o admin roda esse script — não existe self sign-up no app.
+// ao MEMBER#{memberId} já existente na tabela via custom:memberId,
+// já com senha definitiva (sem depender de e-mail).
+//
+// Alternativa recomendada: scripts/inviteUser.ts, que deixa o Cognito
+// mandar um convite por e-mail com senha temporária — use este aqui
+// só se preferir combinar a senha por fora em vez de por e-mail.
 //
 // Uso:
 //   export USER_POOL_ID=<valor do output UserPoolId do sam deploy>

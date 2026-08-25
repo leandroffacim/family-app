@@ -9,7 +9,13 @@ import {
 import * as cognito from "./cognito";
 import { setToken, setUnauthorizedHandler } from "./tokenStore";
 
-type Status = "loading" | "authenticated" | "unauthenticated";
+type Status =
+  | "loading"
+  | "authenticated"
+  | "unauthenticated"
+  // login com senha temporária de convite (scripts/inviteUser.ts) —
+  // precisa definir a senha definitiva antes de continuar
+  | "newPasswordRequired";
 
 interface AuthContextValue {
   status: Status;
@@ -17,6 +23,7 @@ interface AuthContextValue {
   email: string | null;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
+  completeNewPassword: (newPassword: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -53,11 +60,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (loginEmail: string, password: string) => {
     setError(null);
     try {
-      const session = await cognito.login(loginEmail, password);
-      applySession(session);
+      const result = await cognito.login(loginEmail, password);
+      if (result.status === "newPasswordRequired") {
+        setStatus("newPasswordRequired");
+        return;
+      }
+      applySession(result.session);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Não foi possível entrar",
+      );
+      throw err;
+    }
+  };
+
+  const completeNewPassword = async (newPassword: string) => {
+    setError(null);
+    try {
+      const session = await cognito.completeNewPassword(newPassword);
+      applySession(session);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Não foi possível definir a senha",
       );
       throw err;
     }
@@ -69,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({ status, memberId, email, error, login, logout }),
+    () => ({ status, memberId, email, error, login, completeNewPassword, logout }),
     [status, memberId, email, error],
   );
 

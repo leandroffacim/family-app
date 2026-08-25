@@ -8,7 +8,8 @@
     "deploy": "sam deploy --guided",
     "typecheck": "tsc --noEmit",
     "seed": "ts-node scripts/seed.ts",
-    "create-user": "ts-node scripts/createUser.ts"
+    "create-user": "ts-node scripts/createUser.ts",
+    "invite-user": "ts-node scripts/inviteUser.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.600.0",
