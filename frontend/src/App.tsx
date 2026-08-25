@@ -57,7 +57,7 @@ import {
 } from "./types";
 
 type Tab = "hoje" | "tarefas" | "agenda" | "familia";
-type SheetType = "task" | "event";
+type SheetType = "task" | "event" | "invite";
 
 const tabItems = [
   { id: "hoje" as const, label: "Hoje", icon: Sun },
@@ -96,6 +96,10 @@ export default function App() {
   });
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetType, setSheetType] = useState<SheetType>("task");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteMemberId, setInviteMemberId] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [inviteSuccess, setInviteSuccess] = useState<string | null>(null);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskFreq, setNewTaskFreq] = useState<TaskFrequency>("DAILY");
   const [newTaskWeight, setNewTaskWeight] = useState<1 | 2 | 3>(1);
@@ -250,9 +254,32 @@ export default function App() {
   };
 
   const openSheet = () => {
-    setSheetType(tab === "agenda" ? "event" : "task");
+    setSheetType(tab === "agenda" ? "event" : tab === "familia" ? "invite" : "task");
     setNewEventDay(selectedDay);
+    setInviteEmail("");
+    setInviteMemberId(tab === "familia" ? (members[0]?.id ?? "") : inviteMemberId);
+    setActionError(null);
     setSheetOpen(true);
+  };
+
+  const handleInvite = async () => {
+    if (!inviteEmail.trim() || !inviteMemberId) return;
+    setInviting(true);
+    setActionError(null);
+    try {
+      await api.inviteMember({ email: inviteEmail.trim(), memberId: inviteMemberId });
+      const invitedName =
+        members.find((member) => member.id === inviteMemberId)?.name ?? "Membro";
+      setInviteSuccess(`Convite enviado pra ${invitedName}`);
+      setInviteEmail("");
+      setSheetOpen(false);
+    } catch (error) {
+      setActionError(
+        error instanceof Error ? error.message : "Não foi possível enviar o convite",
+      );
+    } finally {
+      setInviting(false);
+    }
   };
 
   const dayEvents = events
@@ -790,7 +817,11 @@ export default function App() {
           <Fab
             color="default"
             aria-label={
-              tab === "agenda" ? "Adicionar compromisso" : "Adicionar tarefa"
+              tab === "agenda"
+                ? "Adicionar compromisso"
+                : tab === "familia"
+                  ? "Convidar membro"
+                  : "Adicionar tarefa"
             }
             onClick={openSheet}
             sx={{
@@ -876,23 +907,29 @@ export default function App() {
             sx={{ justifyContent: "space-between", alignItems: "center" }}
           >
             <Typography variant="h6" sx={{ fontSize: 18 }}>
-              {sheetType === "task" ? "Nova tarefa" : "Novo compromisso"}
+              {sheetType === "task"
+                ? "Nova tarefa"
+                : sheetType === "event"
+                  ? "Novo compromisso"
+                  : "Convidar membro"}
             </Typography>
             <IconButton aria-label="Fechar" onClick={() => setSheetOpen(false)}>
               <X size={20} />
             </IconButton>
           </Stack>
-          <ToggleButtonGroup
-            exclusive
-            fullWidth
-            value={sheetType}
-            onChange={(_, nextType: SheetType | null) =>
-              nextType && setSheetType(nextType)
-            }
-          >
-            <ToggleButton value="task">Tarefa</ToggleButton>
-            <ToggleButton value="event">Compromisso</ToggleButton>
-          </ToggleButtonGroup>
+          {sheetType !== "invite" && (
+            <ToggleButtonGroup
+              exclusive
+              fullWidth
+              value={sheetType}
+              onChange={(_, nextType: SheetType | null) =>
+                nextType && setSheetType(nextType)
+              }
+            >
+              <ToggleButton value="task">Tarefa</ToggleButton>
+              <ToggleButton value="event">Compromisso</ToggleButton>
+            </ToggleButtonGroup>
+          )}
 
           {sheetType === "task" ? (
             <Stack spacing={2}>
@@ -995,7 +1032,7 @@ export default function App() {
                 Adicionar tarefa
               </Button>
             </Stack>
-          ) : (
+          ) : sheetType === "event" ? (
             <Stack spacing={2}>
               <TextField
                 label="Título"
@@ -1077,6 +1114,69 @@ export default function App() {
                 Adicionar compromisso
               </Button>
             </Stack>
+          ) : (
+            <Stack spacing={2}>
+              {actionError && (
+                <Alert severity="error" onClose={() => setActionError(null)}>
+                  {actionError}
+                </Alert>
+              )}
+              <Box>
+                <FormLabel component="legend">Quem é</FormLabel>
+                <ToggleButtonGroup
+                  exclusive
+                  value={inviteMemberId}
+                  onChange={(_, id: string | null) => id && setInviteMemberId(id)}
+                  sx={{
+                    mt: 0.75,
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 1,
+                    "& .MuiToggleButtonGroup-grouped": {
+                      border: "1px solid",
+                      borderColor: "divider",
+                      borderRadius: "999px !important",
+                      m: "0 !important",
+                      px: 1.25,
+                      py: 0.75,
+                    },
+                  }}
+                >
+                  {members.map((member) => (
+                    <ToggleButton
+                      key={member.id}
+                      value={member.id}
+                      sx={{ gap: 0.75 }}
+                    >
+                      <Avatar member={member} size={20} />
+                      {member.name}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Box>
+              <TextField
+                label="E-mail"
+                type="email"
+                value={inviteEmail}
+                onChange={(event) => setInviteEmail(event.target.value)}
+                placeholder="nome@exemplo.com"
+              />
+              <Typography variant="caption" color="text.secondary">
+                A pessoa recebe um e-mail com senha temporária e define a
+                senha definitiva no primeiro acesso.
+              </Typography>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={handleInvite}
+                disabled={inviting || !inviteEmail.trim() || !inviteMemberId}
+                startIcon={
+                  inviting ? <CircularProgress size={16} color="inherit" /> : undefined
+                }
+              >
+                Enviar convite
+              </Button>
+            </Stack>
           )}
         </Stack>
       </Drawer>
@@ -1098,6 +1198,14 @@ export default function App() {
             Desfazer
           </Button>
         }
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
+
+      <Snackbar
+        open={!!inviteSuccess}
+        onClose={() => setInviteSuccess(null)}
+        autoHideDuration={5000}
+        message={inviteSuccess ?? ""}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       />
     </Box>

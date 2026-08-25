@@ -301,6 +301,36 @@ Resources:
         Target: es2022
         EntryPoints: [listMembers.ts]
 
+  InviteMemberFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: INVITE-MEMBER
+      CodeUri: src/handlers/members/
+      Handler: inviteMember.handler
+      Environment:
+        Variables:
+          USER_POOL_ID: !Ref FamilyUserPool
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref FamilyTable
+        - Statement:
+            - Effect: Allow
+              Action: cognito-idp:AdminCreateUser
+              Resource: !GetAtt FamilyUserPool.Arn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /families/{familyId}/members/invite
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [inviteMember.ts]
+
   # ---------- Agenda ----------
 
   ListEventsFunction:

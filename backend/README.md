@@ -22,6 +22,7 @@ src/
     tasks/listTasks.ts       # GET  /families/{id}/tasks
     tasks/createTask.ts      # POST /families/{id}/tasks
     members/listMembers.ts   # GET  /families/{id}/members
+    members/inviteMember.ts  # POST /families/{id}/members/invite
     family/getFamily.ts      # GET  /families/{id}  (nome + streak)
     events/listEvents.ts     # GET  /families/{id}/events
     events/createEvent.ts    # POST /families/{id}/events
@@ -123,8 +124,9 @@ o job rodar de novo no mesmo dia.
 ## Autenticação (Cognito)
 
 Cada membro da família precisa de uma conta pra logar — não existe
-cadastro pelo próprio app. Depois do `sam deploy`, com o `UserPoolId`
-do output, tem dois jeitos de criar a conta:
+cadastro pelo próprio app. Depois do primeiro deploy (quando ainda
+não tem ninguém logado pra usar a tela), tem dois jeitos de criar a
+conta pelo terminal:
 
 **Convite por e-mail (recomendado)** — o Cognito gera a senha
 temporária e manda o convite sozinho:
@@ -148,6 +150,12 @@ npm run create-user -- ana@familia.com ana "umaSenh4Boa"
 Nos dois casos, o segundo argumento (`ana` acima) precisa ser o
 mesmo `id` do membro em `MEMBER#{id}` (o que você usou no seed ou
 criou depois) — é isso que liga a conta do Cognito ao membro certo.
+
+**Convidar pela tela** — depois que já tem pelo menos uma conta
+logando, dá pra convidar o resto direto pelo app: aba Família, botão
+"+", escolhe o membro e o e-mail. Por baixo é o mesmo fluxo do
+`invite-user` (POST `/families/{familyId}/members/invite`), só que
+qualquer membro logado pode usar — não tem conta admin separada.
 Esse vínculo vai no token como `custom:memberId`, e o frontend usa
 ele pra saber quem está logado.
 

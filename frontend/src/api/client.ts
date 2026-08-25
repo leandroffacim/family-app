@@ -70,6 +70,12 @@ export const api = {
 
   listMembers: () => request<{ items: Member[] }>("/members"),
 
+  inviteMember: (payload: { email: string; memberId: string }) =>
+    request<{ invited: boolean }>("/members/invite", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
   listEvents: (date?: string) =>
     request<{ items: FamilyEvent[] }>(`/events${date ? `?date=${date}` : ""}`),
 
