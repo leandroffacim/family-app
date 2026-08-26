@@ -5,6 +5,7 @@ import { ddb, TABLE_NAME } from "../../lib/dynamo";
 import { familyPK, taskSK, instanceSK, gsi1pkMember } from "../../lib/keys";
 import { ok, err } from "../../lib/response";
 import { todayISO } from "../../lib/date";
+import { getActingMember, UnlinkedAccountError } from "../../lib/auth";
 
 // POST /families/{familyId}/deck/{taskId}/decide   body: { "action": "done" | "pass" | "defer" }
 //
@@ -28,6 +29,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     return err(400, "body inválido: esperado { action: 'done' | 'pass' | 'defer' }");
   }
 
+  let acting;
+  try {
+    acting = getActingMember(event);
+  } catch (e) {
+    if (e instanceof UnlinkedAccountError) return err(403, e.message);
+    throw e;
+  }
+
   const date = todayISO();
   const pk = familyPK(familyId);
 
@@ -38,16 +47,19 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         new UpdateCommand({
           TableName: TABLE_NAME,
           Key: { PK: pk, SK: instanceSK(date, taskId) },
-          UpdateExpression: "SET #s = :status",
+          UpdateExpression: "SET #s = :status, completedBy = :completedBy",
           ExpressionAttributeNames: { "#s": "status" },
-          ExpressionAttributeValues: { ":status": newStatus },
+          ExpressionAttributeValues: {
+            ":status": newStatus,
+            ":completedBy": acting.memberId,
+          },
           ConditionExpression: "attribute_exists(PK)",
         })
       );
     } catch {
       return err(404, "Instância da tarefa não encontrada para hoje");
     }
-    return ok({ status: newStatus });
+    return ok({ status: newStatus, completedBy: acting.memberId });
   }
 
   // action === "pass"
@@ -81,7 +93,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
               // guarda previousAssignee/previousIndex para permitir desfazer
               // (undoDecision.ts) sem precisar recalcular o rodízio ao contrário
               UpdateExpression:
-                "SET #s = :passed, assignee = :next, GSI1PK = :gsi1pk, GSI1SK = :date, previousAssignee = :prevAssignee, previousIndex = :prevIndex",
+                "SET #s = :passed, assignee = :next, GSI1PK = :gsi1pk, GSI1SK = :date, previousAssignee = :prevAssignee, previousIndex = :prevIndex, passedBy = :passedBy",
               ExpressionAttributeNames: { "#s": "status" },
               ExpressionAttributeValues: {
                 ":passed": "passed",
@@ -90,6 +102,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 ":date": date,
                 ":prevAssignee": task.Item.rotationOrder[task.Item.currentIndex],
                 ":prevIndex": task.Item.currentIndex,
+                ":passedBy": acting.memberId,
               },
               ConditionExpression: "attribute_exists(PK)",
             },
@@ -101,5 +114,5 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     return err(409, "Não foi possível passar a tarefa (conflito ou instância inexistente)");
   }
 
-  return ok({ status: "passed", nextAssignee });
+  return ok({ status: "passed", nextAssignee, passedBy: acting.memberId });
 };

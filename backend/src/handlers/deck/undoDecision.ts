@@ -31,7 +31,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         new UpdateCommand({
           TableName: TABLE_NAME,
           Key: { PK: pk, SK: instanceSK(date, taskId) },
-          UpdateExpression: "SET #s = :pending",
+          UpdateExpression: "SET #s = :pending REMOVE completedBy",
           ExpressionAttributeNames: { "#s": "status" },
           ExpressionAttributeValues: { ":pending": "pending" },
           ConditionExpression: "attribute_exists(PK) AND #s <> :pending",
@@ -74,7 +74,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
               TableName: TABLE_NAME,
               Key: { PK: pk, SK: instanceSK(date, taskId) },
               UpdateExpression:
-                "SET #s = :pending, assignee = :prevAssignee, GSI1PK = :gsi1pk, GSI1SK = :date REMOVE previousAssignee, previousIndex",
+                "SET #s = :pending, assignee = :prevAssignee, GSI1PK = :gsi1pk, GSI1SK = :date REMOVE previousAssignee, previousIndex, passedBy",
               ExpressionAttributeNames: { "#s": "status" },
               ExpressionAttributeValues: {
                 ":pending": "pending",

@@ -27,6 +27,10 @@ export interface TaskInstance {
   weight: TaskWeight;
   assignee: string;
   status: InstanceStatus;
+  // memberId de quem de fato tomou a ação (vem do token, nunca do body) —
+  // pode ser diferente do assignee se outro membro ajudou/decidiu por ele.
+  completedBy?: string;
+  passedBy?: string;
 }
 
 export interface FamilyEvent {
