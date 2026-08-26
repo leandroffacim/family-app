@@ -138,10 +138,12 @@ T28 → T29 → T30 → T31
 - Skill: NONE
 
 **Done when**:
-- [ ] `assertFamilyAccess` lança `UnlinkedAccountError` quando falta `custom:memberId` OU `custom:familyId`
-- [ ] `assertFamilyAccess` lança `ForbiddenFamilyError` quando `custom:familyId` ≠ `familyId` recebido
-- [ ] `assertFamilyAccess` retorna `{ memberId, email, familyId }` quando tudo bate
-- [ ] Os 4 testes passam (Gate Quick)
+- [x] `assertFamilyAccess` lança `UnlinkedAccountError` quando falta `custom:memberId` OU `custom:familyId`
+- [x] `assertFamilyAccess` lança `ForbiddenFamilyError` quando `custom:familyId` ≠ `familyId` recebido
+- [x] `assertFamilyAccess` retorna `{ memberId, email, familyId }` quando tudo bate
+- [x] Os 4 testes passam (Gate Quick)
+
+**Status**: ✅ Complete
 
 ---
 

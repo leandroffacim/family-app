@@ -6,6 +6,7 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 export interface ActingMember {
   memberId: string;
   email: string;
+  familyId?: string;
 }
 
 export class UnlinkedAccountError extends Error {
@@ -15,10 +16,19 @@ export class UnlinkedAccountError extends Error {
   }
 }
 
+export class ForbiddenFamilyError extends Error {
+  constructor() {
+    super("Conta autenticada não pertence a esta família");
+    this.name = "ForbiddenFamilyError";
+  }
+}
+
+function readClaims(event: APIGatewayProxyEvent): Record<string, string> | undefined {
+  return event.requestContext.authorizer?.claims as Record<string, string> | undefined;
+}
+
 export function getActingMember(event: APIGatewayProxyEvent): ActingMember {
-  const claims = event.requestContext.authorizer?.claims as
-    | Record<string, string>
-    | undefined;
+  const claims = readClaims(event);
 
   const memberId = claims?.["custom:memberId"];
   const email = claims?.["email"] ?? "";
@@ -26,4 +36,19 @@ export function getActingMember(event: APIGatewayProxyEvent): ActingMember {
   if (!memberId) throw new UnlinkedAccountError();
 
   return { memberId, email };
+}
+
+// Confere que o familyId do path bate com o custom:familyId do token —
+// ponto único de checagem que fecha o IDOR de acesso entre famílias.
+export function assertFamilyAccess(event: APIGatewayProxyEvent, familyId: string): ActingMember {
+  const claims = readClaims(event);
+
+  const memberId = claims?.["custom:memberId"];
+  const tokenFamilyId = claims?.["custom:familyId"];
+  const email = claims?.["email"] ?? "";
+
+  if (!memberId || !tokenFamilyId) throw new UnlinkedAccountError();
+  if (tokenFamilyId !== familyId) throw new ForbiddenFamilyError();
+
+  return { memberId, email, familyId: tokenFamilyId };
 }
