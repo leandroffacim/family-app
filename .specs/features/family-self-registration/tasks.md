@@ -254,7 +254,9 @@ Cada task abaixo é independente das demais desta fase (arquivos diferentes); to
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] Mesmo critério do T6 aplicado a este endpoint
+- [x] Mesmo critério do T6 aplicado a este endpoint
+
+**Status**: ✅ Complete (mesma nota de verificação manual do T6 — confirmado por inspeção de código)
 
 ---
 
