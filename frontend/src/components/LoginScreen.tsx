@@ -47,7 +47,8 @@ export function LoginScreen({
         alignItems: "center",
         justifyContent: "center",
         p: 2.5,
-        background: "linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)",
+        background:
+          "linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)",
       }}
     >
       <Paper
@@ -84,7 +85,10 @@ export function LoginScreen({
           >
             <HeartHandshake size={28} />
           </Box>
-          <Typography variant="h5" sx={{ fontSize: 24, fontWeight: 800, color: "#0F172A" }}>
+          <Typography
+            variant="h5"
+            sx={{ fontSize: 24, fontWeight: 800, color: "#0F172A" }}
+          >
             Sistema Familiar
           </Typography>
           <Typography variant="body2" sx={{ color: "#64748B", fontSize: 14 }}>
@@ -92,7 +96,11 @@ export function LoginScreen({
           </Typography>
         </Stack>
 
-        {error && <Alert severity="error" sx={{ borderRadius: 3 }}>{error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ borderRadius: 3 }}>
+            {error}
+          </Alert>
+        )}
 
         <Stack spacing={2}>
           <TextField
@@ -104,7 +112,12 @@ export function LoginScreen({
             autoFocus
             slotProps={{
               input: {
-                startAdornment: <Mail size={18} style={{ marginRight: 8, color: "#94A3B8" }} />,
+                startAdornment: (
+                  <Mail
+                    size={18}
+                    style={{ marginRight: 8, color: "#94A3B8" }}
+                  />
+                ),
               },
             }}
           />
@@ -116,7 +129,12 @@ export function LoginScreen({
             onChange={(e) => setPassword(e.target.value)}
             slotProps={{
               input: {
-                startAdornment: <Lock size={18} style={{ marginRight: 8, color: "#94A3B8" }} />,
+                startAdornment: (
+                  <Lock
+                    size={18}
+                    style={{ marginRight: 8, color: "#94A3B8" }}
+                  />
+                ),
               },
             }}
           />

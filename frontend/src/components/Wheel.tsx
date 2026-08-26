@@ -1,4 +1,4 @@
-import { Box, Typography, Paper } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { RefreshCw } from "lucide-react";
 import { Member, Task } from "../types";
 
@@ -102,8 +102,14 @@ export function Wheel({ task, members }: { task: Task; members: Member[] }) {
         >
           <RefreshCw size={12} /> RODÍZIO ATUAL · {task.name.toUpperCase()}
         </Typography>
-        <Typography variant="h6" sx={{ fontWeight: 800, fontSize: 18, color: "#0F172A", mt: 0.25 }}>
-          Vez de <Box component="span" sx={{ color: "#4F46E5" }}>{current?.name ?? "?"}</Box>
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: 800, fontSize: 18, color: "#0F172A", mt: 0.25 }}
+        >
+          Vez de{" "}
+          <Box component="span" sx={{ color: "#4F46E5" }}>
+            {current?.name ?? "?"}
+          </Box>
         </Typography>
       </Box>
     </Box>

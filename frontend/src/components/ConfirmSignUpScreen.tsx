@@ -73,7 +73,8 @@ export function ConfirmSignUpScreen({
         alignItems: "center",
         justifyContent: "center",
         p: 2.5,
-        background: "linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)",
+        background:
+          "linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)",
       }}
     >
       <Paper
@@ -110,19 +111,31 @@ export function ConfirmSignUpScreen({
           >
             <ShieldCheck size={28} />
           </Box>
-          <Typography variant="h5" sx={{ fontSize: 24, fontWeight: 800, color: "#0F172A" }}>
+          <Typography
+            variant="h5"
+            sx={{ fontSize: 24, fontWeight: 800, color: "#0F172A" }}
+          >
             Confirme seu e-mail
           </Typography>
           <Typography variant="body2" sx={{ color: "#64748B", fontSize: 14 }}>
             Enviamos um código de confirmação para{" "}
             <Box component="span" sx={{ fontWeight: 700, color: "#0F172A" }}>
               {email}
-            </Box>.
+            </Box>
+            .
           </Typography>
         </Stack>
 
-        {error && <Alert severity="error" sx={{ borderRadius: 3 }}>{error}</Alert>}
-        {info && <Alert severity="success" sx={{ borderRadius: 3 }}>{info}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ borderRadius: 3 }}>
+            {error}
+          </Alert>
+        )}
+        {info && (
+          <Alert severity="success" sx={{ borderRadius: 3 }}>
+            {info}
+          </Alert>
+        )}
 
         <TextField
           label="Código de confirmação"
@@ -131,7 +144,12 @@ export function ConfirmSignUpScreen({
           autoFocus
           slotProps={{
             input: {
-              startAdornment: <KeyRound size={18} style={{ marginRight: 8, color: "#94A3B8" }} />,
+              startAdornment: (
+                <KeyRound
+                  size={18}
+                  style={{ marginRight: 8, color: "#94A3B8" }}
+                />
+              ),
             },
           }}
         />

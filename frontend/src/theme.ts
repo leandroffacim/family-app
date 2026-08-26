@@ -73,15 +73,39 @@ export const muiTheme = createTheme({
   },
   typography: {
     fontFamily: fonts.body,
-    h1: { fontFamily: fonts.display, fontWeight: 800, letterSpacing: "-0.02em" },
-    h2: { fontFamily: fonts.display, fontWeight: 800, letterSpacing: "-0.02em" },
-    h3: { fontFamily: fonts.display, fontWeight: 700, letterSpacing: "-0.01em" },
-    h4: { fontFamily: fonts.display, fontWeight: 700, letterSpacing: "-0.01em" },
-    h5: { fontFamily: fonts.display, fontWeight: 700, letterSpacing: "-0.01em" },
+    h1: {
+      fontFamily: fonts.display,
+      fontWeight: 800,
+      letterSpacing: "-0.02em",
+    },
+    h2: {
+      fontFamily: fonts.display,
+      fontWeight: 800,
+      letterSpacing: "-0.02em",
+    },
+    h3: {
+      fontFamily: fonts.display,
+      fontWeight: 700,
+      letterSpacing: "-0.01em",
+    },
+    h4: {
+      fontFamily: fonts.display,
+      fontWeight: 700,
+      letterSpacing: "-0.01em",
+    },
+    h5: {
+      fontFamily: fonts.display,
+      fontWeight: 700,
+      letterSpacing: "-0.01em",
+    },
     h6: { fontFamily: fonts.display, fontWeight: 700 },
     subtitle1: { fontFamily: fonts.display, fontWeight: 700 },
     subtitle2: { fontFamily: fonts.display, fontWeight: 600 },
-    button: { fontFamily: fonts.display, fontWeight: 700, textTransform: "none" },
+    button: {
+      fontFamily: fonts.display,
+      fontWeight: 700,
+      textTransform: "none",
+    },
   },
   shape: { borderRadius: 16 },
   components: {
@@ -163,7 +187,8 @@ export const muiTheme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          boxShadow: "0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03)",
+          boxShadow:
+            "0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03)",
           border: `1px solid ${colors.slate200}`,
           borderRadius: 16,
         },

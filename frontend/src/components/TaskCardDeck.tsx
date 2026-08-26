@@ -1,4 +1,12 @@
-import { Box, Chip, IconButton, Paper, Stack, Typography, Tooltip } from "@mui/material";
+import {
+  Box,
+  Chip,
+  IconButton,
+  Paper,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { Check, Clock3, PartyPopper, SkipForward, Zap } from "lucide-react";
 import { useRef, useState } from "react";
 import { Member, TaskInstance } from "../types";
@@ -124,7 +132,8 @@ export function TaskCardDeck({
           variant="body2"
           sx={{ color: "#64748B", maxWidth: 260, lineHeight: 1.5 }}
         >
-          Todas as tarefas de hoje foram concluídas ou organizadas. Volte amanhã!
+          Todas as tarefas de hoje foram concluídas ou organizadas. Volte
+          amanhã!
         </Typography>
       </Paper>
     );
@@ -140,7 +149,13 @@ export function TaskCardDeck({
   const tx = dir === "right" ? 420 : dir === "left" ? -420 : drag.x;
   const ty = dir === "up" ? -640 : drag.y;
   const rot =
-    dir === "right" ? 22 : dir === "left" ? -22 : dir === "up" ? 0 : drag.x / 18;
+    dir === "right"
+      ? 22
+      : dir === "left"
+        ? -22
+        : dir === "up"
+          ? 0
+          : drag.x / 18;
   const cardOpacity = exit ? 0 : 1;
   const transition = exit
     ? "transform 240ms ease-in, opacity 240ms ease-in"
@@ -171,7 +186,8 @@ export function TaskCardDeck({
             borderRadius: 5,
             bgcolor: "#FFFFFF",
             borderColor: "#E2E8F0",
-            boxShadow: "0 20px 35px -5px rgba(15, 23, 42, 0.08), 0 10px 15px -5px rgba(15, 23, 42, 0.04)",
+            boxShadow:
+              "0 20px 35px -5px rgba(15, 23, 42, 0.08), 0 10px 15px -5px rgba(15, 23, 42, 0.04)",
             display: "flex",
             flexDirection: "column",
             p: 3,
@@ -197,13 +213,30 @@ export function TaskCardDeck({
                 height: 24,
                 fontSize: 11,
                 fontWeight: 700,
-                bgcolor: top.freq === "DAILY" ? "#EEF2FF" : top.freq === "WEEKLY" ? "#FEF3C7" : "#F1F5F9",
-                color: top.freq === "DAILY" ? "#4F46E5" : top.freq === "WEEKLY" ? "#D97706" : "#475569",
+                bgcolor:
+                  top.freq === "DAILY"
+                    ? "#EEF2FF"
+                    : top.freq === "WEEKLY"
+                      ? "#FEF3C7"
+                      : "#F1F5F9",
+                color:
+                  top.freq === "DAILY"
+                    ? "#4F46E5"
+                    : top.freq === "WEEKLY"
+                      ? "#D97706"
+                      : "#475569",
               }}
             />
-            <Stack direction="row" spacing={0.25} sx={{ alignItems: "center", color: "#F59E0B" }}>
+            <Stack
+              direction="row"
+              spacing={0.25}
+              sx={{ alignItems: "center", color: "#F59E0B" }}
+            >
               <Zap size={14} fill="#F59E0B" color="#F59E0B" />
-              <Typography variant="caption" sx={{ fontWeight: 700, color: "#64748B", ml: 0.5 }}>
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: 700, color: "#64748B", ml: 0.5 }}
+              >
                 Esforço {top.weight}
               </Typography>
             </Stack>
@@ -219,7 +252,15 @@ export function TaskCardDeck({
               px: 1,
             }}
           >
-            <Typography variant="h4" sx={{ fontSize: 26, fontWeight: 800, color: "#0F172A", lineHeight: 1.25 }}>
+            <Typography
+              variant="h4"
+              sx={{
+                fontSize: 26,
+                fontWeight: 800,
+                color: "#0F172A",
+                lineHeight: 1.25,
+              }}
+            >
               {top.name}
             </Typography>
           </Box>
@@ -238,8 +279,14 @@ export function TaskCardDeck({
             }}
           >
             <Avatar member={membersById[top.assignee]} size={24} />
-            <Typography variant="body2" sx={{ fontSize: 13, color: "#475569", fontWeight: 600 }}>
-              Sugestão: <Box component="span" sx={{ color: "#0F172A", fontWeight: 700 }}>{membersById[top.assignee]?.name ?? top.assignee}</Box>
+            <Typography
+              variant="body2"
+              sx={{ fontSize: 13, color: "#475569", fontWeight: 600 }}
+            >
+              Sugestão:{" "}
+              <Box component="span" sx={{ color: "#0F172A", fontWeight: 700 }}>
+                {membersById[top.assignee]?.name ?? top.assignee}
+              </Box>
             </Typography>
           </Stack>
 

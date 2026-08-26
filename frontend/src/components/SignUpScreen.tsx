@@ -8,8 +8,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { Lock, Mail, UserPlus, Users } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { UserPlus, Mail, Lock, Users } from "lucide-react";
 import * as cognito from "../auth/cognito";
 
 interface SignUpScreenProps {
@@ -49,7 +49,8 @@ export function SignUpScreen({ onSignedUp, onBackToLogin }: SignUpScreenProps) {
         alignItems: "center",
         justifyContent: "center",
         p: 2.5,
-        background: "linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)",
+        background:
+          "linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)",
       }}
     >
       <Paper
@@ -86,7 +87,10 @@ export function SignUpScreen({ onSignedUp, onBackToLogin }: SignUpScreenProps) {
           >
             <UserPlus size={28} />
           </Box>
-          <Typography variant="h5" sx={{ fontSize: 24, fontWeight: 800, color: "#0F172A" }}>
+          <Typography
+            variant="h5"
+            sx={{ fontSize: 24, fontWeight: 800, color: "#0F172A" }}
+          >
             Criar conta da família
           </Typography>
           <Typography variant="body2" sx={{ color: "#64748B", fontSize: 14 }}>
@@ -94,7 +98,11 @@ export function SignUpScreen({ onSignedUp, onBackToLogin }: SignUpScreenProps) {
           </Typography>
         </Stack>
 
-        {error && <Alert severity="error" sx={{ borderRadius: 3 }}>{error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ borderRadius: 3 }}>
+            {error}
+          </Alert>
+        )}
 
         <Stack spacing={2}>
           <TextField
@@ -104,7 +112,12 @@ export function SignUpScreen({ onSignedUp, onBackToLogin }: SignUpScreenProps) {
             autoFocus
             slotProps={{
               input: {
-                startAdornment: <Users size={18} style={{ marginRight: 8, color: "#94A3B8" }} />,
+                startAdornment: (
+                  <Users
+                    size={18}
+                    style={{ marginRight: 8, color: "#94A3B8" }}
+                  />
+                ),
               },
             }}
           />
@@ -116,7 +129,12 @@ export function SignUpScreen({ onSignedUp, onBackToLogin }: SignUpScreenProps) {
             onChange={(e) => setEmail(e.target.value)}
             slotProps={{
               input: {
-                startAdornment: <Mail size={18} style={{ marginRight: 8, color: "#94A3B8" }} />,
+                startAdornment: (
+                  <Mail
+                    size={18}
+                    style={{ marginRight: 8, color: "#94A3B8" }}
+                  />
+                ),
               },
             }}
           />
@@ -128,7 +146,12 @@ export function SignUpScreen({ onSignedUp, onBackToLogin }: SignUpScreenProps) {
             onChange={(e) => setPassword(e.target.value)}
             slotProps={{
               input: {
-                startAdornment: <Lock size={18} style={{ marginRight: 8, color: "#94A3B8" }} />,
+                startAdornment: (
+                  <Lock
+                    size={18}
+                    style={{ marginRight: 8, color: "#94A3B8" }}
+                  />
+                ),
               },
             }}
           />

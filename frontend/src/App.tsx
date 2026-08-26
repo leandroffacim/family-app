@@ -18,7 +18,6 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
-  LinearProgress,
 } from "@mui/material";
 import {
   CalendarDays,
@@ -396,7 +395,10 @@ export default function App() {
           overflow: "hidden",
           borderRadius: { xs: 0, sm: 6 },
           border: { xs: 0, sm: "1px solid #E2E8F0" },
-          boxShadow: { xs: "none", sm: "0 25px 50px -12px rgba(15, 23, 42, 0.25)" },
+          boxShadow: {
+            xs: "none",
+            sm: "0 25px 50px -12px rgba(15, 23, 42, 0.25)",
+          },
           backgroundColor: "#F8FAFC",
           position: "relative",
         }}
@@ -406,16 +408,24 @@ export default function App() {
           elevation={0}
           sx={{
             flexShrink: 0,
-            background: "linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)",
+            background:
+              "linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)",
             color: "#FFFFFF",
             px: { xs: 2.5, sm: 3.5 },
             pt: { xs: "calc(16px + env(safe-area-inset-top))", sm: 2.5 },
             pb: { xs: 2, sm: 2.5 },
           }}
         >
-          <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
+          <Stack
+            direction="row"
+            sx={{ justifyContent: "space-between", alignItems: "center" }}
+          >
             <Box>
-              <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 0.25 }}>
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{ alignItems: "center", mb: 0.25 }}
+              >
                 <Box
                   sx={{
                     width: 22,
@@ -483,7 +493,10 @@ export default function App() {
                 sx={{
                   color: "#CBD5E1",
                   bgcolor: "rgba(255,255,255,0.1)",
-                  "&:hover": { bgcolor: "rgba(255,255,255,0.2)", color: "#FFFFFF" },
+                  "&:hover": {
+                    bgcolor: "rgba(255,255,255,0.2)",
+                    color: "#FFFFFF",
+                  },
                 }}
               >
                 <LogOut size={18} />
@@ -518,7 +531,9 @@ export default function App() {
               }}
             >
               <CircularProgress size={32} sx={{ color: "#4F46E5" }} />
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>Carregando dados da família...</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                Carregando dados da família...
+              </Typography>
             </Stack>
           )}
           {!loading && loadError && (
@@ -537,7 +552,11 @@ export default function App() {
           {!loading && !loadError && (
             <>
               {actionError && (
-                <Alert severity="error" sx={{ borderRadius: 3 }} onClose={() => setActionError(null)}>
+                <Alert
+                  severity="error"
+                  sx={{ borderRadius: 3 }}
+                  onClose={() => setActionError(null)}
+                >
                   {actionError}
                 </Alert>
               )}
@@ -558,13 +577,23 @@ export default function App() {
                     }}
                   >
                     <Box sx={{ flex: 1 }}>
-                      <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 0.5 }}>
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        sx={{ alignItems: "center", mb: 0.5 }}
+                      >
                         <Sparkles size={16} color="#4F46E5" />
-                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#0F172A" }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 800, color: "#0F172A" }}
+                        >
                           Sua rotina do dia
                         </Typography>
                       </Stack>
-                      <Typography variant="caption" sx={{ color: "#64748B", fontWeight: 500 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "#64748B", fontWeight: 500 }}
+                      >
                         {deckQueue.length === 0
                           ? "Tudo pronto! Nenhuma tarefa pendente no baralho."
                           : `${deckQueue.length} ${deckQueue.length === 1 ? "tarefa pendente" : "tarefas pendentes"} no baralho.`}
@@ -598,9 +627,41 @@ export default function App() {
                       pt: 0.5,
                     }}
                   >
-                    <Chip label="👈 Esquerda: Passar" size="small" variant="outlined" sx={{ borderColor: "#CBD5E1", color: "#64748B", fontSize: 11, fontWeight: 600 }} />
-                    <Chip label="👆 Cima: Adiar" size="small" variant="outlined" sx={{ borderColor: "#FDE68A", color: "#D97706", bgcolor: "#FEF3C7", fontSize: 11, fontWeight: 600 }} />
-                    <Chip label="👉 Direita: Concluir" size="small" variant="outlined" sx={{ borderColor: "#A7F3D0", color: "#059669", bgcolor: "#ECFDF5", fontSize: 11, fontWeight: 600 }} />
+                    <Chip
+                      label="👈 Esquerda: Passar"
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        borderColor: "#CBD5E1",
+                        color: "#64748B",
+                        fontSize: 11,
+                        fontWeight: 600,
+                      }}
+                    />
+                    <Chip
+                      label="👆 Cima: Adiar"
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        borderColor: "#FDE68A",
+                        color: "#D97706",
+                        bgcolor: "#FEF3C7",
+                        fontSize: 11,
+                        fontWeight: 600,
+                      }}
+                    />
+                    <Chip
+                      label="👉 Direita: Concluir"
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        borderColor: "#A7F3D0",
+                        color: "#059669",
+                        bgcolor: "#ECFDF5",
+                        fontSize: 11,
+                        fontWeight: 600,
+                      }}
+                    />
                   </Stack>
                 </Stack>
               )}
@@ -609,7 +670,12 @@ export default function App() {
                 <Stack spacing={2.5}>
                   <Paper
                     variant="outlined"
-                    sx={{ p: 1.5, borderRadius: 4, bgcolor: "#FFFFFF", borderColor: "#E2E8F0" }}
+                    sx={{
+                      p: 1.5,
+                      borderRadius: 4,
+                      bgcolor: "#FFFFFF",
+                      borderColor: "#E2E8F0",
+                    }}
                   >
                     <ToggleButtonGroup
                       exclusive
@@ -620,17 +686,48 @@ export default function App() {
                       }
                       sx={{ gap: 1 }}
                     >
-                      <ToggleButton value="ALL" sx={{ py: 1, borderRadius: "10px !important", border: "1px solid #E2E8F0 !important" }}>
+                      <ToggleButton
+                        value="ALL"
+                        sx={{
+                          py: 1,
+                          borderRadius: "10px !important",
+                          border: "1px solid #E2E8F0 !important",
+                        }}
+                      >
                         Todas ({tasks.length})
                       </ToggleButton>
-                      <ToggleButton value="DAILY" sx={{ py: 1, borderRadius: "10px !important", border: "1px solid #E2E8F0 !important" }}>
-                        Diárias ({tasks.filter((t) => t.freq === "DAILY").length})
+                      <ToggleButton
+                        value="DAILY"
+                        sx={{
+                          py: 1,
+                          borderRadius: "10px !important",
+                          border: "1px solid #E2E8F0 !important",
+                        }}
+                      >
+                        Diárias (
+                        {tasks.filter((t) => t.freq === "DAILY").length})
                       </ToggleButton>
-                      <ToggleButton value="WEEKLY" sx={{ py: 1, borderRadius: "10px !important", border: "1px solid #E2E8F0 !important" }}>
-                        Semanais ({tasks.filter((t) => t.freq === "WEEKLY").length})
+                      <ToggleButton
+                        value="WEEKLY"
+                        sx={{
+                          py: 1,
+                          borderRadius: "10px !important",
+                          border: "1px solid #E2E8F0 !important",
+                        }}
+                      >
+                        Semanais (
+                        {tasks.filter((t) => t.freq === "WEEKLY").length})
                       </ToggleButton>
-                      <ToggleButton value="MONTHLY" sx={{ py: 1, borderRadius: "10px !important", border: "1px solid #E2E8F0 !important" }}>
-                        Mensais ({tasks.filter((t) => t.freq === "MONTHLY").length})
+                      <ToggleButton
+                        value="MONTHLY"
+                        sx={{
+                          py: 1,
+                          borderRadius: "10px !important",
+                          border: "1px solid #E2E8F0 !important",
+                        }}
+                      >
+                        Mensais (
+                        {tasks.filter((t) => t.freq === "MONTHLY").length})
                       </ToggleButton>
                     </ToggleButtonGroup>
                   </Paper>
@@ -654,7 +751,10 @@ export default function App() {
                           borderColor: "#E2E8F0",
                         }}
                       >
-                        <Typography variant="body2" sx={{ color: "#64748B", fontWeight: 600 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: "#64748B", fontWeight: 600 }}
+                        >
                           Nenhuma tarefa encontrada neste filtro.
                         </Typography>
                         <Button
@@ -676,7 +776,12 @@ export default function App() {
                 <Stack spacing={2.5}>
                   <Paper
                     variant="outlined"
-                    sx={{ p: { xs: 1.5, sm: 2 }, borderRadius: 5, bgcolor: "#FFFFFF", borderColor: "#E2E8F0" }}
+                    sx={{
+                      p: { xs: 1.5, sm: 2 },
+                      borderRadius: 5,
+                      bgcolor: "#FFFFFF",
+                      borderColor: "#E2E8F0",
+                    }}
                   >
                     <Stack
                       direction="row"
@@ -713,14 +818,18 @@ export default function App() {
                           noWrap
                           sx={{ fontWeight: 800, color: "#0F172A", mt: 0.25 }}
                         >
-                          {formatDate(weekDates[0])} — {formatDate(weekDates[6])}
+                          {formatDate(weekDates[0])} —{" "}
+                          {formatDate(weekDates[6])}
                         </Typography>
                       </Box>
                       <Button
                         variant="outlined"
                         size="small"
                         onClick={() => selectAgendaDate(todayISO())}
-                        sx={{ display: { xs: "none", sm: "inline-flex" }, borderColor: "#E2E8F0" }}
+                        sx={{
+                          display: { xs: "none", sm: "inline-flex" },
+                          borderColor: "#E2E8F0",
+                        }}
                       >
                         Hoje
                       </Button>
@@ -786,7 +895,9 @@ export default function App() {
                               color: isSelected ? "#FFFFFF" : "#0F172A",
                               border: "1px solid",
                               borderColor: isSelected ? "#4F46E5" : "#E2E8F0",
-                              boxShadow: isSelected ? "0 4px 12px rgba(79, 70, 229, 0.3)" : "none",
+                              boxShadow: isSelected
+                                ? "0 4px 12px rgba(79, 70, 229, 0.3)"
+                                : "none",
                               "&:hover": {
                                 bgcolor: isSelected ? "#4338CA" : "#EEF2FF",
                               },
@@ -845,7 +956,10 @@ export default function App() {
                           borderColor: "#E2E8F0",
                         }}
                       >
-                        <Typography variant="body2" sx={{ color: "#64748B", fontWeight: 600 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: "#64748B", fontWeight: 600 }}
+                        >
                           Nada agendado para este dia.
                         </Typography>
                         <Button
@@ -870,7 +984,10 @@ export default function App() {
 
                   {upcomingEvents.length > 0 && (
                     <Stack spacing={1.5} sx={{ pt: 1 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#0F172A", px: 0.5 }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: 800, color: "#0F172A", px: 0.5 }}
+                      >
                         Próximos compromissos
                       </Typography>
                       {upcomingEvents.map((event) => (
@@ -904,8 +1021,18 @@ export default function App() {
                   )}
 
                   <Stack spacing={1.5}>
-                    <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", px: 0.5 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#0F172A" }}>
+                    <Stack
+                      direction="row"
+                      sx={{
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        px: 0.5,
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: 800, color: "#0F172A" }}
+                      >
                         Membros da Família ({members.length})
                       </Typography>
                       <Button
@@ -932,13 +1059,31 @@ export default function App() {
                           borderColor: "#E2E8F0",
                         }}
                       >
-                        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
+                        <Stack
+                          direction="row"
+                          spacing={1.5}
+                          sx={{ alignItems: "center" }}
+                        >
                           <Avatar member={member} size={38} />
                           <Box>
-                            <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#0F172A" }}>
+                            <Typography
+                              sx={{
+                                fontWeight: 700,
+                                fontSize: 15,
+                                color: "#0F172A",
+                              }}
+                            >
                               {member.name}
                               {member.id === memberId && (
-                                <Box component="span" sx={{ fontWeight: 600, fontSize: 13, color: "#4F46E5", ml: 0.75 }}>
+                                <Box
+                                  component="span"
+                                  sx={{
+                                    fontWeight: 600,
+                                    fontSize: 13,
+                                    color: "#4F46E5",
+                                    ml: 0.75,
+                                  }}
+                                >
                                   (Você)
                                 </Box>
                               )}
@@ -948,7 +1093,11 @@ export default function App() {
                         <Chip
                           label="Membro"
                           size="small"
-                          sx={{ bgcolor: "#F1F5F9", color: "#475569", fontWeight: 600 }}
+                          sx={{
+                            bgcolor: "#F1F5F9",
+                            color: "#475569",
+                            fontWeight: 600,
+                          }}
                         />
                       </Paper>
                     ))}
@@ -1058,13 +1207,26 @@ export default function App() {
         }}
       >
         <Stack spacing={2.5}>
-          <Box sx={{ width: 36, height: 4, borderRadius: 2, bgcolor: "#CBD5E1", mx: "auto", mt: -1, mb: 0.5 }} />
+          <Box
+            sx={{
+              width: 36,
+              height: 4,
+              borderRadius: 2,
+              bgcolor: "#CBD5E1",
+              mx: "auto",
+              mt: -1,
+              mb: 0.5,
+            }}
+          />
 
           <Stack
             direction="row"
             sx={{ justifyContent: "space-between", alignItems: "center" }}
           >
-            <Typography variant="h6" sx={{ fontSize: 19, fontWeight: 800, color: "#0F172A" }}>
+            <Typography
+              variant="h6"
+              sx={{ fontSize: 19, fontWeight: 800, color: "#0F172A" }}
+            >
               {sheetType === "task"
                 ? "Nova tarefa"
                 : sheetType === "event"
@@ -1099,7 +1261,15 @@ export default function App() {
                 placeholder="Ex.: Passar roupa"
               />
               <Box>
-                <FormLabel component="legend" sx={{ fontSize: 13, fontWeight: 700, color: "#475569", mb: 0.5 }}>
+                <FormLabel
+                  component="legend"
+                  sx={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#475569",
+                    mb: 0.5,
+                  }}
+                >
                   Frequência
                 </FormLabel>
                 <ToggleButtonGroup
@@ -1119,7 +1289,15 @@ export default function App() {
               </Box>
               {newTaskFreq === "WEEKLY" && (
                 <Box>
-                  <FormLabel component="legend" sx={{ fontSize: 13, fontWeight: 700, color: "#475569", mb: 0.5 }}>
+                  <FormLabel
+                    component="legend"
+                    sx={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: "#475569",
+                      mb: 0.5,
+                    }}
+                  >
                     Dia da semana
                   </FormLabel>
                   <ToggleButtonGroup
@@ -1156,7 +1334,15 @@ export default function App() {
                 />
               )}
               <Box>
-                <FormLabel component="legend" sx={{ fontSize: 13, fontWeight: 700, color: "#475569", mb: 0.5 }}>
+                <FormLabel
+                  component="legend"
+                  sx={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#475569",
+                    mb: 0.5,
+                  }}
+                >
                   Nível de Esforço
                 </FormLabel>
                 <ToggleButtonGroup
@@ -1169,7 +1355,10 @@ export default function App() {
                 >
                   {[1, 2, 3].map((weight) => (
                     <ToggleButton key={weight} value={weight} sx={{ gap: 0.5 }}>
-                      <Zap size={14} fill={newTaskWeight === weight ? "#4F46E5" : "none"} />
+                      <Zap
+                        size={14}
+                        fill={newTaskWeight === weight ? "#4F46E5" : "none"}
+                      />
                       Esforço {weight}
                     </ToggleButton>
                   ))}
@@ -1194,7 +1383,15 @@ export default function App() {
                 placeholder="Ex.: Consulta médica"
               />
               <Box>
-                <FormLabel component="legend" sx={{ fontSize: 13, fontWeight: 700, color: "#475569", mb: 0.5 }}>
+                <FormLabel
+                  component="legend"
+                  sx={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#475569",
+                    mb: 0.5,
+                  }}
+                >
                   Dia
                 </FormLabel>
                 <ToggleButtonGroup
@@ -1226,7 +1423,15 @@ export default function App() {
                 slotProps={{ inputLabel: { shrink: true } }}
               />
               <Box>
-                <FormLabel component="legend" sx={{ fontSize: 13, fontWeight: 700, color: "#475569", mb: 0.5 }}>
+                <FormLabel
+                  component="legend"
+                  sx={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#475569",
+                    mb: 0.5,
+                  }}
+                >
                   Quem participa
                 </FormLabel>
                 <ToggleButtonGroup
@@ -1272,12 +1477,24 @@ export default function App() {
           ) : (
             <Stack spacing={2}>
               {actionError && (
-                <Alert severity="error" sx={{ borderRadius: 3 }} onClose={() => setActionError(null)}>
+                <Alert
+                  severity="error"
+                  sx={{ borderRadius: 3 }}
+                  onClose={() => setActionError(null)}
+                >
                   {actionError}
                 </Alert>
               )}
               <Box>
-                <FormLabel component="legend" sx={{ fontSize: 13, fontWeight: 700, color: "#475569", mb: 0.5 }}>
+                <FormLabel
+                  component="legend"
+                  sx={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#475569",
+                    mb: 0.5,
+                  }}
+                >
                   Quem é a pessoa?
                 </FormLabel>
                 <ToggleButtonGroup

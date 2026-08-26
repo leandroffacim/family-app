@@ -48,7 +48,8 @@ export function SetPasswordScreen() {
         alignItems: "center",
         justifyContent: "center",
         p: 2.5,
-        background: "linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)",
+        background:
+          "linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)",
       }}
     >
       <Paper
@@ -85,7 +86,10 @@ export function SetPasswordScreen() {
           >
             <KeyRound size={28} />
           </Box>
-          <Typography variant="h5" sx={{ fontSize: 24, fontWeight: 800, color: "#0F172A" }}>
+          <Typography
+            variant="h5"
+            sx={{ fontSize: 24, fontWeight: 800, color: "#0F172A" }}
+          >
             Escolha sua senha
           </Typography>
           <Typography variant="body2" sx={{ color: "#64748B", fontSize: 14 }}>
@@ -109,7 +113,12 @@ export function SetPasswordScreen() {
             autoFocus
             slotProps={{
               input: {
-                startAdornment: <Lock size={18} style={{ marginRight: 8, color: "#94A3B8" }} />,
+                startAdornment: (
+                  <Lock
+                    size={18}
+                    style={{ marginRight: 8, color: "#94A3B8" }}
+                  />
+                ),
               },
             }}
           />
@@ -121,7 +130,12 @@ export function SetPasswordScreen() {
             onChange={(e) => setConfirm(e.target.value)}
             slotProps={{
               input: {
-                startAdornment: <Lock size={18} style={{ marginRight: 8, color: "#94A3B8" }} />,
+                startAdornment: (
+                  <Lock
+                    size={18}
+                    style={{ marginRight: 8, color: "#94A3B8" }}
+                  />
+                ),
               },
             }}
           />
@@ -133,7 +147,9 @@ export function SetPasswordScreen() {
           size="large"
           disabled={submitting || !password || !confirm}
           startIcon={
-            submitting ? <CircularProgress size={18} color="inherit" /> : undefined
+            submitting ? (
+              <CircularProgress size={18} color="inherit" />
+            ) : undefined
           }
           sx={{ py: 1.5, fontSize: 15 }}
         >

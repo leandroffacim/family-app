@@ -1,9 +1,15 @@
-import { Clock, MapPin } from "lucide-react";
 import { AvatarGroup, Box, Paper, Stack, Typography } from "@mui/material";
+import { Clock, MapPin } from "lucide-react";
 import { FamilyEvent, Member } from "../types";
 import { Avatar } from "./Avatar";
 
-export function EventCard({ ev, membersById }: { ev: FamilyEvent; membersById: Record<string, Member> }) {
+export function EventCard({
+  ev,
+  membersById,
+}: {
+  ev: FamilyEvent;
+  membersById: Record<string, Member>;
+}) {
   return (
     <Paper
       variant="outlined"
@@ -36,19 +42,35 @@ export function EventCard({ ev, membersById }: { ev: FamilyEvent; membersById: R
         }}
       >
         <Clock size={14} strokeWidth={2.5} />
-        <Typography sx={{ mt: 0.5, fontSize: 13, fontWeight: 700, lineHeight: 1 }}>
+        <Typography
+          sx={{ mt: 0.5, fontSize: 13, fontWeight: 700, lineHeight: 1 }}
+        >
           {ev.time}
         </Typography>
       </Stack>
 
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#0F172A", lineHeight: 1.3 }}>
+        <Typography
+          sx={{
+            fontWeight: 700,
+            fontSize: 15,
+            color: "#0F172A",
+            lineHeight: 1.3,
+          }}
+        >
           {ev.title}
         </Typography>
         {ev.location && (
-          <Stack direction="row" spacing={0.5} sx={{ mt: 0.5, alignItems: "center", color: "#64748B" }}>
+          <Stack
+            direction="row"
+            spacing={0.5}
+            sx={{ mt: 0.5, alignItems: "center", color: "#64748B" }}
+          >
             <MapPin size={12} strokeWidth={2.2} />
-            <Typography variant="caption" sx={{ fontSize: 12, fontWeight: 500 }}>
+            <Typography
+              variant="caption"
+              sx={{ fontSize: 12, fontWeight: 500 }}
+            >
               {ev.location}
             </Typography>
           </Stack>
@@ -69,7 +91,12 @@ export function EventCard({ ev, membersById }: { ev: FamilyEvent; membersById: R
         }}
       >
         {ev.members.map((memberId) => (
-          <Avatar key={memberId} member={membersById[memberId]} size={28} showBorder={false} />
+          <Avatar
+            key={memberId}
+            member={membersById[memberId]}
+            size={28}
+            showBorder={false}
+          />
         ))}
       </AvatarGroup>
     </Paper>
