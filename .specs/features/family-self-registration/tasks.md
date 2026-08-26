@@ -544,8 +544,8 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] `familyId` fica disponível via `getFamilyId()` logo após login bem-sucedido
-- [ ] Gate Build (frontend) passa
+- [x] `familyId` fica disponível via `getFamilyId()` logo após login bem-sucedido
+- [x] Gate Build (frontend) passa
 
 ---
 

@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import * as cognito from "./cognito";
-import { setToken, setUnauthorizedHandler } from "./tokenStore";
+import { setFamilyId, setToken, setUnauthorizedHandler } from "./tokenStore";
 
 type Status =
   | "loading"
@@ -37,6 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const applySession = (session: cognito.Session | null) => {
     setToken(session?.idToken ?? null);
+    setFamilyId(session?.familyId ?? null);
     setMemberId(session?.memberId ?? null);
     setEmail(session?.email ?? null);
     setStatus(session ? "authenticated" : "unauthenticated");
