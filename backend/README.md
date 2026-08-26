@@ -1,8 +1,9 @@
 # Sistema Familiar — backend
 
 Backend serverless do sistema familiar: baralho de tarefas diário,
-rodízio automático de responsáveis e agenda compartilhada. Uma
-família por deploy (não é multi-tenant).
+rodízio automático de responsáveis e agenda compartilhada. Multi-tenant:
+qualquer pessoa pode se cadastrar pelo app e ganha sua própria família,
+isolada das demais.
 
 ## Estrutura
 
@@ -65,14 +66,15 @@ sam build
 sam deploy --guided
 ```
 
-No `--guided`, o SAM vai perguntar o valor de `FamilyId` (default
-`minha-familia` — deixe fixo por enquanto, é uma família só).
-
-Depois do deploy, pegue `TableName` no output e rode o seed:
+Depois do deploy, quem quiser criar uma família se cadastra pelo
+frontend (self sign-up no Cognito) — ver "Cadastro de família"
+abaixo. Pra popular dados de exemplo numa família de teste (opcional,
+só pra dev local), pegue `TableName` no output e rode o seed com o
+`familyId` gerado no cadastro:
 
 ```bash
 export TABLE_NAME=<valor-do-output>
-export FAMILY_ID=minha-familia
+export FAMILY_ID=<familyId-gerado-no-cadastro>
 npm run seed
 ```
 
@@ -102,8 +104,7 @@ aws sns subscribe --topic-arn <TopicArn-do-output> --protocol email --notificati
 
 - **Autenticação via Cognito.** A API inteira exige um `idToken` válido
   do User Pool (`Authorization: Bearer <idToken>`) — ver seção
-  "Autenticação (Cognito)" abaixo. Não tem self sign-up: só quem roda
-  `npm run create-user` consegue criar conta.
+  "Autenticação (Cognito)" abaixo.
 - Rate limit / usage plan: nenhum configurado ainda.
 - "Esqueci minha senha" ainda não está implementado — só a troca de
   senha do primeiro acesso (convite). Se alguém esquecer a senha
@@ -123,17 +124,27 @@ o job rodar de novo no mesmo dia.
 
 ## Autenticação (Cognito)
 
-Cada membro da família precisa de uma conta pra logar — não existe
-cadastro pelo próprio app. Depois do primeiro deploy (quando ainda
-não tem ninguém logado pra usar a tela), tem dois jeitos de criar a
-conta pelo terminal:
+**Cadastro de família (self sign-up)** — qualquer pessoa pode criar
+uma conta pelo próprio app (tela de cadastro): ao confirmar o e-mail
+com o código, o trigger `PostConfirmation` (`postConfirmation.ts`)
+gera um `familyId` novo (ULID), cria a família e o membro `owner` na
+tabela, e vincula a conta a esse `familyId`/`memberId` via
+`custom:familyId` / `custom:memberId` no usuário Cognito. Esse vínculo
+viaja em todo `idToken` daí em diante e é o que o backend valida em
+todo handler (`assertFamilyAccess`) — cada família só enxerga os
+próprios dados.
+
+Pra adicionar o restante da família (depois que o `owner` já se
+cadastrou), tem dois jeitos de criar conta pelo terminal — em ambos,
+`familyId` é o mesmo `familyId` do `owner` que já se cadastrou (o
+mesmo usado em `FAMILY#{familyId}`):
 
 **Convite por e-mail (recomendado)** — o Cognito gera a senha
 temporária e manda o convite sozinho:
 
 ```bash
 export USER_POOL_ID=<valor do output UserPoolId>
-npm run invite-user -- ana@familia.com ana
+npm run invite-user -- ana@familia.com <familyId> ana
 ```
 
 A pessoa recebe o e-mail, loga com a senha temporária e o app pede
@@ -144,10 +155,10 @@ senha", primeiro acesso).
 
 ```bash
 export USER_POOL_ID=<valor do output UserPoolId>
-npm run create-user -- ana@familia.com ana "umaSenh4Boa"
+npm run create-user -- ana@familia.com <familyId> ana "umaSenh4Boa"
 ```
 
-Nos dois casos, o segundo argumento (`ana` acima) precisa ser o
+Nos dois casos, o último argumento (`ana` acima) precisa ser o
 mesmo `id` do membro em `MEMBER#{id}` (o que você usou no seed ou
 criou depois) — é isso que liga a conta do Cognito ao membro certo.
 
@@ -161,8 +172,9 @@ ele pra saber quem está logado.
 
 ## Conectando o frontend
 
-O protótipo React do baralho (artifact separado) espera consumir uma
-API assim. Aponte as chamadas pra `ApiUrl` do output do stack,
-usando `familyId` = valor de `FamilyId` do deploy, e configure
-`VITE_COGNITO_USER_POOL_ID` / `VITE_COGNITO_CLIENT_ID` com os outputs
-`UserPoolId` / `UserPoolClientId` (ver `frontend/.env.example`).
+O frontend espera consumir uma API assim. Aponte as chamadas pra
+`ApiUrl` do output do stack e configure `VITE_COGNITO_USER_POOL_ID` /
+`VITE_COGNITO_CLIENT_ID` com os outputs `UserPoolId` /
+`UserPoolClientId` (ver `frontend/.env.example`). O `familyId` não é
+mais configurado por env var: ele vem do `idToken` depois do
+cadastro/login (`custom:familyId`).

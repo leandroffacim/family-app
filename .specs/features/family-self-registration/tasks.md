@@ -694,7 +694,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] Nenhuma referência desatualizada a "uma família por deploy" ou `FamilyId` fixo
+- [x] Nenhuma referência desatualizada a "uma família por deploy" ou `FamilyId` fixo
 
 ---
 
