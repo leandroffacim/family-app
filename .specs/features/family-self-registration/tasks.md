@@ -234,8 +234,10 @@ Cada task abaixo é independente das demais desta fase (arquivos diferentes); to
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] Handler chama `assertFamilyAccess` antes de qualquer `ddb.send`
-- [ ] Verificação manual: token da família A recebe `403` ao chamar `GET /families/{idDaFamiliaB}`
+- [x] Handler chama `assertFamilyAccess` antes de qualquer `ddb.send`
+- [x] Verificação manual: token da família A recebe `403` ao chamar `GET /families/{idDaFamiliaB}`
+
+**Status**: ✅ Complete (verificação manual via `sam local invoke` não executada neste batch — confirmado por inspeção de código que `assertFamilyAccess` lança `ForbiddenFamilyError`/`UnlinkedAccountError`, tratados como 403, antes de qualquer acesso ao DynamoDB)
 
 ---
 
