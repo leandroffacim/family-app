@@ -34,9 +34,11 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "./api/client";
 import { useAuth } from "./auth/AuthContext";
 import { Avatar } from "./components/Avatar";
+import { ConfirmSignUpScreen } from "./components/ConfirmSignUpScreen";
 import { EventCard } from "./components/EventCard";
 import { LoginScreen } from "./components/LoginScreen";
 import { SetPasswordScreen } from "./components/SetPasswordScreen";
+import { SignUpScreen } from "./components/SignUpScreen";
 import { TaskCardDeck } from "./components/TaskCardDeck";
 import { TaskDefinitionRow } from "./components/TaskDefinitionRow";
 import { Wheel } from "./components/Wheel";
@@ -74,6 +76,11 @@ const frequencyOptions: { id: TaskFrequency; label: string }[] = [
 
 export default function App() {
   const { status, memberId, logout } = useAuth();
+  const [authView, setAuthView] = useState<"login" | "signup" | "confirm">(
+    "login",
+  );
+  const [pendingConfirmEmail, setPendingConfirmEmail] = useState("");
+  const [prefillEmail, setPrefillEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -312,7 +319,34 @@ export default function App() {
   }
 
   if (status === "unauthenticated") {
-    return <LoginScreen />;
+    if (authView === "signup") {
+      return (
+        <SignUpScreen
+          onSignedUp={(signedUpEmail) => {
+            setPendingConfirmEmail(signedUpEmail);
+            setAuthView("confirm");
+          }}
+          onBackToLogin={() => setAuthView("login")}
+        />
+      );
+    }
+    if (authView === "confirm") {
+      return (
+        <ConfirmSignUpScreen
+          email={pendingConfirmEmail}
+          onConfirmed={(confirmedEmail) => {
+            setPrefillEmail(confirmedEmail);
+            setAuthView("login");
+          }}
+        />
+      );
+    }
+    return (
+      <LoginScreen
+        onNavigateToSignUp={() => setAuthView("signup")}
+        prefillEmail={prefillEmail}
+      />
+    );
   }
 
   if (status === "newPasswordRequired") {

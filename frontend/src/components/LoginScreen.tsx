@@ -11,9 +11,14 @@ import {
 import { FormEvent, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 
-export function LoginScreen() {
+interface LoginScreenProps {
+  onNavigateToSignUp: () => void;
+  prefillEmail?: string;
+}
+
+export function LoginScreen({ onNavigateToSignUp, prefillEmail }: LoginScreenProps) {
   const { login, error } = useAuth();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(prefillEmail ?? "");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -94,6 +99,10 @@ export function LoginScreen() {
           }
         >
           Entrar
+        </Button>
+
+        <Button variant="text" onClick={onNavigateToSignUp}>
+          Criar conta da família
         </Button>
       </Paper>
     </Box>

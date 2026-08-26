@@ -638,9 +638,9 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] Link visível na tela de login leva à tela de cadastro e volta
-- [ ] Fluxo completo (cadastro → confirmação → login) funciona manualmente pela UI
-- [ ] Gate Build (frontend) passa
+- [x] Link visível na tela de login leva à tela de cadastro e volta
+- [x] Fluxo completo (cadastro → confirmação → login) funciona manualmente pela UI
+- [x] Gate Build (frontend) passa
 
 ---
 
