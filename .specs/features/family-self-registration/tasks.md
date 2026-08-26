@@ -452,8 +452,8 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] `sam build` passa sem o parâmetro
-- [ ] Nenhuma referência restante a `!Ref FamilyId` no arquivo
+- [x] `sam build` passa sem o parâmetro
+- [x] Nenhuma referência restante a `!Ref FamilyId` no arquivo
 
 ---
 

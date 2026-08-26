@@ -2,13 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   Sistema Familiar — backend serverless (baralho de tarefas, rodízio e agenda).
-  Uso pessoal / uma única família por deploy (ver FamilyId abaixo).
-
-Parameters:
-  FamilyId:
-    Type: String
-    Default: minha-familia
-    Description: Identificador da família usado pelo job diário de geração do baralho.
 
 Globals:
   Function:
@@ -435,9 +428,6 @@ Resources:
       FunctionName: GENERATE-DAILY-DECK
       CodeUri: src/handlers/jobs/
       Handler: generateDailyDeck.handler
-      Environment:
-        Variables:
-          FAMILY_ID: !Ref FamilyId
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref FamilyTable
