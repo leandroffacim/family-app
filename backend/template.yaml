@@ -125,6 +125,8 @@ Resources:
           RequireUppercase: true
           RequireNumbers: true
           RequireSymbols: false
+      LambdaConfig:
+        PostConfirmation: !GetAtt PostConfirmationFunction.Arn
 
   FamilyUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
@@ -143,6 +145,40 @@ Resources:
         AccessToken: hours
         IdToken: hours
         RefreshToken: days
+
+  # PostConfirmationFunction usa um ARN wildcard (em vez de
+  # !GetAtt FamilyUserPool.Arn) na policy de cognito-idp para evitar
+  # dependência circular com o UserPool (que referencia a Arn desta
+  # função em LambdaConfig.PostConfirmation). A permissão real de
+  # invocação vem do AWS::Lambda::Permission abaixo, que depende dos
+  # dois recursos sem criar ciclo.
+  PostConfirmationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: POST-CONFIRMATION
+      CodeUri: src/handlers/auth/
+      Handler: postConfirmation.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FamilyTable
+        - Statement:
+            - Effect: Allow
+              Action: cognito-idp:AdminUpdateUserAttributes
+              Resource: !Sub "arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*"
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [postConfirmation.ts]
+
+  PostConfirmationInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref PostConfirmationFunction
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt FamilyUserPool.Arn
 
   # ---------- Baralho / tarefas do dia ----------
 

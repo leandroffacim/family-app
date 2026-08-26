@@ -210,8 +210,10 @@ T28 → T29 → T30 → T31
 - Skill: NONE
 
 **Done when**:
-- [ ] `sam build` passa sem erro de dependência circular
+- [x] `sam build` passa sem erro de dependência circular
 - [ ] Cadastro end-to-end manual (signUp real ou console Cognito) confirma que o trigger dispara e a família aparece na tabela
+
+**Status**: ⚠️ Partial (deploy/teste end-to-end real na AWS fora do escopo deste batch — requer `sam deploy`, uma ação remota que exige autorização explícita separada; `sam build` passa sem erro de dependência circular)
 
 ---
 
