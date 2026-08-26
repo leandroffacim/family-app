@@ -18,17 +18,23 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  LinearProgress,
 } from "@mui/material";
 import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
   Flame,
+  HeartHandshake,
   ListChecks,
+  LogOut,
   Plus,
+  Sparkles,
   Sun,
+  UserPlus,
   Users,
   X,
+  Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "./api/client";
@@ -95,6 +101,7 @@ export default function App() {
   const [undoing, setUndoing] = useState(false);
   const [events, setEvents] = useState<FamilyEvent[]>([]);
   const [tab, setTab] = useState<Tab>("hoje");
+  const [taskFilter, setTaskFilter] = useState<"ALL" | TaskFrequency>("ALL");
   const [weekAnchor, setWeekAnchor] = useState(todayISO);
   const weekDates = useMemo(() => weekDatesFor(weekAnchor), [weekAnchor]);
   const [selectedDay, setSelectedDay] = useState(() => {
@@ -364,6 +371,10 @@ export default function App() {
     return <SetPasswordScreen />;
   }
 
+  const filteredTasks = tasks.filter((task) =>
+    taskFilter === "ALL" ? true : task.freq === taskFilter,
+  );
+
   return (
     <Box
       sx={{
@@ -371,22 +382,23 @@ export default function App() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        p: { xs: 0, sm: 3 },
-        bgcolor: { xs: "background.default", sm: "#f2efe3" },
+        p: { xs: 0, sm: 2.5 },
+        bgcolor: { xs: "#F8FAFC", sm: "#CBD5E1" },
       }}
     >
       <Paper
         elevation={0}
         sx={{
-          width: "min(1180px, 100%)",
-          height: { xs: "100dvh", sm: "min(900px, calc(100dvh - 48px))" },
+          width: "min(1080px, 100%)",
+          height: { xs: "100dvh", sm: "min(880px, calc(100dvh - 40px))" },
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
-          borderRadius: { xs: 0, sm: 7 },
-          border: { xs: 0, sm: "1px solid rgba(231, 226, 210, 0.22)" },
-          boxShadow: { xs: "none", sm: "0 30px 70px rgba(0, 0, 0, 0.32)" },
-          backgroundColor: "background.default",
+          borderRadius: { xs: 0, sm: 6 },
+          border: { xs: 0, sm: "1px solid #E2E8F0" },
+          boxShadow: { xs: "none", sm: "0 25px 50px -12px rgba(15, 23, 42, 0.25)" },
+          backgroundColor: "#F8FAFC",
+          position: "relative",
         }}
       >
         <AppBar
@@ -394,61 +406,90 @@ export default function App() {
           elevation={0}
           sx={{
             flexShrink: 0,
-            overflow: "hidden",
-            backgroundColor: "background.main",
-            boxShadow: "inset 0 -1px rgba(255,255,255,0.12)",
+            background: "linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)",
+            color: "#FFFFFF",
+            px: { xs: 2.5, sm: 3.5 },
+            pt: { xs: "calc(16px + env(safe-area-inset-top))", sm: 2.5 },
+            pb: { xs: 2, sm: 2.5 },
           }}
         >
-          <Box
-            sx={{
-              position: "relative",
-              px: { xs: 2.5, sm: 4 },
-              pt: { xs: "calc(16px + env(safe-area-inset-top))", sm: 2.75 },
-              pb: { xs: 2.25, sm: 3 },
-              "&::after": {
-                content: '""',
-                position: "absolute",
-                width: 260,
-                height: 260,
-                right: -85,
-                top: -190,
-                border: "1px solid rgba(242,239,227,0.22)",
-                borderRadius: "50%",
-                boxShadow:
-                  "0 0 0 34px rgba(242,239,227,0.045), 0 0 0 68px rgba(242,239,227,0.035)",
-              },
-            }}
-          >
-            <Typography
-              variant="overline"
-              sx={{
-                position: "relative",
-                zIndex: 1,
-                color: "#B7C4BC",
-                opacity: 0.9,
-                fontSize: 11,
-                letterSpacing: 1,
-              }}
-            >
-              SISTEMA FAMILIAR
-            </Typography>
-            <Typography
-              variant="h5"
-              sx={{
-                position: "relative",
-                zIndex: 1,
-                mt: -0.5,
-                color: "#F2EFE3",
-                fontSize: { xs: 23, sm: 28 },
-                letterSpacing: -0.6,
-              }}
-            >
-              {tab === "hoje" && "Hoje em casa"}
-              {tab === "tarefas" && "Tarefas"}
-              {tab === "agenda" && "Agenda"}
-              {tab === "familia" && "Família"}
-            </Typography>
-          </Box>
+          <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
+            <Box>
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 0.25 }}>
+                <Box
+                  sx={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: 1.5,
+                    bgcolor: "rgba(255,255,255,0.15)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <HeartHandshake size={13} color="#A5B4FC" />
+                </Box>
+                <Typography
+                  variant="overline"
+                  sx={{
+                    color: "#A5B4FC",
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    letterSpacing: 1.2,
+                    lineHeight: 1,
+                  }}
+                >
+                  SISTEMA FAMILIAR
+                </Typography>
+              </Stack>
+              <Typography
+                variant="h5"
+                sx={{
+                  color: "#FFFFFF",
+                  fontSize: { xs: 20, sm: 25 },
+                  fontWeight: 800,
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                {tab === "hoje" && "Hoje em casa"}
+                {tab === "tarefas" && "Tarefas da Família"}
+                {tab === "agenda" && "Agenda Familiar"}
+                {tab === "familia" && "Nossa Família"}
+              </Typography>
+            </Box>
+
+            <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
+              {!!family && family.streak > 0 && (
+                <Chip
+                  size="small"
+                  icon={<Flame size={14} color="#F59E0B" />}
+                  label={`${family.streak} ${family.streak === 1 ? "dia" : "dias"}`}
+                  sx={{
+                    bgcolor: "rgba(245, 158, 11, 0.2)",
+                    color: "#FCD34D",
+                    fontWeight: 800,
+                    fontSize: 12,
+                    border: "1px solid rgba(245, 158, 11, 0.4)",
+                    "& .MuiChip-icon": { color: "#F59E0B" },
+                  }}
+                />
+              )}
+              {memberId && membersById[memberId] && (
+                <Avatar member={membersById[memberId]} size={36} showBorder />
+              )}
+              <IconButton
+                onClick={logout}
+                aria-label="Sair"
+                sx={{
+                  color: "#CBD5E1",
+                  bgcolor: "rgba(255,255,255,0.1)",
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.2)", color: "#FFFFFF" },
+                }}
+              >
+                <LogOut size={18} />
+              </IconButton>
+            </Stack>
+          </Stack>
         </AppBar>
 
         <Box
@@ -459,32 +500,34 @@ export default function App() {
             overflowY: "auto",
             display: "flex",
             flexDirection: "column",
-            gap: 2,
-            width: "min(100%, 920px)",
+            gap: 2.5,
+            width: "min(100%, 860px)",
             alignSelf: "center",
-            p: { xs: 2, sm: "24px 28px 28px" },
+            p: { xs: 2, sm: "24px 28px 32px" },
           }}
         >
           {loading && (
             <Stack
-              spacing={1.5}
+              spacing={2}
               sx={{
                 flex: 1,
-                color: "text.secondary",
+                color: "#64748B",
                 alignItems: "center",
                 justifyContent: "center",
+                py: 8,
               }}
             >
-              <CircularProgress size={28} color="primary" />
-              <Typography variant="body2">Carregando…</Typography>
+              <CircularProgress size={32} sx={{ color: "#4F46E5" }} />
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>Carregando dados da família...</Typography>
             </Stack>
           )}
           {!loading && loadError && (
             <Alert
               severity="error"
+              sx={{ borderRadius: 3 }}
               action={
                 <Button color="inherit" size="small" onClick={loadAll}>
-                  Tentar de novo
+                  Tentar novamente
                 </Button>
               }
             >
@@ -494,156 +537,190 @@ export default function App() {
           {!loading && !loadError && (
             <>
               {actionError && (
-                <Alert severity="error" onClose={() => setActionError(null)}>
+                <Alert severity="error" sx={{ borderRadius: 3 }} onClose={() => setActionError(null)}>
                   {actionError}
                 </Alert>
               )}
+
               {tab === "hoje" && (
-                <>
-                  <Stack
-                    direction="row"
+                <Stack spacing={2.5}>
+                  <Paper
+                    variant="outlined"
                     sx={{
-                      justifyContent: "space-between",
+                      p: 2,
+                      borderRadius: 4,
+                      bgcolor: "#FFFFFF",
+                      borderColor: "#E2E8F0",
+                      display: "flex",
                       alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 2,
                     }}
                   >
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      sx={{ alignItems: "baseline" }}
-                    >
-                      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                        Hoje em casa
+                    <Box sx={{ flex: 1 }}>
+                      <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 0.5 }}>
+                        <Sparkles size={16} color="#4F46E5" />
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#0F172A" }}>
+                          Sua rotina do dia
+                        </Typography>
+                      </Stack>
+                      <Typography variant="caption" sx={{ color: "#64748B", fontWeight: 500 }}>
+                        {deckQueue.length === 0
+                          ? "Tudo pronto! Nenhuma tarefa pendente no baralho."
+                          : `${deckQueue.length} ${deckQueue.length === 1 ? "tarefa pendente" : "tarefas pendentes"} no baralho.`}
                       </Typography>
-                      {!!family && family.streak > 0 && (
-                        <Chip
-                          size="small"
-                          icon={<Flame size={14} />}
-                          label={`${family.streak} ${family.streak === 1 ? "dia" : "dias"}`}
-                          sx={{
-                            bgcolor: "secondary.main",
-                            color: "secondary.contrastText",
-                            fontWeight: 700,
-                            "& .MuiChip-icon": { color: "inherit" },
-                          }}
-                        />
-                      )}
-                    </Stack>
-                    <Typography variant="caption" color="text.secondary">
-                      {deckQueue.length} restantes
-                    </Typography>
-                  </Stack>
+                    </Box>
+                    <Chip
+                      label={`${deckQueue.length} restantes`}
+                      size="small"
+                      sx={{
+                        fontWeight: 800,
+                        bgcolor: deckQueue.length === 0 ? "#DCFCE7" : "#EEF2FF",
+                        color: deckQueue.length === 0 ? "#15803D" : "#4F46E5",
+                        px: 0.5,
+                      }}
+                    />
+                  </Paper>
+
                   <TaskCardDeck
                     queue={deckQueue}
                     membersById={membersById}
                     onDecide={handleDeckDecide}
                   />
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    align="center"
-                    sx={{ px: 1.25 }}
+
+                  <Stack
+                    direction="row"
+                    spacing={1.5}
+                    sx={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      pt: 0.5,
+                    }}
                   >
-                    Arraste a carta: direita = feito, esquerda = passa pra
-                    outro, cima = adia
-                  </Typography>
-                </>
+                    <Chip label="👈 Esquerda: Passar" size="small" variant="outlined" sx={{ borderColor: "#CBD5E1", color: "#64748B", fontSize: 11, fontWeight: 600 }} />
+                    <Chip label="👆 Cima: Adiar" size="small" variant="outlined" sx={{ borderColor: "#FDE68A", color: "#D97706", bgcolor: "#FEF3C7", fontSize: 11, fontWeight: 600 }} />
+                    <Chip label="👉 Direita: Concluir" size="small" variant="outlined" sx={{ borderColor: "#A7F3D0", color: "#059669", bgcolor: "#ECFDF5", fontSize: 11, fontWeight: 600 }} />
+                  </Stack>
+                </Stack>
               )}
 
               {tab === "tarefas" && (
-                <Stack spacing={2}>
-                  {(["DAILY", "WEEKLY", "MONTHLY"] as TaskFrequency[]).map(
-                    (frequency) => {
-                      const list = tasks.filter(
-                        (task) => task.freq === frequency,
-                      );
-                      if (list.length === 0) return null;
-                      return (
-                        <Stack key={frequency} spacing={1}>
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ fontWeight: 700 }}
-                          >
-                            {frequency === "DAILY"
-                              ? "Diária"
-                              : frequency === "WEEKLY"
-                                ? "Semanal"
-                                : "Mensal"}
-                          </Typography>
-                          {list.map((task) => (
-                            <TaskDefinitionRow
-                              key={task.id}
-                              task={task}
-                              membersById={membersById}
-                            />
-                          ))}
-                        </Stack>
-                      );
-                    },
-                  )}
-                  {tasks.length === 0 && (
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      align="center"
-                      sx={{ py: 4 }}
+                <Stack spacing={2.5}>
+                  <Paper
+                    variant="outlined"
+                    sx={{ p: 1.5, borderRadius: 4, bgcolor: "#FFFFFF", borderColor: "#E2E8F0" }}
+                  >
+                    <ToggleButtonGroup
+                      exclusive
+                      fullWidth
+                      value={taskFilter}
+                      onChange={(_, nextFilter: "ALL" | TaskFrequency | null) =>
+                        nextFilter && setTaskFilter(nextFilter)
+                      }
+                      sx={{ gap: 1 }}
                     >
-                      Nenhuma tarefa cadastrada ainda. Toque em “+” para criar a
-                      primeira.
-                    </Typography>
-                  )}
+                      <ToggleButton value="ALL" sx={{ py: 1, borderRadius: "10px !important", border: "1px solid #E2E8F0 !important" }}>
+                        Todas ({tasks.length})
+                      </ToggleButton>
+                      <ToggleButton value="DAILY" sx={{ py: 1, borderRadius: "10px !important", border: "1px solid #E2E8F0 !important" }}>
+                        Diárias ({tasks.filter((t) => t.freq === "DAILY").length})
+                      </ToggleButton>
+                      <ToggleButton value="WEEKLY" sx={{ py: 1, borderRadius: "10px !important", border: "1px solid #E2E8F0 !important" }}>
+                        Semanais ({tasks.filter((t) => t.freq === "WEEKLY").length})
+                      </ToggleButton>
+                      <ToggleButton value="MONTHLY" sx={{ py: 1, borderRadius: "10px !important", border: "1px solid #E2E8F0 !important" }}>
+                        Mensais ({tasks.filter((t) => t.freq === "MONTHLY").length})
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                  </Paper>
+
+                  <Stack spacing={1.5}>
+                    {filteredTasks.map((task) => (
+                      <TaskDefinitionRow
+                        key={task.id}
+                        task={task}
+                        membersById={membersById}
+                      />
+                    ))}
+                    {filteredTasks.length === 0 && (
+                      <Paper
+                        variant="outlined"
+                        sx={{
+                          p: 4,
+                          borderRadius: 4,
+                          textAlign: "center",
+                          bgcolor: "#FFFFFF",
+                          borderColor: "#E2E8F0",
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ color: "#64748B", fontWeight: 600 }}>
+                          Nenhuma tarefa encontrada neste filtro.
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<Plus size={16} />}
+                          onClick={openSheet}
+                          sx={{ mt: 2 }}
+                        >
+                          Adicionar tarefa
+                        </Button>
+                      </Paper>
+                    )}
+                  </Stack>
                 </Stack>
               )}
 
               {tab === "agenda" && (
-                <Stack spacing={2}>
+                <Stack spacing={2.5}>
                   <Paper
                     variant="outlined"
-                    sx={{ p: { xs: 1.25, sm: 1.5, borderRadius: 8 } }}
+                    sx={{ p: { xs: 1.5, sm: 2 }, borderRadius: 5, bgcolor: "#FFFFFF", borderColor: "#E2E8F0" }}
                   >
                     <Stack
                       direction="row"
                       spacing={1}
-                      sx={{ mb: 1.5, alignItems: "center" }}
+                      sx={{ mb: 2, alignItems: "center" }}
                     >
                       <IconButton
                         aria-label="Semana anterior"
                         onClick={() => changeWeek(-1)}
                         sx={{
-                          border: "1px solid",
-                          borderColor: "divider",
-                          bgcolor: "#FDFCF8",
+                          border: "1px solid #E2E8F0",
+                          bgcolor: "#F8FAFC",
+                          "&:hover": { bgcolor: "#EEF2FF", color: "#4F46E5" },
                         }}
                       >
-                        <ChevronLeft size={19} strokeWidth={2.3} />
+                        <ChevronLeft size={18} strokeWidth={2.5} />
                       </IconButton>
                       <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography
                           variant="overline"
-                          color="text.secondary"
                           sx={{
                             display: "block",
                             fontSize: 10,
-                            lineHeight: 1.1,
-                            letterSpacing: 0.7,
+                            fontWeight: 800,
+                            letterSpacing: 0.8,
+                            color: "#64748B",
+                            lineHeight: 1,
                           }}
                         >
-                          SELECIONE UMA DATA
+                          SEMANA ATUAL
                         </Typography>
                         <Typography
-                          variant="subtitle2"
+                          variant="subtitle1"
                           noWrap
-                          sx={{ mt: 0.25 }}
+                          sx={{ fontWeight: 800, color: "#0F172A", mt: 0.25 }}
                         >
-                          {formatDate(weekDates[0])} —{" "}
-                          {formatDate(weekDates[6])}
+                          {formatDate(weekDates[0])} — {formatDate(weekDates[6])}
                         </Typography>
                       </Box>
                       <Button
                         variant="outlined"
                         size="small"
                         onClick={() => selectAgendaDate(todayISO())}
-                        sx={{ display: { xs: "none", sm: "inline-flex" } }}
+                        sx={{ display: { xs: "none", sm: "inline-flex" }, borderColor: "#E2E8F0" }}
                       >
                         Hoje
                       </Button>
@@ -651,9 +728,9 @@ export default function App() {
                         component="label"
                         aria-label="Escolher outra data"
                         sx={{
-                          border: "1px solid",
-                          borderColor: "divider",
-                          bgcolor: "#FDFCF8",
+                          border: "1px solid #E2E8F0",
+                          bgcolor: "#F8FAFC",
+                          "&:hover": { bgcolor: "#EEF2FF", color: "#4F46E5" },
                         }}
                       >
                         <CalendarDays size={18} strokeWidth={2.2} />
@@ -671,14 +748,15 @@ export default function App() {
                         aria-label="Próxima semana"
                         onClick={() => changeWeek(1)}
                         sx={{
-                          border: "1px solid",
-                          borderColor: "divider",
-                          bgcolor: "#FDFCF8",
+                          border: "1px solid #E2E8F0",
+                          bgcolor: "#F8FAFC",
+                          "&:hover": { bgcolor: "#EEF2FF", color: "#4F46E5" },
                         }}
                       >
-                        <ChevronRight size={19} strokeWidth={2.3} />
+                        <ChevronRight size={18} strokeWidth={2.5} />
                       </IconButton>
                     </Stack>
+
                     <Stack
                       direction="row"
                       spacing={1}
@@ -693,8 +771,6 @@ export default function App() {
                         return (
                           <Button
                             key={weekDates[index]}
-                            variant={isSelected ? "contained" : "outlined"}
-                            color="primary"
                             onClick={() => setSelectedDay(index)}
                             aria-pressed={isSelected}
                             sx={{
@@ -705,25 +781,23 @@ export default function App() {
                               display: "flex",
                               flexDirection: "column",
                               lineHeight: 1,
-                              bgcolor: isSelected ? "primary.main" : "#FDFCF8",
-                              borderColor: isSelected
-                                ? "primary.main"
-                                : "divider",
+                              borderRadius: 3.5,
+                              bgcolor: isSelected ? "#4F46E5" : "#F8FAFC",
+                              color: isSelected ? "#FFFFFF" : "#0F172A",
+                              border: "1px solid",
+                              borderColor: isSelected ? "#4F46E5" : "#E2E8F0",
+                              boxShadow: isSelected ? "0 4px 12px rgba(79, 70, 229, 0.3)" : "none",
                               "&:hover": {
-                                bgcolor: isSelected
-                                  ? "primary.dark"
-                                  : "#FDFCF8",
-                                borderColor: isSelected
-                                  ? "primary.dark"
-                                  : "#6B8F71",
+                                bgcolor: isSelected ? "#4338CA" : "#EEF2FF",
                               },
                             }}
                           >
                             <Typography
                               component="span"
                               sx={{
-                                fontSize: 10,
-                                opacity: 0.72,
+                                fontSize: 11,
+                                fontWeight: 700,
+                                opacity: isSelected ? 0.9 : 0.6,
                                 letterSpacing: 0.4,
                               }}
                             >
@@ -734,6 +808,7 @@ export default function App() {
                               sx={{
                                 mt: 0.5,
                                 fontSize: 20,
+                                fontWeight: 800,
                                 lineHeight: 1,
                               }}
                             >
@@ -744,13 +819,11 @@ export default function App() {
                                 component="span"
                                 aria-label="Tem compromisso"
                                 sx={{
-                                  width: 5,
-                                  height: 5,
+                                  width: 6,
+                                  height: 6,
                                   mt: 0.75,
                                   borderRadius: "50%",
-                                  bgcolor: isSelected
-                                    ? "secondary.main"
-                                    : "error.main",
+                                  bgcolor: isSelected ? "#FCD34D" : "#EF4444",
                                 }}
                               />
                             )}
@@ -759,18 +832,32 @@ export default function App() {
                       })}
                     </Stack>
                   </Paper>
-                  <Stack spacing={1}>
+
+                  <Stack spacing={1.5}>
                     {dayEvents.length === 0 && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        align="center"
-                        sx={{ py: 3.75 }}
+                      <Paper
+                        variant="outlined"
+                        sx={{
+                          p: 4,
+                          borderRadius: 4,
+                          textAlign: "center",
+                          bgcolor: "#FFFFFF",
+                          borderColor: "#E2E8F0",
+                        }}
                       >
-                        Nada agendado para este dia.
-                        <br />
-                        Toque em “+” para adicionar um compromisso.
-                      </Typography>
+                        <Typography variant="body2" sx={{ color: "#64748B", fontWeight: 600 }}>
+                          Nada agendado para este dia.
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<Plus size={16} />}
+                          onClick={openSheet}
+                          sx={{ mt: 2 }}
+                        >
+                          Adicionar compromisso
+                        </Button>
+                      </Paper>
                     )}
                     {dayEvents.map((event) => (
                       <EventCard
@@ -780,9 +867,10 @@ export default function App() {
                       />
                     ))}
                   </Stack>
+
                   {upcomingEvents.length > 0 && (
-                    <Stack spacing={1}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                    <Stack spacing={1.5} sx={{ pt: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#0F172A", px: 0.5 }}>
                         Próximos compromissos
                       </Typography>
                       {upcomingEvents.map((event) => (
@@ -798,24 +886,38 @@ export default function App() {
               )}
 
               {tab === "familia" && (
-                <Stack spacing={2}>
+                <Stack spacing={2.5}>
                   {featuredTask && (
                     <Paper
                       variant="outlined"
                       sx={{
                         display: "flex",
                         justifyContent: "center",
-                        p: 2,
-                        borderRadius: 4,
+                        p: 3,
+                        borderRadius: 5,
+                        bgcolor: "#FFFFFF",
+                        borderColor: "#E2E8F0",
                       }}
                     >
                       <Wheel task={featuredTask} members={members} />
                     </Paper>
                   )}
-                  <Stack spacing={1}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                      Membros
-                    </Typography>
+
+                  <Stack spacing={1.5}>
+                    <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", px: 0.5 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#0F172A" }}>
+                        Membros da Família ({members.length})
+                      </Typography>
+                      <Button
+                        size="small"
+                        startIcon={<UserPlus size={16} />}
+                        onClick={openSheet}
+                        sx={{ color: "#4F46E5", fontWeight: 700 }}
+                      >
+                        Convidar
+                      </Button>
+                    </Stack>
+
                     {members.map((member) => (
                       <Paper
                         key={member.id}
@@ -823,39 +925,34 @@ export default function App() {
                         sx={{
                           display: "flex",
                           alignItems: "center",
-                          gap: 1.25,
-                          p: "10px 12px",
-                          borderRadius: 3,
+                          justifyContent: "space-between",
+                          p: "12px 16px",
+                          borderRadius: 4,
+                          bgcolor: "#FFFFFF",
+                          borderColor: "#E2E8F0",
                         }}
                       >
-                        <Avatar member={member} size={34} />
-                        <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
-                          {member.name}
-                          {member.id === memberId && (
-                            <Typography
-                              component="span"
-                              sx={{
-                                fontWeight: 500,
-                                fontSize: 12.5,
-                                color: "text.secondary",
-                              }}
-                            >
-                              {" "}
-                              (você)
+                        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
+                          <Avatar member={member} size={38} />
+                          <Box>
+                            <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#0F172A" }}>
+                              {member.name}
+                              {member.id === memberId && (
+                                <Box component="span" sx={{ fontWeight: 600, fontSize: 13, color: "#4F46E5", ml: 0.75 }}>
+                                  (Você)
+                                </Box>
+                              )}
                             </Typography>
-                          )}
-                        </Typography>
+                          </Box>
+                        </Stack>
+                        <Chip
+                          label="Membro"
+                          size="small"
+                          sx={{ bgcolor: "#F1F5F9", color: "#475569", fontWeight: 600 }}
+                        />
                       </Paper>
                     ))}
                   </Stack>
-                  <Button
-                    variant="outlined"
-                    color="inherit"
-                    onClick={logout}
-                    sx={{ alignSelf: "flex-start" }}
-                  >
-                    Sair
-                  </Button>
                 </Stack>
               )}
             </>
@@ -864,7 +961,7 @@ export default function App() {
 
         {!loading && !loadError && (
           <Fab
-            color="default"
+            color="primary"
             aria-label={
               tab === "agenda"
                 ? "Adicionar compromisso"
@@ -876,18 +973,24 @@ export default function App() {
             sx={{
               position: "absolute",
               right: {
-                xs: 8,
-                sm: "max(28px, calc((100% - 920px) / 2 + 12px))",
+                xs: 20,
+                sm: "max(32px, calc((100% - 860px) / 2 + 16px))",
               },
               bottom: {
-                xs: "calc(72px + env(safe-area-inset-bottom))",
-                sm: 9.5,
+                xs: "calc(76px + env(safe-area-inset-bottom))",
+                sm: 24,
               },
-              boxShadow: "0 6px 16px rgba(217,164,65,0.5)",
-              "&:hover": { boxShadow: "0 10px 22px rgba(217,164,65,0.48)" },
+              zIndex: 10,
+              bgcolor: "#4F46E5",
+              color: "#FFFFFF",
+              width: 56,
+              height: 56,
+              boxShadow: "0 10px 25px -5px rgba(79, 70, 229, 0.5)",
+              "&:hover": { bgcolor: "#4338CA", transform: "scale(1.05)" },
+              transition: "all 0.2s ease-in-out",
             }}
           >
-            <Plus size={22} strokeWidth={2.5} className="" />
+            <Plus size={26} strokeWidth={2.5} />
           </Fab>
         )}
 
@@ -899,23 +1002,27 @@ export default function App() {
             flexShrink: 0,
             minHeight: {
               xs: "calc(64px + env(safe-area-inset-bottom))",
-              sm: 70,
+              sm: 68,
             },
-            px: { xs: 0.5, sm: 2.75 },
+            px: { xs: 1, sm: 3 },
             pb: { xs: "env(safe-area-inset-bottom)", sm: 0 },
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderTop: "1px solid #E2E8F0",
+            bgcolor: "#FFFFFF",
             "& .MuiBottomNavigationAction-root": {
               minWidth: 0,
               py: 1,
               borderRadius: 3,
-              mx: { xs: 0, sm: 0.4 },
+              mx: { xs: 0, sm: 0.5 },
+              color: "#64748B",
+              transition: "all 0.2s ease-in-out",
             },
-            "& .Mui-selected": { bgcolor: "rgba(30,58,50,0.1)" },
+            "& .Mui-selected": {
+              color: "#4F46E5",
+              bgcolor: "#EEF2FF",
+            },
             "& .MuiBottomNavigationAction-label": {
-              fontSize: 10.5,
-              fontWeight: 600,
+              fontSize: 11,
+              fontWeight: 700,
             },
           }}
         >
@@ -924,7 +1031,7 @@ export default function App() {
               key={id}
               value={id}
               label={label}
-              icon={<Icon size={19} strokeWidth={tab === id ? 2.4 : 2} />}
+              icon={<Icon size={20} strokeWidth={tab === id ? 2.5 : 2} />}
             />
           ))}
         </BottomNavigation>
@@ -937,25 +1044,27 @@ export default function App() {
         slotProps={{
           paper: {
             sx: {
-              width: "min(720px, 100%)",
+              width: "min(680px, 100%)",
               mx: "auto",
-              borderRadius: "22px 22px 0 0",
+              borderRadius: "24px 22px 0 0",
               p: {
-                xs: "20px 20px calc(20px + env(safe-area-inset-bottom))",
-                sm: 2.5,
+                xs: "24px 20px calc(24px + env(safe-area-inset-bottom))",
+                sm: 3,
               },
-              bgcolor: "background.default",
-              boxShadow: "0 -14px 42px rgba(18,33,26,0.2)",
+              bgcolor: "#FFFFFF",
+              boxShadow: "0 -20px 50px rgba(15, 23, 42, 0.15)",
             },
           },
         }}
       >
-        <Stack spacing={2}>
+        <Stack spacing={2.5}>
+          <Box sx={{ width: 36, height: 4, borderRadius: 2, bgcolor: "#CBD5E1", mx: "auto", mt: -1, mb: 0.5 }} />
+
           <Stack
             direction="row"
             sx={{ justifyContent: "space-between", alignItems: "center" }}
           >
-            <Typography variant="h6" sx={{ fontSize: 18 }}>
+            <Typography variant="h6" sx={{ fontSize: 19, fontWeight: 800, color: "#0F172A" }}>
               {sheetType === "task"
                 ? "Nova tarefa"
                 : sheetType === "event"
@@ -966,6 +1075,7 @@ export default function App() {
               <X size={20} />
             </IconButton>
           </Stack>
+
           {sheetType !== "invite" && (
             <ToggleButtonGroup
               exclusive
@@ -989,7 +1099,9 @@ export default function App() {
                 placeholder="Ex.: Passar roupa"
               />
               <Box>
-                <FormLabel component="legend">Frequência</FormLabel>
+                <FormLabel component="legend" sx={{ fontSize: 13, fontWeight: 700, color: "#475569", mb: 0.5 }}>
+                  Frequência
+                </FormLabel>
                 <ToggleButtonGroup
                   exclusive
                   fullWidth
@@ -997,7 +1109,6 @@ export default function App() {
                   onChange={(_, frequency: TaskFrequency | null) =>
                     frequency && setNewTaskFreq(frequency)
                   }
-                  sx={{ mt: 0.75 }}
                 >
                   {frequencyOptions.map((frequency) => (
                     <ToggleButton key={frequency.id} value={frequency.id}>
@@ -1008,7 +1119,9 @@ export default function App() {
               </Box>
               {newTaskFreq === "WEEKLY" && (
                 <Box>
-                  <FormLabel component="legend">Dia da semana</FormLabel>
+                  <FormLabel component="legend" sx={{ fontSize: 13, fontWeight: 700, color: "#475569", mb: 0.5 }}>
+                    Dia da semana
+                  </FormLabel>
                   <ToggleButtonGroup
                     exclusive
                     fullWidth
@@ -1016,14 +1129,13 @@ export default function App() {
                     onChange={(_, day: number | null) =>
                       day !== null && setNewTaskDayOfWeek(day)
                     }
-                    sx={{ mt: 0.75 }}
                   >
                     {WEEKDAYS.map((day, index) => (
                       <ToggleButton
                         key={day}
                         value={index}
                         sx={{
-                          fontSize: 11,
+                          fontSize: 12,
                         }}
                       >
                         {day[0]}
@@ -1044,7 +1156,9 @@ export default function App() {
                 />
               )}
               <Box>
-                <FormLabel component="legend">Peso / esforço</FormLabel>
+                <FormLabel component="legend" sx={{ fontSize: 13, fontWeight: 700, color: "#475569", mb: 0.5 }}>
+                  Nível de Esforço
+                </FormLabel>
                 <ToggleButtonGroup
                   exclusive
                   fullWidth
@@ -1052,22 +1166,11 @@ export default function App() {
                   onChange={(_, weight: 1 | 2 | 3 | null) =>
                     weight && setNewTaskWeight(weight)
                   }
-                  sx={{ mt: 0.75 }}
                 >
                   {[1, 2, 3].map((weight) => (
-                    <ToggleButton
-                      key={weight}
-                      value={weight}
-                      sx={{
-                        "&.Mui-selected": {
-                          bgcolor: "rgba(217,164,65,0.18)",
-                          borderColor: "secondary.main",
-                          "&:hover": { bgcolor: "rgba(217,164,65,0.26)" },
-                        },
-                      }}
-                    >
-                      {"●".repeat(weight)}
-                      {"○".repeat(3 - weight)}
+                    <ToggleButton key={weight} value={weight} sx={{ gap: 0.5 }}>
+                      <Zap size={14} fill={newTaskWeight === weight ? "#4F46E5" : "none"} />
+                      Esforço {weight}
                     </ToggleButton>
                   ))}
                 </ToggleButtonGroup>
@@ -1077,6 +1180,7 @@ export default function App() {
                 size="large"
                 onClick={addTask}
                 disabled={!newTaskName.trim() || members.length === 0}
+                sx={{ py: 1.5, mt: 1 }}
               >
                 Adicionar tarefa
               </Button>
@@ -1090,7 +1194,9 @@ export default function App() {
                 placeholder="Ex.: Consulta médica"
               />
               <Box>
-                <FormLabel component="legend">Dia</FormLabel>
+                <FormLabel component="legend" sx={{ fontSize: 13, fontWeight: 700, color: "#475569", mb: 0.5 }}>
+                  Dia
+                </FormLabel>
                 <ToggleButtonGroup
                   exclusive
                   fullWidth
@@ -1098,14 +1204,13 @@ export default function App() {
                   onChange={(_, day: number | null) =>
                     day !== null && setNewEventDay(day)
                   }
-                  sx={{ mt: 0.75 }}
                 >
                   {WEEKDAYS.map((day, index) => (
                     <ToggleButton
                       key={day}
                       value={index}
                       sx={{
-                        fontSize: 11,
+                        fontSize: 12,
                       }}
                     >
                       {day[0]}
@@ -1121,23 +1226,23 @@ export default function App() {
                 slotProps={{ inputLabel: { shrink: true } }}
               />
               <Box>
-                <FormLabel component="legend">Quem participa</FormLabel>
+                <FormLabel component="legend" sx={{ fontSize: 13, fontWeight: 700, color: "#475569", mb: 0.5 }}>
+                  Quem participa
+                </FormLabel>
                 <ToggleButtonGroup
                   value={newEventMembers}
                   onChange={(_, participantIds: string[]) =>
                     setNewEventMembers(participantIds)
                   }
                   sx={{
-                    mt: 0.75,
                     display: "flex",
                     flexWrap: "wrap",
                     gap: 1,
                     "& .MuiToggleButtonGroup-grouped": {
-                      border: "1px solid",
-                      borderColor: "divider",
-                      borderRadius: "999px !important",
+                      border: "1px solid #E2E8F0",
+                      borderRadius: "99px !important",
                       m: "0 !important",
-                      px: 1.25,
+                      px: 1.5,
                       py: 0.75,
                     },
                   }}
@@ -1148,7 +1253,7 @@ export default function App() {
                       value={member.id}
                       sx={{ gap: 0.75 }}
                     >
-                      <Avatar member={member} size={20} />
+                      <Avatar member={member} size={20} showBorder={false} />
                       {member.name}
                     </ToggleButton>
                   ))}
@@ -1159,6 +1264,7 @@ export default function App() {
                 size="large"
                 onClick={addEvent}
                 disabled={!newEventTitle.trim() || !newEventTime.trim()}
+                sx={{ py: 1.5, mt: 1 }}
               >
                 Adicionar compromisso
               </Button>
@@ -1166,12 +1272,14 @@ export default function App() {
           ) : (
             <Stack spacing={2}>
               {actionError && (
-                <Alert severity="error" onClose={() => setActionError(null)}>
+                <Alert severity="error" sx={{ borderRadius: 3 }} onClose={() => setActionError(null)}>
                   {actionError}
                 </Alert>
               )}
               <Box>
-                <FormLabel component="legend">Quem é</FormLabel>
+                <FormLabel component="legend" sx={{ fontSize: 13, fontWeight: 700, color: "#475569", mb: 0.5 }}>
+                  Quem é a pessoa?
+                </FormLabel>
                 <ToggleButtonGroup
                   exclusive
                   value={inviteMemberId}
@@ -1179,16 +1287,14 @@ export default function App() {
                     id && setInviteMemberId(id)
                   }
                   sx={{
-                    mt: 0.75,
                     display: "flex",
                     flexWrap: "wrap",
                     gap: 1,
                     "& .MuiToggleButtonGroup-grouped": {
-                      border: "1px solid",
-                      borderColor: "divider",
-                      borderRadius: "999px !important",
+                      border: "1px solid #E2E8F0",
+                      borderRadius: "99px !important",
                       m: "0 !important",
-                      px: 1.25,
+                      px: 1.5,
                       py: 0.75,
                     },
                   }}
@@ -1199,7 +1305,7 @@ export default function App() {
                       value={member.id}
                       sx={{ gap: 0.75 }}
                     >
-                      <Avatar member={member} size={20} />
+                      <Avatar member={member} size={20} showBorder={false} />
                       {member.name}
                     </ToggleButton>
                   ))}
@@ -1212,9 +1318,8 @@ export default function App() {
                 onChange={(event) => setInviteEmail(event.target.value)}
                 placeholder="nome@exemplo.com"
               />
-              <Typography variant="caption" color="text.secondary">
-                A pessoa recebe um e-mail com senha temporária e define a senha
-                definitiva no primeiro acesso.
+              <Typography variant="caption" sx={{ color: "#64748B" }}>
+                A pessoa receberá um e-mail com senha temporária para acesso.
               </Typography>
               <Button
                 variant="contained"
@@ -1223,9 +1328,10 @@ export default function App() {
                 disabled={inviting || !inviteEmail.trim() || !inviteMemberId}
                 startIcon={
                   inviting ? (
-                    <CircularProgress size={16} color="inherit" />
+                    <CircularProgress size={18} color="inherit" />
                   ) : undefined
                 }
+                sx={{ py: 1.5, mt: 1 }}
               >
                 Enviar convite
               </Button>
@@ -1241,10 +1347,11 @@ export default function App() {
         message={lastDecision ? `"${lastDecision.name}" saiu do baralho` : ""}
         action={
           <Button
-            color="inherit"
+            color="secondary"
             size="small"
             disabled={undoing}
             onClick={handleUndo}
+            sx={{ fontWeight: 800 }}
           >
             Desfazer
           </Button>

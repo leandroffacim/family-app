@@ -1,14 +1,12 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Paper } from "@mui/material";
+import { RefreshCw } from "lucide-react";
 import { Member, Task } from "../types";
 
-// Mostra o rodízio atual de uma tarefa (quem é a vez). Somente
-// leitura: o avanço do rodízio só acontece de verdade quando alguém
-// desliza "passa" no baralho do dia — aqui é só o retrato do estado.
 export function Wheel({ task, members }: { task: Task; members: Member[] }) {
   if (members.length === 0) return null;
 
-  const radius = 72;
-  const center = 84;
+  const radius = 76;
+  const center = 90;
   const segAngle = 360 / members.length;
   const currentId =
     task.rotationOrder[task.currentIndex % task.rotationOrder.length];
@@ -26,21 +24,22 @@ export function Wheel({ task, members }: { task: Task; members: Member[] }) {
     const lx = center + radius * 0.62 * Math.cos(toRad(midAngle));
     const ly = center + radius * 0.62 * Math.sin(toRad(midAngle));
     const isCurrent = m.id === currentId;
+
     return (
       <g key={m.id}>
         <path
           d={`M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${x2} ${y2} Z`}
-          fill={m.color}
-          opacity={isCurrent ? 1 : 0.35}
-          stroke="#F2EFE3"
-          strokeWidth="2"
+          fill={m.color || "#4F46E5"}
+          opacity={isCurrent ? 1 : 0.4}
+          stroke="#FFFFFF"
+          strokeWidth="3"
         />
         <text
           x={lx}
           y={ly}
-          fill="#F2EFE3"
-          fontWeight="700"
-          fontSize="13"
+          fill="#FFFFFF"
+          fontWeight="800"
+          fontSize="14"
           textAnchor="middle"
           dominantBaseline="middle"
         >
@@ -56,7 +55,9 @@ export function Wheel({ task, members }: { task: Task; members: Member[] }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: 1,
+        gap: 2,
+        width: "100%",
+        py: 1,
       }}
     >
       <Box sx={{ position: "relative", width: center * 2, height: center * 2 }}>
@@ -65,32 +66,44 @@ export function Wheel({ task, members }: { task: Task; members: Member[] }) {
           <circle
             cx={center}
             cy={center}
-            r="20"
-            fill="#F2EFE3"
-            stroke="#1E3A32"
-            strokeWidth="2"
+            r="22"
+            fill="#FFFFFF"
+            stroke="#E2E8F0"
+            strokeWidth="3"
           />
         </svg>
         <Box
           sx={{
             position: "absolute",
-            top: -0.75,
+            top: -2,
             left: "50%",
             transform: "translateX(-50%)",
             width: 0,
             height: 0,
-            borderLeft: "7px solid transparent",
-            borderRight: "7px solid transparent",
-            borderTop: "12px solid #22281F",
+            borderLeft: "8px solid transparent",
+            borderRight: "8px solid transparent",
+            borderTop: "14px solid #4F46E5",
+            filter: "drop-shadow(0 2px 4px rgba(79, 70, 229, 0.3))",
           }}
         />
       </Box>
       <Box sx={{ textAlign: "center" }}>
-        <Typography sx={{ fontSize: 11, color: "#6B7268", letterSpacing: 1 }}>
-          RODÍZIO · {task.name.toUpperCase()}
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: "#4F46E5",
+            letterSpacing: 1.2,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 0.5,
+          }}
+        >
+          <RefreshCw size={12} /> RODÍZIO ATUAL · {task.name.toUpperCase()}
         </Typography>
-        <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#22281F" }}>
-          Vez de {current?.name ?? "?"}
+        <Typography variant="h6" sx={{ fontWeight: 800, fontSize: 18, color: "#0F172A", mt: 0.25 }}>
+          Vez de <Box component="span" sx={{ color: "#4F46E5" }}>{current?.name ?? "?"}</Box>
         </Typography>
       </Box>
     </Box>
