@@ -177,3 +177,9 @@ Executado em worktree isolado (`git worktree add /tmp/sensor-scratch HEAD`), nun
 **Issues found**: 1 mutante sobrevivente (Minor) — suíte de teste não distingue `memberId` real de um valor hardcoded "owner"; ver Fix 1.
 
 **Next steps**: opcional — adicionar o 5º caso de teste da Fix 1 antes de considerar a cobertura de `assertFamilyAccess` completamente robusta. Não bloqueia o merge/deploy desta feature.
+
+---
+
+## Post-Verification Fix Applied
+
+Fix 1 aplicada em `92b3ccb` (`test(auth): add memberId discrimination case to assertFamilyAccess suite`): novo caso de teste com `custom:memberId: "ana"` + `expect(result.memberId).toBe("ana")`, matando o mutante que sobrevivia (retorno hardcoded `"owner"`). Suíte agora com 5/5 testes passando (`npx vitest run`).
