@@ -23,6 +23,18 @@ describe("assertFamilyAccess", () => {
     expect(result).toEqual({ memberId: "owner", email: "owner@example.com", familyId: "fam-123" });
   });
 
+  it("returns the actual custom:memberId claim, not a hardcoded value", () => {
+    const event = eventWithClaims({
+      "custom:memberId": "ana",
+      "custom:familyId": "fam-123",
+      email: "ana@example.com",
+    });
+
+    const result = assertFamilyAccess(event, "fam-123");
+
+    expect(result.memberId).toBe("ana");
+  });
+
   it("throws ForbiddenFamilyError when custom:familyId does not match the requested familyId", () => {
     const event = eventWithClaims({
       "custom:memberId": "owner",
