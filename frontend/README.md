@@ -9,7 +9,7 @@ rodízio da família. Consome a API do backend serverless
 ```bash
 npm install
 cp .env.example .env
-# edite .env com a ApiUrl do output do `sam deploy` e o FamilyId usado no seed
+# edite .env com a ApiUrl do output do `sam deploy` e os ids do Cognito
 npm run dev
 ```
 
@@ -18,7 +18,12 @@ npm run dev
 | Variável | Onde pegar |
 |---|---|
 | `VITE_API_URL` | Output `ApiUrl` do `sam deploy` do backend |
-| `VITE_FAMILY_ID` | O mesmo `FamilyId` passado no `sam deploy --guided` |
+| `VITE_COGNITO_USER_POOL_ID` | Output `UserPoolId` do `sam deploy` do backend |
+| `VITE_COGNITO_CLIENT_ID` | Output `UserPoolClientId` do `sam deploy` do backend |
+
+O `familyId` não é configurado por env var: ele vem do `idToken`
+depois que a pessoa se cadastra (self sign-up) ou faz login — o app
+lê `custom:familyId` do token e usa isso em todas as chamadas à API.
 
 ## Build de produção
 

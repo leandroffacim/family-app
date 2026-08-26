@@ -711,7 +711,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] Nenhuma referência restante a `VITE_FAMILY_ID`
+- [x] Nenhuma referência restante a `VITE_FAMILY_ID`
 
 ---
 
