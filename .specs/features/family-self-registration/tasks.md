@@ -373,7 +373,9 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] Mesmo critério do T6 aplicado
+- [x] Mesmo critério do T6 aplicado
+
+**Status**: ✅ Complete
 
 ---
 
