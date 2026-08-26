@@ -5,7 +5,10 @@
 //
 // Uso:
 //   export USER_POOL_ID=<valor do output UserPoolId do sam deploy>
-//   npm run invite-user -- <email> <memberId>
+//   npm run invite-user -- <email> <familyId> <memberId>
+//
+// <familyId> tem que ser o mesmo id usado em FAMILY#{familyId} (o que
+// aparece em scripts/seed.ts).
 //
 // <memberId> tem que ser o mesmo id usado em MEMBER#{memberId} (o que
 // aparece em scripts/seed.ts, ex.: "voce", "ana", "theo") — é isso
@@ -21,14 +24,14 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 
 const USER_POOL_ID = process.env.USER_POOL_ID;
-const [, , email, memberId] = process.argv;
+const [, , email, familyId, memberId] = process.argv;
 
 if (!USER_POOL_ID) {
   console.error("Defina USER_POOL_ID antes de rodar (veja o output do `sam deploy`).");
   process.exit(1);
 }
-if (!email || !memberId) {
-  console.error("Uso: npm run invite-user -- <email> <memberId>");
+if (!email || !familyId || !memberId) {
+  console.error("Uso: npm run invite-user -- <email> <familyId> <memberId>");
   process.exit(1);
 }
 
@@ -42,6 +45,7 @@ async function main() {
       UserAttributes: [
         { Name: "email", Value: email },
         { Name: "email_verified", Value: "true" },
+        { Name: "custom:familyId", Value: familyId },
         { Name: "custom:memberId", Value: memberId },
       ],
       // sem MessageAction: SUPPRESS -> Cognito gera a senha temporária
@@ -50,7 +54,7 @@ async function main() {
     })
   );
 
-  console.log(`Convite enviado para ${email} (memberId=${memberId}).`);
+  console.log(`Convite enviado para ${email} (familyId=${familyId}, memberId=${memberId}).`);
 }
 
 main().catch((e) => {
