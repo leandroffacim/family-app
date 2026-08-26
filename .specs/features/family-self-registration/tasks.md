@@ -433,9 +433,9 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] Handler não lê mais `process.env.FAMILY_ID`
-- [ ] Loop captura exceção por família e segue pras demais (log do erro, sem `throw`)
-- [ ] Verificação manual: `sam local invoke GenerateDailyDeckFunction` com 2 famílias seedadas gera `INSTANCE#` pras duas
+- [x] Handler não lê mais `process.env.FAMILY_ID`
+- [x] Loop captura exceção por família e segue pras demais (log do erro, sem `throw`)
+- [ ] Verificação manual: `sam local invoke GenerateDailyDeckFunction` com 2 famílias seedadas gera `INSTANCE#` pras duas (não executado neste ambiente — sem `sam`/docker disponíveis; gate de typecheck passou)
 
 ---
 

@@ -1,17 +1,16 @@
-import { QueryCommand, PutCommand, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { ScanCommand, QueryCommand, PutCommand, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { ddb, TABLE_NAME } from "../../lib/dynamo";
-import { familyPK, instanceSK, gsi1pkMember, metadataSK } from "../../lib/keys";
+import { instanceSK, gsi1pkMember, metadataSK } from "../../lib/keys";
 import { todayISO, weekdayIndex, dayOfMonthOf, shiftISO } from "../../lib/date";
 import { Task } from "../../lib/types";
 
-// Disparado pelo EventBridge (cron diário). Lê as TASK# da família
-// configurada em FAMILY_ID e cria a INSTANCE# do dia para cada
-// tarefa que está "em dia" hoje, respeitando a frequência.
+// Disparado pelo EventBridge (cron diário). Faz um Scan pra achar
+// todas as FAMILY#{id}/METADATA existentes e cria a INSTANCE# do dia
+// para cada tarefa "em dia" hoje, em cada família, respeitando a
+// frequência.
 //
 // Idempotente: usa ConditionExpression pra nunca sobrescrever uma
 // instância que já existe (ex: se o job rodar 2x no mesmo dia).
-
-const FAMILY_ID = process.env.FAMILY_ID as string;
 
 function isDueToday(task: Task, date: string): boolean {
   if (task.freq === "DAILY") return true;
@@ -65,9 +64,31 @@ async function updateStreak(pk: string, today: string): Promise<number> {
   return nextStreak;
 }
 
-export const handler = async () => {
-  const date = todayISO();
-  const pk = familyPK(FAMILY_ID);
+async function scanFamilyIds(): Promise<string[]> {
+  const familyIds: string[] = [];
+  let ExclusiveStartKey: Record<string, unknown> | undefined;
+
+  do {
+    const result = await ddb.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+        FilterExpression: "SK = :metadata",
+        ExpressionAttributeValues: { ":metadata": metadataSK() },
+        ExclusiveStartKey,
+      })
+    );
+    for (const item of result.Items ?? []) {
+      const pk = item.PK as string;
+      familyIds.push(pk.replace("FAMILY#", ""));
+    }
+    ExclusiveStartKey = result.LastEvaluatedKey;
+  } while (ExclusiveStartKey);
+
+  return familyIds;
+}
+
+async function processFamily(familyId: string, date: string) {
+  const pk = `FAMILY#${familyId}`;
 
   const streak = await updateStreak(pk, date);
 
@@ -92,7 +113,7 @@ export const handler = async () => {
           Item: {
             PK: pk,
             SK: instanceSK(date, task.id),
-            GSI1PK: gsi1pkMember(FAMILY_ID, assignee),
+            GSI1PK: gsi1pkMember(familyId, assignee),
             GSI1SK: date,
             date,
             taskId: task.id,
@@ -111,8 +132,28 @@ export const handler = async () => {
     }
   }
 
-  console.log(
-    `Baralho de ${date}: ${created}/${dueTasks.length} instâncias criadas (streak=${streak})`
-  );
-  return { date, created, due: dueTasks.length, streak };
+  return { created, due: dueTasks.length, streak };
+}
+
+export const handler = async () => {
+  const date = todayISO();
+  const familyIds = await scanFamilyIds();
+
+  const results: Record<string, { created: number; due: number; streak: number } | { error: string }> = {};
+
+  for (const familyId of familyIds) {
+    try {
+      results[familyId] = await processFamily(familyId, date);
+      const r = results[familyId] as { created: number; due: number; streak: number };
+      console.log(
+        `Baralho de ${date} (família ${familyId}): ${r.created}/${r.due} instâncias criadas (streak=${r.streak})`
+      );
+    } catch (err) {
+      results[familyId] = { error: err instanceof Error ? err.message : String(err) };
+      console.error(`Falha ao gerar baralho da família ${familyId}:`, err);
+    }
+  }
+
+  return { date, families: results };
 };
+
