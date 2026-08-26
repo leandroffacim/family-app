@@ -508,8 +508,8 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] `Session.familyId` populado a partir de `custom:familyId`
-- [ ] Gate Build (frontend) passa
+- [x] `Session.familyId` populado a partir de `custom:familyId`
+- [x] Gate Build (frontend) passa
 
 ---
 

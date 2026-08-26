@@ -14,6 +14,7 @@ export interface Session {
   idToken: string;
   memberId: string | null;
   email: string | null;
+  familyId: string | null;
 }
 
 function sessionFromCognito(session: CognitoUserSession): Session {
@@ -22,6 +23,7 @@ function sessionFromCognito(session: CognitoUserSession): Session {
     idToken: session.getIdToken().getJwtToken(),
     memberId: (payload["custom:memberId"] as string | undefined) ?? null,
     email: (payload["email"] as string | undefined) ?? null,
+    familyId: (payload["custom:familyId"] as string | undefined) ?? null,
   };
 }
 
