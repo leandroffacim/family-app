@@ -619,9 +619,9 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] Código errado/expirado permite reenviar sem recriar cadastro
-- [ ] Confirmação correta redireciona pra tela de login com e-mail preenchido
-- [ ] Gate Build (frontend) passa
+- [x] Código errado/expirado permite reenviar sem recriar cadastro
+- [x] Confirmação correta redireciona pra tela de login com e-mail preenchido
+- [x] Gate Build (frontend) passa
 
 ---
 
