@@ -79,11 +79,10 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: sistema-familiar-users
-      # Só admin cria conta (via script scripts/inviteUser.ts) — sem
-      # self sign-up, é uma família fechada. O Cognito manda o e-mail
-      # de convite sozinho (cota padrão ~50/dia, sem precisar de SES).
+      # Self sign-up habilitado: qualquer família nova cria sua conta
+      # sozinha (trigger PostConfirmation cria FAMILY#/MEMBER#owner).
       AdminCreateUserConfig:
-        AllowAdminCreateUserOnly: true
+        AllowAdminCreateUserOnly: false
         InviteMessageTemplate:
           EmailSubject: "Seu convite pro Sistema Familiar"
           EmailMessage: >-
@@ -103,6 +102,19 @@ Resources:
         # MEMBER#{memberId} na tabela) — vem no idToken como
         # custom:memberId depois do login.
         - Name: memberId
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+        # Liga a conta do Cognito à família (id do FAMILY#{familyId} na
+        # tabela) — vem no idToken como custom:familyId depois do login;
+        # gravado pelo trigger PostConfirmation no cadastro.
+        - Name: familyId
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+        # Nome da família informado no cadastro, lido só pelo trigger
+        # PostConfirmation (nunca usado depois disso).
+        - Name: familyName
           AttributeDataType: String
           Mutable: true
           Required: false

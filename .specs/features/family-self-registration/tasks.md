@@ -164,8 +164,10 @@ T28 → T29 → T30 → T31
 - Skill: NONE
 
 **Done when**:
-- [ ] `sam build` valida o template sem erro
-- [ ] Schema lista `email`, `memberId`, `familyId`, `familyName`
+- [x] `sam build` valida o template sem erro
+- [x] Schema lista `email`, `memberId`, `familyId`, `familyName`
+
+**Status**: ✅ Complete
 
 ---
 
