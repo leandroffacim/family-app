@@ -601,8 +601,8 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] Erros do Cognito (e-mail em uso, senha fraca) aparecem traduzidos na tela, sem travar o formulário
-- [ ] Gate Build (frontend) passa
+- [x] Erros do Cognito (e-mail em uso, senha fraca) aparecem traduzidos na tela, sem travar o formulário
+- [x] Gate Build (frontend) passa
 
 ---
 
