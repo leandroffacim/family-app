@@ -1,17 +1,17 @@
 import { Member, Task, TaskInstance, FamilyEvent, TaskFrequency, TaskWeight, Family } from "../types";
-import { getToken, notifyUnauthorized } from "../auth/tokenStore";
+import { getFamilyId, getToken, notifyUnauthorized } from "../auth/tokenStore";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const FAMILY_ID = import.meta.env.VITE_FAMILY_ID;
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  if (!API_URL || !FAMILY_ID) {
+  const familyId = getFamilyId();
+  if (!API_URL || !familyId) {
     throw new Error(
-      "VITE_API_URL / VITE_FAMILY_ID não configurados — copie .env.example para .env e preencha."
+      "VITE_API_URL não configurado ou familyId ausente — verifique .env e se o login foi concluído."
     );
   }
   const token = getToken();
-  const res = await fetch(`${API_URL}/families/${FAMILY_ID}${path}`, {
+  const res = await fetch(`${API_URL}/families/${familyId}${path}`, {
     headers: {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

@@ -562,8 +562,8 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] Nenhuma referência a `import.meta.env.VITE_FAMILY_ID` restante em `client.ts`
-- [ ] Smoke test manual: logado, o app carrega o baralho do dia normalmente
+- [x] Nenhuma referência a `import.meta.env.VITE_FAMILY_ID` restante em `client.ts`
+- [x] Smoke test manual: logado, o app carrega o baralho do dia normalmente
 
 ---
 
