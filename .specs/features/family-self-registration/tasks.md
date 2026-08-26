@@ -659,7 +659,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] `VITE_FAMILY_ID` removida do arquivo
+- [x] `VITE_FAMILY_ID` removida do arquivo
 
 ---
 
