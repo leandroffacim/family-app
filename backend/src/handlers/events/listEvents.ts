@@ -1,9 +1,13 @@
 import { QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyHandler } from "aws-lambda";
+import {
+  assertFamilyAccess,
+  ForbiddenFamilyError,
+  UnlinkedAccountError,
+} from "../../lib/auth";
 import { ddb, TABLE_NAME } from "../../lib/dynamo";
 import { familyPK } from "../../lib/keys";
 import { err, ok } from "../../lib/response";
-import { assertFamilyAccess, UnlinkedAccountError, ForbiddenFamilyError } from "../../lib/auth";
 
 // GET /families/{familyId}/events?date=YYYY-MM-DD (opcional — sem
 // data, retorna todos os compromissos cadastrados)
@@ -15,7 +19,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     assertFamilyAccess(event, familyId);
   } catch (e) {
-    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError) return err(403, e.message);
+    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError)
+      return err(403, e.message);
     throw e;
   }
 

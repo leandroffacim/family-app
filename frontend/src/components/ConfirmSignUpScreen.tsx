@@ -5,8 +5,8 @@ import {
   CircularProgress,
   Paper,
   Stack,
-  Typography,
   TextField,
+  Typography,
 } from "@mui/material";
 import { FormEvent, useState } from "react";
 import * as cognito from "../auth/cognito";
@@ -37,7 +37,9 @@ export function ConfirmSignUpScreen({
       onConfirmed(email);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Não foi possível confirmar o código",
+        err instanceof Error
+          ? err.message
+          : "Não foi possível confirmar o código",
       );
     } finally {
       setSubmitting(false);
@@ -53,7 +55,9 @@ export function ConfirmSignUpScreen({
       setInfo("Novo código enviado pro seu e-mail.");
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Não foi possível reenviar o código",
+        err instanceof Error
+          ? err.message
+          : "Não foi possível reenviar o código",
       );
     } finally {
       setResending(false);
@@ -111,7 +115,9 @@ export function ConfirmSignUpScreen({
             size="large"
             disabled={submitting || !code.trim()}
             startIcon={
-              submitting ? <CircularProgress size={16} color="inherit" /> : undefined
+              submitting ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : undefined
             }
           >
             Confirmar
@@ -122,7 +128,9 @@ export function ConfirmSignUpScreen({
             onClick={onResend}
             disabled={resending}
             startIcon={
-              resending ? <CircularProgress size={16} color="inherit" /> : undefined
+              resending ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : undefined
             }
           >
             Reenviar código

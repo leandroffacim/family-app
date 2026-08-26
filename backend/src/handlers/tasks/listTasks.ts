@@ -1,9 +1,13 @@
-import { APIGatewayProxyHandler } from "aws-lambda";
 import { QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { APIGatewayProxyHandler } from "aws-lambda";
+import {
+  assertFamilyAccess,
+  ForbiddenFamilyError,
+  UnlinkedAccountError,
+} from "../../lib/auth";
 import { ddb, TABLE_NAME } from "../../lib/dynamo";
 import { familyPK } from "../../lib/keys";
-import { ok, err } from "../../lib/response";
-import { assertFamilyAccess, UnlinkedAccountError, ForbiddenFamilyError } from "../../lib/auth";
+import { err, ok } from "../../lib/response";
 
 // GET /families/{familyId}/tasks
 export const handler: APIGatewayProxyHandler = async (event) => {
@@ -13,7 +17,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     assertFamilyAccess(event, familyId);
   } catch (e) {
-    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError) return err(403, e.message);
+    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError)
+      return err(403, e.message);
     throw e;
   }
 
@@ -21,8 +26,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     new QueryCommand({
       TableName: TABLE_NAME,
       KeyConditionExpression: "PK = :pk AND begins_with(SK, :prefix)",
-      ExpressionAttributeValues: { ":pk": familyPK(familyId), ":prefix": "TASK#" },
-    })
+      ExpressionAttributeValues: {
+        ":pk": familyPK(familyId),
+        ":prefix": "TASK#",
+      },
+    }),
   );
 
   return ok({ items: result.Items ?? [] });

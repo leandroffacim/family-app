@@ -68,9 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       applySession(result.session);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Não foi possível entrar",
-      );
+      setError(err instanceof Error ? err.message : "Não foi possível entrar");
       throw err;
     }
   };
@@ -94,7 +92,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({ status, memberId, email, error, login, completeNewPassword, logout }),
+    () => ({
+      status,
+      memberId,
+      email,
+      error,
+      login,
+      completeNewPassword,
+      logout,
+    }),
     [status, memberId, email, error],
   );
 

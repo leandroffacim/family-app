@@ -5,8 +5,8 @@ import {
   CircularProgress,
   Paper,
   Stack,
-  Typography,
   TextField,
+  Typography,
 } from "@mui/material";
 import { FormEvent, useState } from "react";
 import * as cognito from "../auth/cognito";
@@ -103,9 +103,13 @@ export function SignUpScreen({ onSignedUp, onBackToLogin }: SignUpScreenProps) {
           type="submit"
           variant="contained"
           size="large"
-          disabled={submitting || !familyName.trim() || !email.trim() || !password}
+          disabled={
+            submitting || !familyName.trim() || !email.trim() || !password
+          }
           startIcon={
-            submitting ? <CircularProgress size={16} color="inherit" /> : undefined
+            submitting ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : undefined
           }
         >
           Criar conta

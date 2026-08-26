@@ -1,8 +1,14 @@
-import { describe, expect, it } from "vitest";
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { assertFamilyAccess, ForbiddenFamilyError, UnlinkedAccountError } from "../auth";
+import { describe, expect, it } from "vitest";
+import {
+  assertFamilyAccess,
+  ForbiddenFamilyError,
+  UnlinkedAccountError,
+} from "../auth";
 
-function eventWithClaims(claims: Record<string, string> | undefined): APIGatewayProxyEvent {
+function eventWithClaims(
+  claims: Record<string, string> | undefined,
+): APIGatewayProxyEvent {
   return {
     requestContext: {
       authorizer: claims === undefined ? undefined : { claims },
@@ -20,7 +26,11 @@ describe("assertFamilyAccess", () => {
 
     const result = assertFamilyAccess(event, "fam-123");
 
-    expect(result).toEqual({ memberId: "owner", email: "owner@example.com", familyId: "fam-123" });
+    expect(result).toEqual({
+      memberId: "owner",
+      email: "owner@example.com",
+      familyId: "fam-123",
+    });
   });
 
   it("returns the actual custom:memberId claim, not a hardcoded value", () => {
@@ -42,7 +52,9 @@ describe("assertFamilyAccess", () => {
       email: "owner@example.com",
     });
 
-    expect(() => assertFamilyAccess(event, "fam-999")).toThrow(ForbiddenFamilyError);
+    expect(() => assertFamilyAccess(event, "fam-999")).toThrow(
+      ForbiddenFamilyError,
+    );
   });
 
   it("throws UnlinkedAccountError when custom:familyId claim is absent", () => {
@@ -51,7 +63,9 @@ describe("assertFamilyAccess", () => {
       email: "owner@example.com",
     });
 
-    expect(() => assertFamilyAccess(event, "fam-123")).toThrow(UnlinkedAccountError);
+    expect(() => assertFamilyAccess(event, "fam-123")).toThrow(
+      UnlinkedAccountError,
+    );
   });
 
   it("throws UnlinkedAccountError when custom:memberId claim is absent", () => {
@@ -60,6 +74,8 @@ describe("assertFamilyAccess", () => {
       email: "owner@example.com",
     });
 
-    expect(() => assertFamilyAccess(event, "fam-123")).toThrow(UnlinkedAccountError);
+    expect(() => assertFamilyAccess(event, "fam-123")).toThrow(
+      UnlinkedAccountError,
+    );
   });
 });

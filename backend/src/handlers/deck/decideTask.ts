@@ -1,11 +1,19 @@
+import {
+  GetCommand,
+  TransactWriteCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyHandler } from "aws-lambda";
-import { GetCommand, TransactWriteCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { ddb, TABLE_NAME } from "../../lib/dynamo";
-import { familyPK, taskSK, instanceSK, gsi1pkMember } from "../../lib/keys";
-import { ok, err } from "../../lib/response";
+import {
+  assertFamilyAccess,
+  ForbiddenFamilyError,
+  UnlinkedAccountError,
+} from "../../lib/auth";
 import { todayISO } from "../../lib/date";
-import { assertFamilyAccess, UnlinkedAccountError, ForbiddenFamilyError } from "../../lib/auth";
+import { ddb, TABLE_NAME } from "../../lib/dynamo";
+import { familyPK, gsi1pkMember, instanceSK, taskSK } from "../../lib/keys";
+import { err, ok } from "../../lib/response";
 
 // POST /families/{familyId}/deck/{taskId}/decide   body: { "action": "done" | "pass" | "defer" }
 //
@@ -20,20 +28,25 @@ const bodySchema = z.object({ action: z.enum(["done", "pass", "defer"]) });
 export const handler: APIGatewayProxyHandler = async (event) => {
   const familyId = event.pathParameters?.familyId;
   const taskId = event.pathParameters?.taskId;
-  if (!familyId || !taskId) return err(400, "familyId e taskId são obrigatórios");
+  if (!familyId || !taskId)
+    return err(400, "familyId e taskId são obrigatórios");
 
   let parsedBody;
   try {
     parsedBody = bodySchema.parse(JSON.parse(event.body ?? "{}"));
   } catch {
-    return err(400, "body inválido: esperado { action: 'done' | 'pass' | 'defer' }");
+    return err(
+      400,
+      "body inválido: esperado { action: 'done' | 'pass' | 'defer' }",
+    );
   }
 
   let acting;
   try {
     acting = assertFamilyAccess(event, familyId);
   } catch (e) {
-    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError) return err(403, e.message);
+    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError)
+      return err(403, e.message);
     throw e;
   }
 
@@ -54,7 +67,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             ":completedBy": acting.memberId,
           },
           ConditionExpression: "attribute_exists(PK)",
-        })
+        }),
       );
     } catch {
       return err(404, "Instância da tarefa não encontrada para hoje");
@@ -64,12 +77,16 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
   // action === "pass"
   const task = await ddb.send(
-    new GetCommand({ TableName: TABLE_NAME, Key: { PK: pk, SK: taskSK(taskId) } })
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: pk, SK: taskSK(taskId) },
+    }),
   );
   if (!task.Item) return err(404, "Tarefa não encontrada");
 
   const rotationOrder: string[] = task.Item.rotationOrder ?? [];
-  if (rotationOrder.length === 0) return err(400, "Tarefa sem rodízio configurado");
+  if (rotationOrder.length === 0)
+    return err(400, "Tarefa sem rodízio configurado");
 
   const nextIndex = (task.Item.currentIndex + 1) % rotationOrder.length;
   const nextAssignee = rotationOrder[nextIndex];
@@ -100,7 +117,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 ":next": nextAssignee,
                 ":gsi1pk": gsi1pkMember(familyId, nextAssignee),
                 ":date": date,
-                ":prevAssignee": task.Item.rotationOrder[task.Item.currentIndex],
+                ":prevAssignee":
+                  task.Item.rotationOrder[task.Item.currentIndex],
                 ":prevIndex": task.Item.currentIndex,
                 ":passedBy": acting.memberId,
               },
@@ -108,10 +126,13 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             },
           },
         ],
-      })
+      }),
     );
   } catch {
-    return err(409, "Não foi possível passar a tarefa (conflito ou instância inexistente)");
+    return err(
+      409,
+      "Não foi possível passar a tarefa (conflito ou instância inexistente)",
+    );
   }
 
   return ok({ status: "passed", nextAssignee, passedBy: acting.memberId });

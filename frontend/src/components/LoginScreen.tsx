@@ -16,7 +16,10 @@ interface LoginScreenProps {
   prefillEmail?: string;
 }
 
-export function LoginScreen({ onNavigateToSignUp, prefillEmail }: LoginScreenProps) {
+export function LoginScreen({
+  onNavigateToSignUp,
+  prefillEmail,
+}: LoginScreenProps) {
   const { login, error } = useAuth();
   const [email, setEmail] = useState(prefillEmail ?? "");
   const [password, setPassword] = useState("");
@@ -95,7 +98,9 @@ export function LoginScreen({ onNavigateToSignUp, prefillEmail }: LoginScreenPro
           size="large"
           disabled={submitting || !email.trim() || !password}
           startIcon={
-            submitting ? <CircularProgress size={16} color="inherit" /> : undefined
+            submitting ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : undefined
           }
         >
           Entrar

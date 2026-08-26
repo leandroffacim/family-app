@@ -36,13 +36,13 @@ scripts/inviteUser.ts        # convida membro por e-mail (senha temporária)
 
 ## Modelo de dados (DynamoDB, single-table)
 
-| Item | PK | SK |
-|---|---|---|
-| Família | `FAMILY#{id}` | `METADATA` |
-| Membro | `FAMILY#{id}` | `MEMBER#{memberId}` |
-| Tarefa | `FAMILY#{id}` | `TASK#{taskId}` |
+| Item             | PK            | SK                         |
+| ---------------- | ------------- | -------------------------- |
+| Família          | `FAMILY#{id}` | `METADATA`                 |
+| Membro           | `FAMILY#{id}` | `MEMBER#{memberId}`        |
+| Tarefa           | `FAMILY#{id}` | `TASK#{taskId}`            |
 | Instância do dia | `FAMILY#{id}` | `INSTANCE#{date}#{taskId}` |
-| Evento | `FAMILY#{id}` | `EVENT#{date}#{eventId}` |
+| Evento           | `FAMILY#{id}` | `EVENT#{date}#{eventId}`   |
 
 `GSI1` (`GSI1PK = FAMILY#{id}#MEMBER#{memberId}`, `GSI1SK = date`) fica
 disponível pra consultar "tarefas de um membro por data" — ainda não

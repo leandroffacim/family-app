@@ -1,7 +1,13 @@
-import { ScanCommand, QueryCommand, PutCommand, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  GetCommand,
+  PutCommand,
+  QueryCommand,
+  ScanCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
+import { dayOfMonthOf, shiftISO, todayISO, weekdayIndex } from "../../lib/date";
 import { ddb, TABLE_NAME } from "../../lib/dynamo";
-import { instanceSK, gsi1pkMember, metadataSK } from "../../lib/keys";
-import { todayISO, weekdayIndex, dayOfMonthOf, shiftISO } from "../../lib/date";
+import { gsi1pkMember, instanceSK, metadataSK } from "../../lib/keys";
 import { Task } from "../../lib/types";
 
 // Disparado pelo EventBridge (cron diário). Faz um Scan pra achar
@@ -28,7 +34,10 @@ function isDueToday(task: Task, date: string): boolean {
 async function updateStreak(pk: string, today: string): Promise<number> {
   const meta = (
     await ddb.send(
-      new GetCommand({ TableName: TABLE_NAME, Key: { PK: pk, SK: metadataSK() } })
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { PK: pk, SK: metadataSK() },
+      }),
     )
   ).Item as { streak?: number; streakUpdatedDate?: string } | undefined;
 
@@ -36,15 +45,19 @@ async function updateStreak(pk: string, today: string): Promise<number> {
   if (meta?.streakUpdatedDate === today) return currentStreak;
 
   const yesterday = shiftISO(today, -1);
-  const yesterdayItems = (
-    await ddb.send(
-      new QueryCommand({
-        TableName: TABLE_NAME,
-        KeyConditionExpression: "PK = :pk AND begins_with(SK, :prefix)",
-        ExpressionAttributeValues: { ":pk": pk, ":prefix": `INSTANCE#${yesterday}#` },
-      })
-    )
-  ).Items ?? [];
+  const yesterdayItems =
+    (
+      await ddb.send(
+        new QueryCommand({
+          TableName: TABLE_NAME,
+          KeyConditionExpression: "PK = :pk AND begins_with(SK, :prefix)",
+          ExpressionAttributeValues: {
+            ":pk": pk,
+            ":prefix": `INSTANCE#${yesterday}#`,
+          },
+        }),
+      )
+    ).Items ?? [];
 
   let nextStreak = currentStreak;
   if (yesterdayItems.length > 0) {
@@ -58,7 +71,7 @@ async function updateStreak(pk: string, today: string): Promise<number> {
       Key: { PK: pk, SK: metadataSK() },
       UpdateExpression: "SET streak = :s, streakUpdatedDate = :d",
       ExpressionAttributeValues: { ":s": nextStreak, ":d": today },
-    })
+    }),
   );
 
   return nextStreak;
@@ -75,7 +88,7 @@ async function scanFamilyIds(): Promise<string[]> {
         FilterExpression: "SK = :metadata",
         ExpressionAttributeValues: { ":metadata": metadataSK() },
         ExclusiveStartKey,
-      })
+      }),
     );
     for (const item of result.Items ?? []) {
       const pk = item.PK as string;
@@ -97,7 +110,7 @@ async function processFamily(familyId: string, date: string) {
       TableName: TABLE_NAME,
       KeyConditionExpression: "PK = :pk AND begins_with(SK, :prefix)",
       ExpressionAttributeValues: { ":pk": pk, ":prefix": "TASK#" },
-    })
+    }),
   );
 
   const tasks = (tasksResult.Items ?? []) as Task[];
@@ -105,7 +118,8 @@ async function processFamily(familyId: string, date: string) {
 
   let created = 0;
   for (const task of dueTasks) {
-    const assignee = task.rotationOrder[task.currentIndex % task.rotationOrder.length];
+    const assignee =
+      task.rotationOrder[task.currentIndex % task.rotationOrder.length];
     try {
       await ddb.send(
         new PutCommand({
@@ -124,7 +138,7 @@ async function processFamily(familyId: string, date: string) {
             status: "pending",
           },
           ConditionExpression: "attribute_not_exists(PK)",
-        })
+        }),
       );
       created++;
     } catch {
@@ -139,21 +153,29 @@ export const handler = async () => {
   const date = todayISO();
   const familyIds = await scanFamilyIds();
 
-  const results: Record<string, { created: number; due: number; streak: number } | { error: string }> = {};
+  const results: Record<
+    string,
+    { created: number; due: number; streak: number } | { error: string }
+  > = {};
 
   for (const familyId of familyIds) {
     try {
       results[familyId] = await processFamily(familyId, date);
-      const r = results[familyId] as { created: number; due: number; streak: number };
+      const r = results[familyId] as {
+        created: number;
+        due: number;
+        streak: number;
+      };
       console.log(
-        `Baralho de ${date} (família ${familyId}): ${r.created}/${r.due} instâncias criadas (streak=${r.streak})`
+        `Baralho de ${date} (família ${familyId}): ${r.created}/${r.due} instâncias criadas (streak=${r.streak})`,
       );
     } catch (err) {
-      results[familyId] = { error: err instanceof Error ? err.message : String(err) };
+      results[familyId] = {
+        error: err instanceof Error ? err.message : String(err),
+      };
       console.error(`Falha ao gerar baralho da família ${familyId}:`, err);
     }
   }
 
   return { date, families: results };
 };
-

@@ -19,15 +19,17 @@
 // combinar a senha por fora em vez de depender do e-mail).
 
 import {
-  CognitoIdentityProviderClient,
   AdminCreateUserCommand,
+  CognitoIdentityProviderClient,
 } from "@aws-sdk/client-cognito-identity-provider";
 
 const USER_POOL_ID = process.env.USER_POOL_ID;
 const [, , email, familyId, memberId] = process.argv;
 
 if (!USER_POOL_ID) {
-  console.error("Defina USER_POOL_ID antes de rodar (veja o output do `sam deploy`).");
+  console.error(
+    "Defina USER_POOL_ID antes de rodar (veja o output do `sam deploy`).",
+  );
   process.exit(1);
 }
 if (!email || !familyId || !memberId) {
@@ -51,10 +53,12 @@ async function main() {
       // sem MessageAction: SUPPRESS -> Cognito gera a senha temporária
       // e manda o e-mail de convite sozinho (template configurado no
       // template.yaml, AdminCreateUserConfig.InviteMessageTemplate)
-    })
+    }),
   );
 
-  console.log(`Convite enviado para ${email} (familyId=${familyId}, memberId=${memberId}).`);
+  console.log(
+    `Convite enviado para ${email} (familyId=${familyId}, memberId=${memberId}).`,
+  );
 }
 
 main().catch((e) => {

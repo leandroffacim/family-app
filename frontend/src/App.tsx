@@ -136,13 +136,14 @@ export default function App() {
     setLoading(true);
     setLoadError(null);
     try {
-      const [membersRes, tasksRes, deckRes, eventsRes, familyRes] = await Promise.all([
-        api.listMembers(),
-        api.listTasks(),
-        api.getDeck(),
-        api.listEvents(),
-        api.getFamily(),
-      ]);
+      const [membersRes, tasksRes, deckRes, eventsRes, familyRes] =
+        await Promise.all([
+          api.listMembers(),
+          api.listTasks(),
+          api.getDeck(),
+          api.listEvents(),
+          api.getFamily(),
+        ]);
       setMembers(membersRes.items);
       setTasks(tasksRes.items);
       setDeckQueue(deckRes.items);
@@ -261,10 +262,14 @@ export default function App() {
   };
 
   const openSheet = () => {
-    setSheetType(tab === "agenda" ? "event" : tab === "familia" ? "invite" : "task");
+    setSheetType(
+      tab === "agenda" ? "event" : tab === "familia" ? "invite" : "task",
+    );
     setNewEventDay(selectedDay);
     setInviteEmail("");
-    setInviteMemberId(tab === "familia" ? (members[0]?.id ?? "") : inviteMemberId);
+    setInviteMemberId(
+      tab === "familia" ? (members[0]?.id ?? "") : inviteMemberId,
+    );
     setActionError(null);
     setSheetOpen(true);
   };
@@ -274,15 +279,21 @@ export default function App() {
     setInviting(true);
     setActionError(null);
     try {
-      await api.inviteMember({ email: inviteEmail.trim(), memberId: inviteMemberId });
+      await api.inviteMember({
+        email: inviteEmail.trim(),
+        memberId: inviteMemberId,
+      });
       const invitedName =
-        members.find((member) => member.id === inviteMemberId)?.name ?? "Membro";
+        members.find((member) => member.id === inviteMemberId)?.name ??
+        "Membro";
       setInviteSuccess(`Convite enviado pra ${invitedName}`);
       setInviteEmail("");
       setSheetOpen(false);
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : "Não foi possível enviar o convite",
+        error instanceof Error
+          ? error.message
+          : "Não foi possível enviar o convite",
       );
     } finally {
       setInviting(false);
@@ -496,7 +507,11 @@ export default function App() {
                       alignItems: "center",
                     }}
                   >
-                    <Stack direction="row" spacing={1} sx={{ alignItems: "baseline" }}>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ alignItems: "baseline" }}
+                    >
                       <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                         Hoje em casa
                       </Typography>
@@ -1160,7 +1175,9 @@ export default function App() {
                 <ToggleButtonGroup
                   exclusive
                   value={inviteMemberId}
-                  onChange={(_, id: string | null) => id && setInviteMemberId(id)}
+                  onChange={(_, id: string | null) =>
+                    id && setInviteMemberId(id)
+                  }
                   sx={{
                     mt: 0.75,
                     display: "flex",
@@ -1196,8 +1213,8 @@ export default function App() {
                 placeholder="nome@exemplo.com"
               />
               <Typography variant="caption" color="text.secondary">
-                A pessoa recebe um e-mail com senha temporária e define a
-                senha definitiva no primeiro acesso.
+                A pessoa recebe um e-mail com senha temporária e define a senha
+                definitiva no primeiro acesso.
               </Typography>
               <Button
                 variant="contained"
@@ -1205,7 +1222,9 @@ export default function App() {
                 onClick={handleInvite}
                 disabled={inviting || !inviteEmail.trim() || !inviteMemberId}
                 startIcon={
-                  inviting ? <CircularProgress size={16} color="inherit" /> : undefined
+                  inviting ? (
+                    <CircularProgress size={16} color="inherit" />
+                  ) : undefined
                 }
               >
                 Enviar convite
@@ -1219,9 +1238,7 @@ export default function App() {
         open={!!lastDecision}
         onClose={() => setLastDecision(null)}
         autoHideDuration={8000}
-        message={
-          lastDecision ? `"${lastDecision.name}" saiu do baralho` : ""
-        }
+        message={lastDecision ? `"${lastDecision.name}" saiu do baralho` : ""}
         action={
           <Button
             color="inherit"

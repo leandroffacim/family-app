@@ -15,11 +15,11 @@ npm run dev
 
 ## Variáveis de ambiente
 
-| Variável | Onde pegar |
-|---|---|
-| `VITE_API_URL` | Output `ApiUrl` do `sam deploy` do backend |
-| `VITE_COGNITO_USER_POOL_ID` | Output `UserPoolId` do `sam deploy` do backend |
-| `VITE_COGNITO_CLIENT_ID` | Output `UserPoolClientId` do `sam deploy` do backend |
+| Variável                    | Onde pegar                                           |
+| --------------------------- | ---------------------------------------------------- |
+| `VITE_API_URL`              | Output `ApiUrl` do `sam deploy` do backend           |
+| `VITE_COGNITO_USER_POOL_ID` | Output `UserPoolId` do `sam deploy` do backend       |
+| `VITE_COGNITO_CLIENT_ID`    | Output `UserPoolClientId` do `sam deploy` do backend |
 
 O `familyId` não é configurado por env var: ele vem do `idToken`
 depois que a pessoa se cadastra (self sign-up) ou faz login — o app

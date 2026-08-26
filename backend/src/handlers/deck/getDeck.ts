@@ -1,10 +1,14 @@
-import { APIGatewayProxyHandler } from "aws-lambda";
 import { QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { APIGatewayProxyHandler } from "aws-lambda";
+import {
+  assertFamilyAccess,
+  ForbiddenFamilyError,
+  UnlinkedAccountError,
+} from "../../lib/auth";
+import { todayISO } from "../../lib/date";
 import { ddb, TABLE_NAME } from "../../lib/dynamo";
 import { familyPK } from "../../lib/keys";
-import { ok, err } from "../../lib/response";
-import { todayISO } from "../../lib/date";
-import { assertFamilyAccess, UnlinkedAccountError, ForbiddenFamilyError } from "../../lib/auth";
+import { err, ok } from "../../lib/response";
 
 // GET /families/{familyId}/deck?date=YYYY-MM-DD (date é opcional, default hoje)
 // Retorna só as instâncias com status "pending" — as já decididas
@@ -16,7 +20,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     assertFamilyAccess(event, familyId);
   } catch (e) {
-    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError) return err(403, e.message);
+    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError)
+      return err(403, e.message);
     throw e;
   }
 
@@ -30,7 +35,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         ":pk": familyPK(familyId),
         ":skPrefix": `INSTANCE#${date}#`,
       },
-    })
+    }),
   );
 
   const items = (result.Items ?? []).filter((i) => i.status === "pending");

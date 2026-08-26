@@ -17,21 +17,21 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 > Gerado por amostragem do código — **não há testes automatizados no projeto hoje** (sem jest/vitest, sem `AGENTS.md`/`CONTRIBUTING.md`, sem pasta de teste em backend ou frontend). Decisão (autônoma, na ausência de resposta do usuário): cobrir com teste automatizado apenas a lógica pura de mais alto risco de segurança (`assertFamilyAccess`, o fix do IDOR); o restante (handlers Lambda com I/O em DynamoDB/Cognito, trigger, job, telas React) segue por verificação manual, já que criar toda a infraestrutura de mocks de AWS SDK do zero está fora do escopo desta feature e não há precedente no repo.
 
-| Code Layer | Required Test Type | Coverage Expectation | Location Pattern | Run Command |
-| ---------- | ------------------- | --------------------- | ----------------- | ------------- |
-| `assertFamilyAccess` / `getActingMember` (lógica pura de autorização em `lib/auth.ts`) | unit | Todos os branches: match, mismatch, claims ausentes (REG-09 a REG-12) | `backend/src/lib/__tests__/auth.test.ts` | `cd backend && npx vitest run` |
-| Handlers Lambda (API + trigger + job) | none (verificação manual) | `sam local invoke` / smoke test por task, conforme "Done when" | - | `sam local invoke <Função> -e event.json` |
-| Frontend (`SignUpScreen`, `ConfirmSignUpScreen`, `tokenStore.ts`, `client.ts`) | none (verificação manual) | Fluxo manual pela UI (`npm run dev`) | - | `cd frontend && npm run dev` |
-| Config (`template.yaml`) | none | Build gate only | - | `cd backend && npm run build` (via `sam build`) |
+| Code Layer                                                                             | Required Test Type        | Coverage Expectation                                                  | Location Pattern                         | Run Command                                     |
+| -------------------------------------------------------------------------------------- | ------------------------- | --------------------------------------------------------------------- | ---------------------------------------- | ----------------------------------------------- |
+| `assertFamilyAccess` / `getActingMember` (lógica pura de autorização em `lib/auth.ts`) | unit                      | Todos os branches: match, mismatch, claims ausentes (REG-09 a REG-12) | `backend/src/lib/__tests__/auth.test.ts` | `cd backend && npx vitest run`                  |
+| Handlers Lambda (API + trigger + job)                                                  | none (verificação manual) | `sam local invoke` / smoke test por task, conforme "Done when"        | -                                        | `sam local invoke <Função> -e event.json`       |
+| Frontend (`SignUpScreen`, `ConfirmSignUpScreen`, `tokenStore.ts`, `client.ts`)         | none (verificação manual) | Fluxo manual pela UI (`npm run dev`)                                  | -                                        | `cd frontend && npm run dev`                    |
+| Config (`template.yaml`)                                                               | none                      | Build gate only                                                       | -                                        | `cd backend && npm run build` (via `sam build`) |
 
 ## Gate Check Commands
 
-| Gate Level | When to Use | Command |
-| ---------- | ------------ | ------- |
-| Quick | Após a task com teste unitário (`auth.ts`) | `cd backend && npx vitest run` |
-| Full | Não aplicável (sem integração/e2e configurada nesta feature) | mesma coisa que Quick |
-| Build (backend) | Após tasks de backend/config | `cd backend && npm run typecheck && npm run build` |
-| Build (frontend) | Após tasks de frontend | `cd frontend && npm run build` |
+| Gate Level       | When to Use                                                  | Command                                            |
+| ---------------- | ------------------------------------------------------------ | -------------------------------------------------- |
+| Quick            | Após a task com teste unitário (`auth.ts`)                   | `cd backend && npx vitest run`                     |
+| Full             | Não aplicável (sem integração/e2e configurada nesta feature) | mesma coisa que Quick                              |
+| Build (backend)  | Após tasks de backend/config                                 | `cd backend && npm run typecheck && npm run build` |
+| Build (frontend) | Após tasks de frontend                                       | `cd frontend && npm run build`                     |
 
 ---
 
@@ -112,10 +112,12 @@ T28 → T29 → T30 → T31
 **Gate**: Build (backend) — `cd backend && npm run typecheck`
 
 **Tools**:
+
 - MCP: NONE
 - Skill: NONE
 
 **Done when**:
+
 - [x] `npx vitest run` executa sem erro (mesmo sem nenhum teste ainda) a partir de `backend/`
 - [x] Gate Build (backend) passa
 
@@ -134,10 +136,12 @@ T28 → T29 → T30 → T31
 **Gate**: Quick — `cd backend && npx vitest run`
 
 **Tools**:
+
 - MCP: NONE
 - Skill: NONE
 
 **Done when**:
+
 - [x] `assertFamilyAccess` lança `UnlinkedAccountError` quando falta `custom:memberId` OU `custom:familyId`
 - [x] `assertFamilyAccess` lança `ForbiddenFamilyError` quando `custom:familyId` ≠ `familyId` recebido
 - [x] `assertFamilyAccess` retorna `{ memberId, email, familyId }` quando tudo bate
@@ -160,10 +164,12 @@ T28 → T29 → T30 → T31
 **Gate**: Build (backend) — `cd backend && npm run build`
 
 **Tools**:
+
 - MCP: NONE
 - Skill: NONE
 
 **Done when**:
+
 - [x] `sam build` valida o template sem erro
 - [x] Schema lista `email`, `memberId`, `familyId`, `familyName`
 
@@ -182,10 +188,12 @@ T28 → T29 → T30 → T31
 **Gate**: Build (backend) — `cd backend && npm run typecheck && npm run build`
 
 **Tools**:
+
 - MCP: NONE
 - Skill: NONE
 
 **Done when**:
+
 - [x] Handler devolve o `event` recebido (contrato do trigger Cognito)
 - [x] Falha no `TransactWriteCommand` propaga o erro (impede confirmação, REG-05)
 - [x] Nome vazio (após trim) é rejeitado antes da escrita (REG-06)
@@ -206,10 +214,12 @@ T28 → T29 → T30 → T31
 **Gate**: Build (backend) — `cd backend && npm run build`
 
 **Tools**:
+
 - MCP: NONE
 - Skill: NONE
 
 **Done when**:
+
 - [x] `sam build` passa sem erro de dependência circular
 - [ ] Cadastro end-to-end manual (signUp real ou console Cognito) confirma que o trigger dispara e a família aparece na tabela
 
@@ -234,6 +244,7 @@ Cada task abaixo é independente das demais desta fase (arquivos diferentes); to
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Handler chama `assertFamilyAccess` antes de qualquer `ddb.send`
 - [x] Verificação manual: token da família A recebe `403` ao chamar `GET /families/{idDaFamiliaB}`
 
@@ -254,6 +265,7 @@ Cada task abaixo é independente das demais desta fase (arquivos diferentes); to
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Mesmo critério do T6 aplicado a este endpoint
 
 **Status**: ✅ Complete (mesma nota de verificação manual do T6 — confirmado por inspeção de código)
@@ -273,6 +285,7 @@ Cada task abaixo é independente das demais desta fase (arquivos diferentes); to
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] `getActingMember` isolado não é mais chamado diretamente neste arquivo
 - [x] Mesmo critério do T6 aplicado
 
@@ -293,6 +306,7 @@ Cada task abaixo é independente das demais desta fase (arquivos diferentes); to
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Mesmo critério do T6 aplicado
 
 **Status**: ✅ Complete (mesma nota de verificação manual do T6 — confirmado por inspeção de código)
@@ -312,6 +326,7 @@ Cada task abaixo é independente das demais desta fase (arquivos diferentes); to
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Mesmo critério do T6 aplicado
 
 **Status**: ✅ Complete (mesma nota de verificação manual do T6 — confirmado por inspeção de código)
@@ -335,6 +350,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Mesmo critério do T6 aplicado
 
 **Status**: ✅ Complete
@@ -354,6 +370,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Mesmo critério do T6 aplicado
 
 **Status**: ✅ Complete
@@ -373,6 +390,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Mesmo critério do T6 aplicado
 
 **Status**: ✅ Complete
@@ -392,6 +410,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Mesmo critério do T6 aplicado
 
 **Status**: ✅ Complete
@@ -411,6 +430,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Mesmo critério do T6 aplicado
 - [x] Gate Build (backend completo) passa depois de T6-T15 todos aplicados
 
@@ -433,6 +453,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Handler não lê mais `process.env.FAMILY_ID`
 - [x] Loop captura exceção por família e segue pras demais (log do erro, sem `throw`)
 - [ ] Verificação manual: `sam local invoke GenerateDailyDeckFunction` com 2 famílias seedadas gera `INSTANCE#` pras duas (não executado neste ambiente — sem `sam`/docker disponíveis; gate de typecheck passou)
@@ -452,6 +473,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] `sam build` passa sem o parâmetro
 - [x] Nenhuma referência restante a `!Ref FamilyId` no arquivo
 
@@ -470,6 +492,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Uso `npm run create-user -- <email> <familyId> <memberId> <senha>` documentado no cabeçalho
 - [x] Chamada sem `familyId` falha com mensagem clara antes de chamar o Cognito
 
@@ -488,6 +511,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Uso `npm run invite-user -- <email> <familyId> <memberId>` documentado no cabeçalho
 - [x] Chamada sem `familyId` falha com mensagem clara antes de chamar o Cognito
 
@@ -508,6 +532,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] `Session.familyId` populado a partir de `custom:familyId`
 - [x] Gate Build (frontend) passa
 
@@ -526,6 +551,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] `setFamilyId`/`getFamilyId` implementados no mesmo módulo/estilo
 - [x] Gate Build (frontend) passa
 
@@ -544,6 +570,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] `familyId` fica disponível via `getFamilyId()` logo após login bem-sucedido
 - [x] Gate Build (frontend) passa
 
@@ -562,6 +589,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Nenhuma referência a `import.meta.env.VITE_FAMILY_ID` restante em `client.ts`
 - [x] Smoke test manual: logado, o app carrega o baralho do dia normalmente
 
@@ -582,6 +610,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] `signUp(familyName, email, password)` envia `custom:familyName` corretamente
 - [x] `confirmSignUp`/`resendConfirmationCode` implementados e tipados
 - [x] Gate Build (frontend) passa
@@ -601,6 +630,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Erros do Cognito (e-mail em uso, senha fraca) aparecem traduzidos na tela, sem travar o formulário
 - [x] Gate Build (frontend) passa
 
@@ -619,6 +649,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Código errado/expirado permite reenviar sem recriar cadastro
 - [x] Confirmação correta redireciona pra tela de login com e-mail preenchido
 - [x] Gate Build (frontend) passa
@@ -638,6 +669,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Link visível na tela de login leva à tela de cadastro e volta
 - [x] Fluxo completo (cadastro → confirmação → login) funciona manualmente pela UI
 - [x] Gate Build (frontend) passa
@@ -659,6 +691,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] `VITE_FAMILY_ID` removida do arquivo
 
 ---
@@ -676,6 +709,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] `npm run build` (frontend) passa
 - [x] Nenhuma referência restante a `VITE_FAMILY_ID` no repo
 
@@ -694,6 +728,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Nenhuma referência desatualizada a "uma família por deploy" ou `FamilyId` fixo
 
 ---
@@ -711,6 +746,7 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
+
 - [x] Nenhuma referência restante a `VITE_FAMILY_ID`
 
 ---
@@ -723,28 +759,28 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 
 ### Check 2: Diagram-Definition Cross-Check
 
-| Edge / grupo no diagrama | `Depends on` correspondente | OK? |
-| ------------------------- | ------------------------------ | --- |
-| T1 → T2 | T2 depends on T1 | ✅ |
-| T3 → T4 → T5 | T4 depends on T3; T5 depends on T4 | ✅ |
-| T6..T10 (sem seta, independentes) | todas depend on T2 (Phase 1, cross-phase, sem seta necessária) | ✅ |
-| T11..T15 (sem seta, independentes) | todas depend on T2 (Phase 1, cross-phase) | ✅ |
-| T16 → T17 | T17 depends on T16 | ✅ |
-| T18, T19 (sem seta) | ambas depend on T5 (Phase 2, cross-phase) | ✅ |
-| T20 → T22, T21 → T22 | T22 depends on T20, T21 | ✅ |
-| T22 → T23 | T23 depends on T22 | ✅ |
-| T24 → T25 → T26 → T27 | cada um depende do anterior | ✅ |
-| T28 → T29 → T30 → T31 | cada um depende do anterior | ✅ |
+| Edge / grupo no diagrama           | `Depends on` correspondente                                    | OK? |
+| ---------------------------------- | -------------------------------------------------------------- | --- |
+| T1 → T2                            | T2 depends on T1                                               | ✅  |
+| T3 → T4 → T5                       | T4 depends on T3; T5 depends on T4                             | ✅  |
+| T6..T10 (sem seta, independentes)  | todas depend on T2 (Phase 1, cross-phase, sem seta necessária) | ✅  |
+| T11..T15 (sem seta, independentes) | todas depend on T2 (Phase 1, cross-phase)                      | ✅  |
+| T16 → T17                          | T17 depends on T16                                             | ✅  |
+| T18, T19 (sem seta)                | ambas depend on T5 (Phase 2, cross-phase)                      | ✅  |
+| T20 → T22, T21 → T22               | T22 depends on T20, T21                                        | ✅  |
+| T22 → T23                          | T23 depends on T22                                             | ✅  |
+| T24 → T25 → T26 → T27              | cada um depende do anterior                                    | ✅  |
+| T28 → T29 → T30 → T31              | cada um depende do anterior                                    | ✅  |
 
 Nenhuma dependência aponta pra fase posterior. ✅
 
 ### Check 3: Test Co-location Validation
 
-| Task | Layer tocado | `Tests` na task | Bate com a matriz? |
-| ---- | ------------- | ---------------- | -------------------- |
-| T2 | Lógica pura (`auth.ts`) | `unit` (4 branches, na mesma task) | ✅ |
-| T4, T5, T6-T19 | Handlers Lambda / config | `Tests: none` (verificação manual documentada em "Done when") | ✅ |
-| T20-T31 | Frontend / scripts / docs | `Tests: none` (verificação manual) | ✅ |
+| Task           | Layer tocado              | `Tests` na task                                               | Bate com a matriz? |
+| -------------- | ------------------------- | ------------------------------------------------------------- | ------------------ |
+| T2             | Lógica pura (`auth.ts`)   | `unit` (4 branches, na mesma task)                            | ✅                 |
+| T4, T5, T6-T19 | Handlers Lambda / config  | `Tests: none` (verificação manual documentada em "Done when") | ✅                 |
+| T20-T31        | Frontend / scripts / docs | `Tests: none` (verificação manual)                            | ✅                 |
 
 ---
 

@@ -1,10 +1,18 @@
+import {
+  GetCommand,
+  TransactWriteCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyHandler } from "aws-lambda";
-import { GetCommand, TransactWriteCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { ddb, TABLE_NAME } from "../../lib/dynamo";
-import { familyPK, taskSK, instanceSK, gsi1pkMember } from "../../lib/keys";
-import { ok, err } from "../../lib/response";
+import {
+  assertFamilyAccess,
+  ForbiddenFamilyError,
+  UnlinkedAccountError,
+} from "../../lib/auth";
 import { todayISO } from "../../lib/date";
-import { assertFamilyAccess, UnlinkedAccountError, ForbiddenFamilyError } from "../../lib/auth";
+import { ddb, TABLE_NAME } from "../../lib/dynamo";
+import { familyPK, gsi1pkMember, instanceSK, taskSK } from "../../lib/keys";
+import { err, ok } from "../../lib/response";
 
 // POST /families/{familyId}/deck/{taskId}/undo   body: {} (opcional: ?date=YYYY-MM-DD)
 //
@@ -13,12 +21,14 @@ import { assertFamilyAccess, UnlinkedAccountError, ForbiddenFamilyError } from "
 export const handler: APIGatewayProxyHandler = async (event) => {
   const familyId = event.pathParameters?.familyId;
   const taskId = event.pathParameters?.taskId;
-  if (!familyId || !taskId) return err(400, "familyId e taskId são obrigatórios");
+  if (!familyId || !taskId)
+    return err(400, "familyId e taskId são obrigatórios");
 
   try {
     assertFamilyAccess(event, familyId);
   } catch (e) {
-    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError) return err(403, e.message);
+    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError)
+      return err(403, e.message);
     throw e;
   }
 
@@ -26,7 +36,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   const pk = familyPK(familyId);
 
   const current = await ddb.send(
-    new GetCommand({ TableName: TABLE_NAME, Key: { PK: pk, SK: instanceSK(date, taskId) } })
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: pk, SK: instanceSK(date, taskId) },
+    }),
   );
   if (!current.Item) return err(404, "Instância da tarefa não encontrada");
   if (current.Item.status === "pending") {
@@ -43,7 +56,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           ExpressionAttributeNames: { "#s": "status" },
           ExpressionAttributeValues: { ":pending": "pending" },
           ConditionExpression: "attribute_exists(PK) AND #s <> :pending",
-        })
+        }),
       );
     } catch {
       return err(409, "Não foi possível desfazer (conflito)");
@@ -53,7 +66,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
   // status === "passed" -> reverte assignee/rodízio usando os valores
   // gravados pelo decideTask no momento do "pass"
-  const previousAssignee = current.Item.previousAssignee ?? current.Item.assignee;
+  const previousAssignee =
+    current.Item.previousAssignee ?? current.Item.assignee;
   const previousIndex = current.Item.previousIndex;
 
   if (previousIndex === undefined) {
@@ -61,7 +75,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   }
 
   const task = await ddb.send(
-    new GetCommand({ TableName: TABLE_NAME, Key: { PK: pk, SK: taskSK(taskId) } })
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: pk, SK: taskSK(taskId) },
+    }),
   );
   if (!task.Item) return err(404, "Tarefa não encontrada");
 
@@ -94,7 +111,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             },
           },
         ],
-      })
+      }),
     );
   } catch {
     return err(409, "Não foi possível desfazer (conflito)");

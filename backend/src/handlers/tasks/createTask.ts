@@ -1,11 +1,15 @@
-import { APIGatewayProxyHandler } from "aws-lambda";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { APIGatewayProxyHandler } from "aws-lambda";
 import { ulid } from "ulid";
 import { z } from "zod";
+import {
+  assertFamilyAccess,
+  ForbiddenFamilyError,
+  UnlinkedAccountError,
+} from "../../lib/auth";
 import { ddb, TABLE_NAME } from "../../lib/dynamo";
 import { familyPK, taskSK } from "../../lib/keys";
-import { ok, err } from "../../lib/response";
-import { assertFamilyAccess, UnlinkedAccountError, ForbiddenFamilyError } from "../../lib/auth";
+import { err, ok } from "../../lib/response";
 
 // POST /families/{familyId}/tasks
 const bodySchema = z
@@ -31,7 +35,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     assertFamilyAccess(event, familyId);
   } catch (e) {
-    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError) return err(403, e.message);
+    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError)
+      return err(403, e.message);
     throw e;
   }
 
@@ -46,8 +51,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   await ddb.send(
     new PutCommand({
       TableName: TABLE_NAME,
-      Item: { PK: familyPK(familyId), SK: taskSK(id), id, ...body, currentIndex: 0 },
-    })
+      Item: {
+        PK: familyPK(familyId),
+        SK: taskSK(id),
+        id,
+        ...body,
+        currentIndex: 0,
+      },
+    }),
   );
 
   return ok({ id }, 201);

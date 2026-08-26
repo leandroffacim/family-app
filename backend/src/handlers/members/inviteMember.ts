@@ -1,13 +1,17 @@
-import { APIGatewayProxyHandler } from "aws-lambda";
-import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import {
-  CognitoIdentityProviderClient,
   AdminCreateUserCommand,
+  CognitoIdentityProviderClient,
 } from "@aws-sdk/client-cognito-identity-provider";
+import { GetCommand } from "@aws-sdk/lib-dynamodb";
+import { APIGatewayProxyHandler } from "aws-lambda";
+import {
+  assertFamilyAccess,
+  ForbiddenFamilyError,
+  UnlinkedAccountError,
+} from "../../lib/auth";
 import { ddb, TABLE_NAME } from "../../lib/dynamo";
 import { familyPK, memberSK } from "../../lib/keys";
-import { ok, err } from "../../lib/response";
-import { assertFamilyAccess, UnlinkedAccountError, ForbiddenFamilyError } from "../../lib/auth";
+import { err, ok } from "../../lib/response";
 
 // POST /families/{familyId}/members/invite   body: { email, memberId }
 //
@@ -26,7 +30,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     assertFamilyAccess(event, familyId);
   } catch (e) {
-    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError) return err(403, e.message);
+    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError)
+      return err(403, e.message);
     throw e;
   }
 
@@ -44,7 +49,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     new GetCommand({
       TableName: TABLE_NAME,
       Key: { PK: familyPK(familyId), SK: memberSK(memberId) },
-    })
+    }),
   );
   if (!member.Item) return err(404, "Membro não encontrado");
 
@@ -59,7 +64,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           { Name: "custom:memberId", Value: memberId },
         ],
         // sem MessageAction: SUPPRESS -> o Cognito manda o convite sozinho
-      })
+      }),
     );
   } catch (error) {
     if (error instanceof Error && error.name === "UsernameExistsException") {

@@ -1,12 +1,12 @@
-import { PostConfirmationTriggerHandler } from "aws-lambda";
-import { TransactWriteCommand } from "@aws-sdk/lib-dynamodb";
 import {
-  CognitoIdentityProviderClient,
   AdminUpdateUserAttributesCommand,
+  CognitoIdentityProviderClient,
 } from "@aws-sdk/client-cognito-identity-provider";
+import { TransactWriteCommand } from "@aws-sdk/lib-dynamodb";
+import { PostConfirmationTriggerHandler } from "aws-lambda";
 import { ulid } from "ulid";
 import { ddb, TABLE_NAME } from "../../lib/dynamo";
-import { familyPK, metadataSK, memberSK } from "../../lib/keys";
+import { familyPK, memberSK, metadataSK } from "../../lib/keys";
 
 // Trigger PostConfirmation do Cognito: roda uma única vez, logo após o
 // usuário confirmar o e-mail do cadastro. Cria a família + membro owner
@@ -18,7 +18,9 @@ const cognito = new CognitoIdentityProviderClient({});
 export const handler: PostConfirmationTriggerHandler = async (event) => {
   const familyName = event.request.userAttributes["custom:familyName"]?.trim();
   if (!familyName) {
-    throw new Error("custom:familyName é obrigatório para completar o cadastro");
+    throw new Error(
+      "custom:familyName é obrigatório para completar o cadastro",
+    );
   }
 
   const familyId = ulid();
@@ -51,7 +53,7 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
           },
         },
       ],
-    })
+    }),
   );
 
   await cognito.send(
@@ -62,7 +64,7 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
         { Name: "custom:familyId", Value: familyId },
         { Name: "custom:memberId", Value: "owner" },
       ],
-    })
+    }),
   );
 
   return event;

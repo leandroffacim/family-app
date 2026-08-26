@@ -1,9 +1,9 @@
 import {
+  AuthenticationDetails,
   CognitoUser,
   CognitoUserAttribute,
   CognitoUserPool,
   CognitoUserSession,
-  AuthenticationDetails,
 } from "amazon-cognito-identity-js";
 
 const userPool = new CognitoUserPool({
@@ -35,13 +35,15 @@ export function restoreSession(): Promise<Session | null> {
   const user = userPool.getCurrentUser();
   if (!user) return Promise.resolve(null);
   return new Promise((resolve) => {
-    user.getSession((error: Error | null, session: CognitoUserSession | null) => {
-      if (error || !session || !session.isValid()) {
-        resolve(null);
-        return;
-      }
-      resolve(sessionFromCognito(session));
-    });
+    user.getSession(
+      (error: Error | null, session: CognitoUserSession | null) => {
+        if (error || !session || !session.isValid()) {
+          resolve(null);
+          return;
+        }
+        resolve(sessionFromCognito(session));
+      },
+    );
   });
 }
 
@@ -106,7 +108,10 @@ export function signUp(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const attributes = [
-      new CognitoUserAttribute({ Name: "custom:familyName", Value: familyName }),
+      new CognitoUserAttribute({
+        Name: "custom:familyName",
+        Value: familyName,
+      }),
     ];
     userPool.signUp(email, password, attributes, [], (error) => {
       if (error) {
