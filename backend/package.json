@@ -7,6 +7,7 @@
     "build": "sam build",
     "deploy": "sam deploy --guided",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "seed": "ts-node scripts/seed.ts",
     "create-user": "ts-node scripts/createUser.ts",
     "invite-user": "ts-node scripts/inviteUser.ts"
@@ -25,6 +26,7 @@
     "@types/node": "^20.14.0",
     "typescript": "^5.4.5",
     "esbuild": "^0.21.4",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "vitest": "^2.1.9"
   }
 }

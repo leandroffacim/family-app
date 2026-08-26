@@ -21,7 +21,7 @@ export function getActingMember(event: APIGatewayProxyEvent): ActingMember {
     | undefined;
 
   const memberId = claims?.["custom:memberId"];
-  const email = claims?.["email"];
+  const email = claims?.["email"] ?? "";
 
   if (!memberId) throw new UnlinkedAccountError();
 
