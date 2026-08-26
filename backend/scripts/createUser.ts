@@ -8,7 +8,10 @@
 //
 // Uso:
 //   export USER_POOL_ID=<valor do output UserPoolId do sam deploy>
-//   npm run create-user -- <email> <memberId> <senha-inicial>
+//   npm run create-user -- <email> <familyId> <memberId> <senha-inicial>
+//
+// <familyId> tem que ser o mesmo id usado em FAMILY#{familyId} (o que
+// aparece em scripts/seed.ts).
 //
 // <memberId> tem que ser o mesmo id usado em MEMBER#{memberId} (o que
 // aparece em scripts/seed.ts, ex.: "voce", "ana", "theo").
@@ -24,7 +27,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 
 const USER_POOL_ID = process.env.USER_POOL_ID || "us-east-1_AphfqQmaR";
-const [, , email, memberId, password] = process.argv;
+const [, , email, familyId, memberId, password] = process.argv;
 
 if (!USER_POOL_ID) {
   console.error(
@@ -32,9 +35,9 @@ if (!USER_POOL_ID) {
   );
   process.exit(1);
 }
-if (!email || !memberId || !password) {
+if (!email || !familyId || !memberId || !password) {
   console.error(
-    "Uso: npm run create-user -- <email> <memberId> <senha-inicial>",
+    "Uso: npm run create-user -- <email> <familyId> <memberId> <senha-inicial>",
   );
   process.exit(1);
 }
@@ -55,6 +58,7 @@ async function main() {
       UserAttributes: [
         { Name: "email", Value: email },
         { Name: "email_verified", Value: "true" },
+        { Name: "custom:familyId", Value: familyId },
         { Name: "custom:memberId", Value: memberId },
       ],
       MessageAction: "SUPPRESS",
@@ -72,7 +76,7 @@ async function main() {
   );
 
   console.log(
-    `Conta criada para ${email} (memberId=${memberId}). Já pode logar no app com essa senha.`,
+    `Conta criada para ${email} (familyId=${familyId}, memberId=${memberId}). Já pode logar no app com essa senha.`,
   );
 }
 

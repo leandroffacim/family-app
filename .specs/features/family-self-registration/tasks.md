@@ -470,8 +470,8 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] Uso `npm run create-user -- <email> <familyId> <memberId> <senha>` documentado no cabeçalho
-- [ ] Chamada sem `familyId` falha com mensagem clara antes de chamar o Cognito
+- [x] Uso `npm run create-user -- <email> <familyId> <memberId> <senha>` documentado no cabeçalho
+- [x] Chamada sem `familyId` falha com mensagem clara antes de chamar o Cognito
 
 ---
 
