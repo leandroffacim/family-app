@@ -5,7 +5,7 @@ import { ddb, TABLE_NAME } from "../../lib/dynamo";
 import { familyPK, taskSK, instanceSK, gsi1pkMember } from "../../lib/keys";
 import { ok, err } from "../../lib/response";
 import { todayISO } from "../../lib/date";
-import { getActingMember, UnlinkedAccountError } from "../../lib/auth";
+import { assertFamilyAccess, UnlinkedAccountError, ForbiddenFamilyError } from "../../lib/auth";
 
 // POST /families/{familyId}/deck/{taskId}/decide   body: { "action": "done" | "pass" | "defer" }
 //
@@ -31,9 +31,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
   let acting;
   try {
-    acting = getActingMember(event);
+    acting = assertFamilyAccess(event, familyId);
   } catch (e) {
-    if (e instanceof UnlinkedAccountError) return err(403, e.message);
+    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError) return err(403, e.message);
     throw e;
   }
 

@@ -273,8 +273,10 @@ Cada task abaixo é independente das demais desta fase (arquivos diferentes); to
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] `getActingMember` isolado não é mais chamado diretamente neste arquivo
-- [ ] Mesmo critério do T6 aplicado
+- [x] `getActingMember` isolado não é mais chamado diretamente neste arquivo
+- [x] Mesmo critério do T6 aplicado
+
+**Status**: ✅ Complete (mesma nota de verificação manual do T6 — confirmado por inspeção de código)
 
 ---
 
