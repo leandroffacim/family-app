@@ -526,8 +526,8 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] `setFamilyId`/`getFamilyId` implementados no mesmo módulo/estilo
-- [ ] Gate Build (frontend) passa
+- [x] `setFamilyId`/`getFamilyId` implementados no mesmo módulo/estilo
+- [x] Gate Build (frontend) passa
 
 ---
 

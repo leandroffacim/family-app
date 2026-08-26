@@ -4,6 +4,7 @@
 // (token expirado/revogado) pra ele voltar pra tela de login.
 
 let currentToken: string | null = null;
+let currentFamilyId: string | null = null;
 let unauthorizedHandler: (() => void) | null = null;
 
 export function setToken(token: string | null) {
@@ -12,6 +13,14 @@ export function setToken(token: string | null) {
 
 export function getToken(): string | null {
   return currentToken;
+}
+
+export function setFamilyId(familyId: string | null) {
+  currentFamilyId = familyId;
+}
+
+export function getFamilyId(): string | null {
+  return currentFamilyId;
 }
 
 export function setUnauthorizedHandler(handler: (() => void) | null) {
