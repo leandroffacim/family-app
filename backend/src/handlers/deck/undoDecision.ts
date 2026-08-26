@@ -4,6 +4,7 @@ import { ddb, TABLE_NAME } from "../../lib/dynamo";
 import { familyPK, taskSK, instanceSK, gsi1pkMember } from "../../lib/keys";
 import { ok, err } from "../../lib/response";
 import { todayISO } from "../../lib/date";
+import { assertFamilyAccess, UnlinkedAccountError, ForbiddenFamilyError } from "../../lib/auth";
 
 // POST /families/{familyId}/deck/{taskId}/undo   body: {} (opcional: ?date=YYYY-MM-DD)
 //
@@ -13,6 +14,13 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   const familyId = event.pathParameters?.familyId;
   const taskId = event.pathParameters?.taskId;
   if (!familyId || !taskId) return err(400, "familyId e taskId são obrigatórios");
+
+  try {
+    assertFamilyAccess(event, familyId);
+  } catch (e) {
+    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError) return err(403, e.message);
+    throw e;
+  }
 
   const date = event.queryStringParameters?.date ?? todayISO();
   const pk = familyPK(familyId);
