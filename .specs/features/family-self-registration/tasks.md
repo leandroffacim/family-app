@@ -411,8 +411,10 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] Mesmo critério do T6 aplicado
-- [ ] Gate Build (backend completo) passa depois de T6-T15 todos aplicados
+- [x] Mesmo critério do T6 aplicado
+- [x] Gate Build (backend completo) passa depois de T6-T15 todos aplicados
+
+**Status**: ✅ Complete
 
 ---
 

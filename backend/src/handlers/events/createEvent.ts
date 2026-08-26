@@ -5,6 +5,7 @@ import { z } from "zod";
 import { ddb, TABLE_NAME } from "../../lib/dynamo";
 import { familyPK, eventSK } from "../../lib/keys";
 import { ok, err } from "../../lib/response";
+import { assertFamilyAccess, UnlinkedAccountError, ForbiddenFamilyError } from "../../lib/auth";
 
 // POST /families/{familyId}/events
 const bodySchema = z.object({
@@ -18,6 +19,13 @@ const bodySchema = z.object({
 export const handler: APIGatewayProxyHandler = async (event) => {
   const familyId = event.pathParameters?.familyId;
   if (!familyId) return err(400, "familyId é obrigatório");
+
+  try {
+    assertFamilyAccess(event, familyId);
+  } catch (e) {
+    if (e instanceof UnlinkedAccountError || e instanceof ForbiddenFamilyError) return err(403, e.message);
+    throw e;
+  }
 
   let body;
   try {
