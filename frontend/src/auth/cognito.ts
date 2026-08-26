@@ -1,5 +1,6 @@
 import {
   CognitoUser,
+  CognitoUserAttribute,
   CognitoUserPool,
   CognitoUserSession,
   AuthenticationDetails,
@@ -96,4 +97,49 @@ export function completeNewPassword(newPassword: string): Promise<Session> {
 export function logout() {
   pendingNewPasswordUser = null;
   userPool.getCurrentUser()?.signOut();
+}
+
+export function signUp(
+  familyName: string,
+  email: string,
+  password: string,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const attributes = [
+      new CognitoUserAttribute({ Name: "custom:familyName", Value: familyName }),
+    ];
+    userPool.signUp(email, password, attributes, [], (error) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
+export function confirmSignUp(email: string, code: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const user = new CognitoUser({ Username: email, Pool: userPool });
+    user.confirmRegistration(code, true, (error) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
+export function resendConfirmationCode(email: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const user = new CognitoUser({ Username: email, Pool: userPool });
+    user.resendConfirmationCode((error) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve();
+    });
+  });
 }

@@ -582,9 +582,9 @@ Cada task abaixo é independente das demais desta fase; todas dependem de T2.
 **Tools**: MCP: NONE / Skill: NONE
 
 **Done when**:
-- [ ] `signUp(familyName, email, password)` envia `custom:familyName` corretamente
-- [ ] `confirmSignUp`/`resendConfirmationCode` implementados e tipados
-- [ ] Gate Build (frontend) passa
+- [x] `signUp(familyName, email, password)` envia `custom:familyName` corretamente
+- [x] `confirmSignUp`/`resendConfirmationCode` implementados e tipados
+- [x] Gate Build (frontend) passa
 
 ---
 
