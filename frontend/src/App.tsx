@@ -222,7 +222,7 @@ export default function App() {
         name: newTaskName.trim(),
         freq: newTaskFreq,
         weight: newTaskWeight,
-        rotationOrder: members.map((member) => member.id),
+        rotationOrder: members.map((member) => member.id).filter(Boolean),
         dayOfWeek:
           newTaskFreq === "WEEKLY"
             ? displayIndexToApiWeekday(newTaskDayOfWeek)
