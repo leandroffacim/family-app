@@ -46,7 +46,7 @@ export function Avatar({
         },
       }}
     >
-      {member.name.charAt(0).toUpperCase()}
+      {member.name?.charAt(0)?.toUpperCase() ?? "?"}
     </MuiAvatar>
   );
 }

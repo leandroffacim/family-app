@@ -43,7 +43,7 @@ export function Wheel({ task, members }: { task: Task; members: Member[] }) {
           textAnchor="middle"
           dominantBaseline="middle"
         >
-          {m.name.charAt(0).toUpperCase()}
+          {m.name?.charAt(0)?.toUpperCase() ?? "?"}
         </text>
       </g>
     );
