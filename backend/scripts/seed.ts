@@ -35,7 +35,14 @@ async function main() {
   await ddb.send(
     new PutCommand({
       TableName: TABLE_NAME,
-      Item: { PK: pk, SK: "METADATA", name: "Minha família", streak: 0 },
+      Item: {
+        PK: pk,
+        SK: "METADATA",
+        name: "Minha família",
+        streak: 0,
+        GSI2PK: "FAMILIES",
+        GSI2SK: FAMILY_ID,
+      },
     }),
   );
 

@@ -2,18 +2,26 @@ import {
   GetCommand,
   PutCommand,
   QueryCommand,
-  ScanCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { dayOfMonthOf, shiftISO, todayISO, weekdayIndex } from "../../lib/date";
 import { ddb, TABLE_NAME } from "../../lib/dynamo";
-import { gsi1pkMember, instanceSK, metadataSK } from "../../lib/keys";
+import { GSI2PK_FAMILIES, gsi1pkMember, instanceSK, metadataSK } from "../../lib/keys";
 import { Task } from "../../lib/types";
 
-// Disparado pelo EventBridge (cron diário). Faz um Scan pra achar
-// todas as FAMILY#{id}/METADATA existentes e cria a INSTANCE# do dia
-// para cada tarefa "em dia" hoje, em cada família, respeitando a
-// frequência.
+// Instâncias diárias não são mais lidas por nada depois de ~1 dia (o
+// streak só olha "ontem", ver updateStreak) — TTL evita a tabela
+// crescer pra sempre. DynamoDB costuma remover o item em até 48h
+// depois do expiresAt, não instantaneamente.
+const INSTANCE_TTL_DAYS = 90;
+function instanceExpiresAt(): number {
+  return Math.floor(Date.now() / 1000) + INSTANCE_TTL_DAYS * 24 * 60 * 60;
+}
+
+// Disparado pelo EventBridge (cron diário). Faz um Query no GSI2 pra
+// achar todas as FAMILY#{id}/METADATA existentes (sem Scan na tabela
+// inteira) e cria a INSTANCE# do dia para cada tarefa "em dia" hoje,
+// em cada família, respeitando a frequência.
 //
 // Idempotente: usa ConditionExpression pra nunca sobrescrever uma
 // instância que já existe (ex: se o job rodar 2x no mesmo dia).
@@ -77,16 +85,17 @@ async function updateStreak(pk: string, today: string): Promise<number> {
   return nextStreak;
 }
 
-async function scanFamilyIds(): Promise<string[]> {
+async function listFamilyIds(): Promise<string[]> {
   const familyIds: string[] = [];
   let ExclusiveStartKey: Record<string, unknown> | undefined;
 
   do {
     const result = await ddb.send(
-      new ScanCommand({
+      new QueryCommand({
         TableName: TABLE_NAME,
-        FilterExpression: "SK = :metadata",
-        ExpressionAttributeValues: { ":metadata": metadataSK() },
+        IndexName: "GSI2",
+        KeyConditionExpression: "GSI2PK = :pk",
+        ExpressionAttributeValues: { ":pk": GSI2PK_FAMILIES },
         ExclusiveStartKey,
       }),
     );
@@ -136,6 +145,7 @@ async function processFamily(familyId: string, date: string) {
             weight: task.weight,
             assignee,
             status: "pending",
+            expiresAt: instanceExpiresAt(),
           },
           ConditionExpression: "attribute_not_exists(PK)",
         }),
@@ -151,7 +161,7 @@ async function processFamily(familyId: string, date: string) {
 
 export const handler = async () => {
   const date = todayISO();
-  const familyIds = await scanFamilyIds();
+  const familyIds = await listFamilyIds();
 
   const results: Record<
     string,

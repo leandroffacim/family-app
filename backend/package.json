@@ -10,7 +10,8 @@
     "test": "vitest run",
     "seed": "ts-node scripts/seed.ts",
     "create-user": "ts-node scripts/createUser.ts",
-    "invite-user": "ts-node scripts/inviteUser.ts"
+    "invite-user": "ts-node scripts/inviteUser.ts",
+    "backfill-family-index": "ts-node scripts/backfillFamilyIndex.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.600.0",

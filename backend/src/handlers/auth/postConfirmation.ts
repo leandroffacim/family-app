@@ -6,7 +6,7 @@ import { TransactWriteCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { PostConfirmationTriggerHandler } from "aws-lambda";
 import { ulid } from "ulid";
 import { ddb, TABLE_NAME } from "../../lib/dynamo";
-import { familyPK, memberSK, metadataSK } from "../../lib/keys";
+import { familyPK, GSI2PK_FAMILIES, memberSK, metadataSK } from "../../lib/keys";
 
 const cognito = new CognitoIdentityProviderClient({});
 
@@ -61,6 +61,8 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
               SK: metadataSK(),
               name: familyName,
               streak: 0,
+              GSI2PK: GSI2PK_FAMILIES,
+              GSI2SK: familyId,
             },
             ConditionExpression: "attribute_not_exists(PK)",
           },

@@ -29,6 +29,10 @@ Resources:
           AttributeType: S
         - AttributeName: GSI1SK
           AttributeType: S
+        - AttributeName: GSI2PK
+          AttributeType: S
+        - AttributeName: GSI2SK
+          AttributeType: S
       KeySchema:
         - AttributeName: PK
           KeyType: HASH
@@ -43,8 +47,23 @@ Resources:
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
+        # GSI2: só a linha METADATA de cada família tem GSI2PK/GSI2SK
+        # (valor fixo "FAMILIES" + familyId). Existe só pra
+        # generateDailyDeck listar todas as famílias com um Query barato
+        # em vez de um Scan na tabela inteira — ver lib/keys.ts.
+        - IndexName: GSI2
+          KeySchema:
+            - AttributeName: GSI2PK
+              KeyType: HASH
+            - AttributeName: GSI2SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
 
   TaskEventsTopic:
     Type: AWS::SNS::Topic
