@@ -15,10 +15,10 @@ import { err, ok } from "../../lib/response";
 
 // POST /families/{familyId}/members/invite   body: { email, memberId }
 //
-// Qualquer membro logado pode convidar outro — mesma coisa que
-// scripts/inviteUser.ts, só que direto pela tela em vez do terminal.
-// O Cognito gera a senha temporária e manda o e-mail de convite
-// sozinho (ver InviteMessageTemplate no template.yaml).
+// Qualquer membro logado pode convidar outro.
+// O ponto importante é vincular a nova conta Cognito à família existente.
+// Sem custom:familyId, o authorizer considera a conta sem família e todas
+// as chamadas protegidas retornam 403.
 
 const USER_POOL_ID = process.env.USER_POOL_ID as string;
 const cognito = new CognitoIdentityProviderClient({});
@@ -41,7 +41,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   } catch {
     return err(400, "JSON inválido");
   }
-  const email = body.email?.trim();
+
+  const email = body.email?.trim().toLowerCase();
   const memberId = body.memberId?.trim();
   if (!email || !memberId) return err(400, "email e memberId são obrigatórios");
 
@@ -62,8 +63,12 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           { Name: "email", Value: email },
           { Name: "email_verified", Value: "true" },
           { Name: "custom:memberId", Value: memberId },
+          // O usuário convidado pertence à família que enviou o convite.
+          // Isso é necessário para assertFamilyAccess() funcionar depois
+          // do primeiro login.
+          { Name: "custom:familyId", Value: familyId },
         ],
-        // sem MessageAction: SUPPRESS -> o Cognito manda o convite sozinho
+        // Sem MessageAction: SUPPRESS -> o Cognito envia o convite.
       }),
     );
   } catch (error) {
