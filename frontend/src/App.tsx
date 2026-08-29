@@ -118,10 +118,12 @@ export default function App() {
   const [newTaskWeight, setNewTaskWeight] = useState<1 | 2 | 3>(1);
   const [newTaskDayOfWeek, setNewTaskDayOfWeek] = useState(0);
   const [newTaskDayOfMonth, setNewTaskDayOfMonth] = useState(1);
+  const [creatingTask, setCreatingTask] = useState(false);
   const [newEventTitle, setNewEventTitle] = useState("");
   const [newEventTime, setNewEventTime] = useState("");
   const [newEventDay, setNewEventDay] = useState(selectedDay);
   const [newEventMembers, setNewEventMembers] = useState<string[]>([]);
+  const [creatingEvent, setCreatingEvent] = useState(false);
 
   const membersById = useMemo(
     () => Object.fromEntries(members.map((member) => [member.id, member])),
@@ -217,6 +219,8 @@ export default function App() {
 
   const addTask = async () => {
     if (!newTaskName.trim() || members.length === 0) return;
+    setCreatingTask(true);
+    setActionError(null);
     try {
       await api.createTask({
         name: newTaskName.trim(),
@@ -240,11 +244,15 @@ export default function App() {
           ? error.message
           : "Não foi possível criar a tarefa",
       );
+    } finally {
+      setCreatingTask(false);
     }
   };
 
   const addEvent = async () => {
     if (!newEventTitle.trim() || !newEventTime.trim()) return;
+    setCreatingEvent(true);
+    setActionError(null);
     try {
       await api.createEvent({
         date: weekDates[newEventDay],
@@ -264,6 +272,8 @@ export default function App() {
           ? error.message
           : "Não foi possível criar o compromisso",
       );
+    } finally {
+      setCreatingEvent(false);
     }
   };
 
@@ -1256,6 +1266,15 @@ export default function App() {
 
           {sheetType === "task" ? (
             <Stack spacing={2}>
+              {actionError && (
+                <Alert
+                  severity="error"
+                  sx={{ borderRadius: 3 }}
+                  onClose={() => setActionError(null)}
+                >
+                  {actionError}
+                </Alert>
+              )}
               <TextField
                 label="Nome da tarefa"
                 value={newTaskName}
@@ -1370,14 +1389,30 @@ export default function App() {
                 variant="contained"
                 size="large"
                 onClick={addTask}
-                disabled={!newTaskName.trim() || members.length === 0}
+                disabled={
+                  creatingTask || !newTaskName.trim() || members.length === 0
+                }
+                startIcon={
+                  creatingTask ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : undefined
+                }
                 sx={{ py: 1.5, mt: 1 }}
               >
-                Adicionar tarefa
+                {creatingTask ? "Adicionando..." : "Adicionar tarefa"}
               </Button>
             </Stack>
           ) : sheetType === "event" ? (
             <Stack spacing={2}>
+              {actionError && (
+                <Alert
+                  severity="error"
+                  sx={{ borderRadius: 3 }}
+                  onClose={() => setActionError(null)}
+                >
+                  {actionError}
+                </Alert>
+              )}
               <TextField
                 label="Título"
                 value={newEventTitle}
@@ -1470,10 +1505,19 @@ export default function App() {
                 variant="contained"
                 size="large"
                 onClick={addEvent}
-                disabled={!newEventTitle.trim() || !newEventTime.trim()}
+                disabled={
+                  creatingEvent ||
+                  !newEventTitle.trim() ||
+                  !newEventTime.trim()
+                }
+                startIcon={
+                  creatingEvent ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : undefined
+                }
                 sx={{ py: 1.5, mt: 1 }}
               >
-                Adicionar compromisso
+                {creatingEvent ? "Adicionando..." : "Adicionar compromisso"}
               </Button>
             </Stack>
           ) : (
@@ -1552,7 +1596,7 @@ export default function App() {
                 }
                 sx={{ py: 1.5, mt: 1 }}
               >
-                Enviar convite
+                {inviting ? "Enviando..." : "Enviar convite"}
               </Button>
             </Stack>
           )}
