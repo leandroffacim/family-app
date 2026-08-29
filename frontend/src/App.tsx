@@ -777,8 +777,8 @@ export default function App() {
                   <Paper
                     variant="outlined"
                     sx={{
-                      p: { xs: 1.5, sm: 2 },
-                      borderRadius: 5,
+                      p: { xs: 2, sm: 2.5 },
+                      borderRadius: { xs: 1, sm: 1.25 },
                       bgcolor: "#FFFFFF",
                       borderColor: "#E2E8F0",
                     }}
@@ -866,10 +866,12 @@ export default function App() {
                       </IconButton>
                     </Stack>
 
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      sx={{ overflowX: "auto", pb: 0.5 }}
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+                        gap: { xs: 0.5, sm: 1 },
+                      }}
                       aria-label="Dias da semana"
                     >
                       {WEEKDAYS.map((day, index) => {
@@ -883,10 +885,10 @@ export default function App() {
                             onClick={() => setSelectedDay(index)}
                             aria-pressed={isSelected}
                             sx={{
-                              flex: "1 0 62px",
-                              minWidth: 62,
-                              minHeight: 76,
-                              p: 1,
+                              minWidth: 0,
+                              width: "100%",
+                              minHeight: { xs: 60, sm: 76 },
+                              p: { xs: 0.5, sm: 1 },
                               display: "flex",
                               flexDirection: "column",
                               lineHeight: 1,
@@ -906,10 +908,10 @@ export default function App() {
                             <Typography
                               component="span"
                               sx={{
-                                fontSize: 11,
+                                fontSize: { xs: 9.5, sm: 11 },
                                 fontWeight: 700,
                                 opacity: isSelected ? 0.9 : 0.6,
-                                letterSpacing: 0.4,
+                                letterSpacing: 0.3,
                               }}
                             >
                               {day}
@@ -918,7 +920,7 @@ export default function App() {
                               component="span"
                               sx={{
                                 mt: 0.5,
-                                fontSize: 20,
+                                fontSize: { xs: 16, sm: 20 },
                                 fontWeight: 800,
                                 lineHeight: 1,
                               }}
@@ -941,7 +943,7 @@ export default function App() {
                           </Button>
                         );
                       })}
-                    </Stack>
+                    </Box>
                   </Paper>
 
                   <Stack spacing={1.5}>
