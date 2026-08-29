@@ -39,7 +39,7 @@ export function TaskCardDeck({
 }: {
   queue: TaskInstance[];
   membersById: Record<string, Member>;
-  onDecide: (taskId: string, action: Action) => void;
+  onDecide: (taskId: string, action: Action) => void | Promise<void>;
 }) {
   const [drag, setDrag] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
@@ -85,7 +85,11 @@ export function TaskCardDeck({
   const triggerExit = (action: Action) => {
     setExit(action);
     setTimeout(() => {
-      onDecide(top.taskId, action);
+      Promise.resolve(onDecide(top.taskId, action)).then(() => {
+        // O backend é a fonte da verdade. Depois de passar, recarregamos
+        // para que a tarefa apareça imediatamente para o novo responsável.
+        if (action === "pass") window.location.reload();
+      });
       setExit(null);
       setDrag({ x: 0, y: 0 });
     }, 240);
