@@ -10,9 +10,10 @@ import { ddb, TABLE_NAME } from "../../lib/dynamo";
 import { familyPK } from "../../lib/keys";
 import { err, ok } from "../../lib/response";
 
-// GET /families/{familyId}/deck?date=YYYY-MM-DD (date é opcional, default hoje)
-// Retorna só as instâncias com status "pending" — as já decididas
-// (done/passed/deferred) saem do baralho do dia.
+// GET /families/{familyId}/deck?date=YYYY-MM-DD
+// Retorna tarefas pendentes do dia. Uma tarefa passada continua pending,
+// mas agora pertence ao próximo assignee; assim ela aparece para o próximo
+// membro sem precisar reconstruir o deck.
 export const handler: APIGatewayProxyHandler = async (event) => {
   const familyId = event.pathParameters?.familyId;
   if (!familyId) return err(400, "familyId é obrigatório");
