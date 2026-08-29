@@ -352,7 +352,7 @@ Resources:
         Variables:
           USER_POOL_ID: !Ref FamilyUserPool
       Policies:
-        - DynamoDBReadPolicy:
+        - DynamoDBCrudPolicy:
             TableName: !Ref FamilyTable
         - Statement:
             - Effect: Allow

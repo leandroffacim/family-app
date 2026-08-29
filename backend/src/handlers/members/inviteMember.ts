@@ -63,7 +63,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   // Compatibilidade com a UI atual: ela seleciona o owner por padrão.
   // Se o e-mail do convite for diferente do membro selecionado, tratamos
   // isso como um novo membro em vez de vincular o convite ao owner.
-  if (!member || (member.email && String(member.email).toLowerCase() !== email)) {
+  if (
+    !member ||
+    (member.email && String(member.email).toLowerCase() !== email)
+  ) {
     memberId = ulid();
     member = {
       PK: familyPK(familyId),
@@ -108,7 +111,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     if (error instanceof Error && error.name === "UsernameExistsException") {
       return err(409, "Já existe uma conta com esse e-mail");
     }
-    throw error;
+    return err(500, "Erro ao criar usuário no Cognito");
   }
 
   return ok({ invited: true, email, memberId });
