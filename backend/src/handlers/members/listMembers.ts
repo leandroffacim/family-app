@@ -33,5 +33,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }),
   );
 
-  return ok({ items: result.Items ?? [] });
+  // A tabela usa `memberId`, enquanto o frontend trabalha com `id`.
+  // Antes dessa normalização o createTask recebia rotationOrder vazio
+  // porque `member.id` era undefined e era removido pelo filter(Boolean).
+  const items = (result.Items ?? []).map((item) => ({
+    id: String(item.memberId ?? String(item.SK ?? "").replace(/^MEMBER#/, "")),
+    name: String(item.name ?? item.email ?? "Membro"),
+    color: String(item.color ?? "#4F46E5"),
+  }));
+
+  return ok({ items });
 };
