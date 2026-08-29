@@ -15,14 +15,6 @@ import { ddb, TABLE_NAME } from "../../lib/dynamo";
 import { familyPK, gsi1pkMember, instanceSK, taskSK } from "../../lib/keys";
 import { err, ok } from "../../lib/response";
 
-// POST /families/{familyId}/deck/{taskId}/decide   body: { "action": "done" | "pass" | "defer" }
-//
-// done   -> marca a instância de hoje como concluída
-// defer  -> marca como adiada (fica pendente de novo amanhã, o job diário não recria a mesma data)
-// pass   -> avança o rodízio da tarefa (TASK.currentIndex) e reatribui a
-//           instância de hoje, tudo numa transação (mesmo padrão de
-//           TransactWriteItems usado no outbox pattern)
-
 const bodySchema = z.object({ action: z.enum(["done", "pass", "defer"]) });
 
 export const handler: APIGatewayProxyHandler = async (event) => {
@@ -35,10 +27,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     parsedBody = bodySchema.parse(JSON.parse(event.body ?? "{}"));
   } catch {
-    return err(
-      400,
-      "body inválido: esperado { action: 'done' | 'pass' | 'defer' }",
-    );
+    return err(400, "body inválido: esperado { action: 'done' | 'pass' | 'defer' }");
   }
 
   let acting;
@@ -75,7 +64,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     return ok({ status: newStatus, completedBy: acting.memberId });
   }
 
-  // action === "pass"
   const task = await ddb.send(
     new GetCommand({
       TableName: TABLE_NAME,
@@ -88,7 +76,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   if (rotationOrder.length === 0)
     return err(400, "Tarefa sem rodízio configurado");
 
-  const nextIndex = (task.Item.currentIndex + 1) % rotationOrder.length;
+  const currentIndex = Number(task.Item.currentIndex ?? 0);
+  const nextIndex = (currentIndex + 1) % rotationOrder.length;
   const nextAssignee = rotationOrder[nextIndex];
 
   try {
@@ -107,19 +96,16 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             Update: {
               TableName: TABLE_NAME,
               Key: { PK: pk, SK: instanceSK(date, taskId) },
-              // guarda previousAssignee/previousIndex para permitir desfazer
-              // (undoDecision.ts) sem precisar recalcular o rodízio ao contrário
               UpdateExpression:
-                "SET #s = :passed, assignee = :next, GSI1PK = :gsi1pk, GSI1SK = :date, previousAssignee = :prevAssignee, previousIndex = :prevIndex, passedBy = :passedBy",
+                "SET #s = :pending, assignee = :next, GSI1PK = :gsi1pk, GSI1SK = :date, previousAssignee = :prevAssignee, previousIndex = :prevIndex, passedBy = :passedBy",
               ExpressionAttributeNames: { "#s": "status" },
               ExpressionAttributeValues: {
-                ":passed": "passed",
+                ":pending": "pending",
                 ":next": nextAssignee,
                 ":gsi1pk": gsi1pkMember(familyId, nextAssignee),
                 ":date": date,
-                ":prevAssignee":
-                  task.Item.rotationOrder[task.Item.currentIndex],
-                ":prevIndex": task.Item.currentIndex,
+                ":prevAssignee": rotationOrder[currentIndex],
+                ":prevIndex": currentIndex,
                 ":passedBy": acting.memberId,
               },
               ConditionExpression: "attribute_exists(PK)",
@@ -129,10 +115,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }),
     );
   } catch {
-    return err(
-      409,
-      "Não foi possível passar a tarefa (conflito ou instância inexistente)",
-    );
+    return err(409, "Não foi possível passar a tarefa (conflito ou instância inexistente)");
   }
 
   return ok({ status: "passed", nextAssignee, passedBy: acting.memberId });
