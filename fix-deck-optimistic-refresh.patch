@@ -1,0 +1,243 @@
+diff --git a/frontend/src/App.tsx b/frontend/src/App.tsx
+index 248b67b..df5167c 100644
+--- a/frontend/src/App.tsx
++++ b/frontend/src/App.tsx
+@@ -17,6 +17,7 @@ import {
+   TextField,
+   ToggleButton,
+   ToggleButtonGroup,
++  Tooltip,
+   Typography,
+ } from "@mui/material";
+ import {
+@@ -28,6 +29,7 @@ import {
+   ListChecks,
+   LogOut,
+   Plus,
++  RefreshCw,
+   Sparkles,
+   Sun,
+   UserPlus,
+@@ -87,6 +89,7 @@ export default function App() {
+   const [pendingConfirmEmail, setPendingConfirmEmail] = useState("");
+   const [prefillEmail, setPrefillEmail] = useState("");
+   const [loading, setLoading] = useState(true);
++  const [refreshing, setRefreshing] = useState(false);
+   const [loadError, setLoadError] = useState<string | null>(null);
+   const [actionError, setActionError] = useState<string | null>(null);
+   const [members, setMembers] = useState<Member[]>([]);
+@@ -167,6 +170,23 @@ export default function App() {
+     }
+   }
+ 
++  const refreshDeck = async () => {
++    setRefreshing(true);
++    setActionError(null);
++    try {
++      const deckRes = await api.getDeck();
++      setDeckQueue(deckRes.items);
++    } catch (error) {
++      setActionError(
++        error instanceof Error
++          ? error.message
++          : "Não foi possível atualizar o baralho",
++      );
++    } finally {
++      setRefreshing(false);
++    }
++  };
++
+   useEffect(() => {
+     if (status === "authenticated") loadAll();
+   }, [status]);
+@@ -177,14 +197,19 @@ export default function App() {
+   ) => {
+     setActionError(null);
+     const decided = deckQueue.find((item) => item.taskId === taskId);
++    // Otimista: tira a carta da fila já — não espera a viagem de rede
++    // pra próxima carta virar interativa. Se a API falhar, volta pro
++    // topo no catch (ver TaskCardDeck.tsx, que anima em cima de um
++    // snapshot local, então não depende de quando a fila muda aqui).
++    setDeckQueue((queue) => queue.filter((item) => item.taskId !== taskId));
+     try {
+       await api.decide(taskId, action);
+-      setDeckQueue((queue) => queue.filter((item) => item.taskId !== taskId));
+       if (action === "pass") setTasks((await api.listTasks()).items);
+       // guarda a última decisão pra permitir "Desfazer" na hora, sem
+       // precisar esperar o baralho de amanhã recriar a tarefa
+       setLastDecision(decided ? { taskId, name: decided.name } : null);
+     } catch (error) {
++      if (decided) setDeckQueue((queue) => [decided, ...queue]);
+       setActionError(
+         error instanceof Error
+           ? error.message
+@@ -609,16 +634,39 @@ export default function App() {
+                           : `${deckQueue.length} ${deckQueue.length === 1 ? "tarefa pendente" : "tarefas pendentes"} no baralho.`}
+                       </Typography>
+                     </Box>
+-                    <Chip
+-                      label={`${deckQueue.length} restantes`}
+-                      size="small"
+-                      sx={{
+-                        fontWeight: 800,
+-                        bgcolor: deckQueue.length === 0 ? "#DCFCE7" : "#EEF2FF",
+-                        color: deckQueue.length === 0 ? "#15803D" : "#4F46E5",
+-                        px: 0.5,
+-                      }}
+-                    />
++                    <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
++                      <Chip
++                        label={`${deckQueue.length} restantes`}
++                        size="small"
++                        sx={{
++                          fontWeight: 800,
++                          bgcolor:
++                            deckQueue.length === 0 ? "#DCFCE7" : "#EEF2FF",
++                          color: deckQueue.length === 0 ? "#15803D" : "#4F46E5",
++                          px: 0.5,
++                        }}
++                      />
++                      <Tooltip title="Atualizar baralho">
++                        <IconButton
++                          size="small"
++                          onClick={refreshDeck}
++                          disabled={refreshing}
++                          aria-label="Atualizar baralho"
++                          sx={{
++                            color: "#64748B",
++                            bgcolor: "#F8FAFC",
++                            border: "1px solid #E2E8F0",
++                            "&:hover": { bgcolor: "#F1F5F9" },
++                          }}
++                        >
++                          {refreshing ? (
++                            <CircularProgress size={16} color="inherit" />
++                          ) : (
++                            <RefreshCw size={16} />
++                          )}
++                        </IconButton>
++                      </Tooltip>
++                    </Stack>
+                   </Paper>
+ 
+                   <TaskCardDeck
+diff --git a/frontend/src/components/TaskCardDeck.tsx b/frontend/src/components/TaskCardDeck.tsx
+index 1fb2062..5039731 100644
+--- a/frontend/src/components/TaskCardDeck.tsx
++++ b/frontend/src/components/TaskCardDeck.tsx
+@@ -44,9 +44,15 @@ export function TaskCardDeck({
+   const [drag, setDrag] = useState({ x: 0, y: 0 });
+   const [dragging, setDragging] = useState(false);
+   const [exit, setExit] = useState<Action | null>(null);
++  // Snapshot da carta que está saindo. A fila do pai agora é otimista
++  // (muda assim que você decide, sem esperar a API) — sem esse
++  // snapshot, a carta em animação passaria a mostrar o conteúdo da
++  // PRÓXIMA carta no meio da própria animação de saída dela.
++  const [exitingCard, setExitingCard] = useState<TaskInstance | null>(null);
+   const startRef = useRef({ x: 0, y: 0 });
+ 
+   const top = queue[0];
++  const displayed = exitingCard ?? top;
+ 
+   const onPointerDown = (e: React.PointerEvent) => {
+     if (exit || !top) return;
+@@ -83,22 +89,21 @@ export function TaskCardDeck({
+   const onPointerCancel = (e: React.PointerEvent) => endDrag(e, false);
+ 
+   const triggerExit = (action: Action) => {
++    if (!top) return;
++    setExitingCard(top);
+     setExit(action);
++    // Dispara e não espera: a fila do pai já tira essa carta na hora
++    // (otimista) — se a API falhar de verdade, ele devolve a carta e
++    // mostra o erro. Aqui só cuidamos da animação local.
++    void onDecide(top.taskId, action);
+     setTimeout(() => {
+-      // Só destrava a carta (permite novo toque/arrasto) depois que a
+-      // decisão realmente terminou no servidor — antes disso, exit
+-      // continua truthy e os handlers acima (onPointerDown, botões)
+-      // ignoram qualquer nova interação. Sem esse await, a carta
+-      // reaparecia visualmente antes da resposta chegar e um segundo
+-      // toque nessa janela mandava a mesma decisão duas vezes.
+-      void onDecide(top.taskId, action).then(() => {
+-        setExit(null);
+-        setDrag({ x: 0, y: 0 });
+-      });
++      setExit(null);
++      setExitingCard(null);
++      setDrag({ x: 0, y: 0 });
+     }, 240);
+   };
+ 
+-  if (!top) {
++  if (!displayed) {
+     return (
+       <Paper
+         variant="outlined"
+@@ -209,9 +214,9 @@ export function TaskCardDeck({
+           <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+             <Chip
+               label={
+-                top.freq === "DAILY"
++                displayed.freq === "DAILY"
+                   ? "Diária"
+-                  : top.freq === "WEEKLY"
++                  : displayed.freq === "WEEKLY"
+                     ? "Semanal"
+                     : "Mensal"
+               }
+@@ -221,15 +226,15 @@ export function TaskCardDeck({
+                 fontSize: 11,
+                 fontWeight: 700,
+                 bgcolor:
+-                  top.freq === "DAILY"
++                  displayed.freq === "DAILY"
+                     ? "#EEF2FF"
+-                    : top.freq === "WEEKLY"
++                    : displayed.freq === "WEEKLY"
+                       ? "#FEF3C7"
+                       : "#F1F5F9",
+                 color:
+-                  top.freq === "DAILY"
++                  displayed.freq === "DAILY"
+                     ? "#4F46E5"
+-                    : top.freq === "WEEKLY"
++                    : displayed.freq === "WEEKLY"
+                       ? "#D97706"
+                       : "#475569",
+               }}
+@@ -244,7 +249,7 @@ export function TaskCardDeck({
+                 variant="caption"
+                 sx={{ fontWeight: 700, color: "#64748B", ml: 0.5 }}
+               >
+-                Esforço {top.weight}
++                Esforço {displayed.weight}
+               </Typography>
+             </Stack>
+           </Stack>
+@@ -268,7 +273,7 @@ export function TaskCardDeck({
+                 lineHeight: 1.25,
+               }}
+             >
+-              {top.name}
++              {displayed.name}
+             </Typography>
+           </Box>
+ 
+@@ -285,14 +290,14 @@ export function TaskCardDeck({
+               border: "1px solid #F1F5F9",
+             }}
+           >
+-            <Avatar member={membersById[top.assignee]} size={24} />
++            <Avatar member={membersById[displayed.assignee]} size={24} />
+             <Typography
+               variant="body2"
+               sx={{ fontSize: 13, color: "#475569", fontWeight: 600 }}
+             >
+               Sugestão:{" "}
+               <Box component="span" sx={{ color: "#0F172A", fontWeight: 700 }}>
+-                {membersById[top.assignee]?.name ?? top.assignee}
++                {membersById[displayed.assignee]?.name ?? displayed.assignee}
+               </Box>
+             </Typography>
+           </Stack>

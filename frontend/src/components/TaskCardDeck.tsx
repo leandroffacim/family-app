@@ -44,9 +44,15 @@ export function TaskCardDeck({
   const [drag, setDrag] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const [exit, setExit] = useState<Action | null>(null);
+  // Snapshot da carta que está saindo. A fila do pai agora é otimista
+  // (muda assim que você decide, sem esperar a API) — sem esse
+  // snapshot, a carta em animação passaria a mostrar o conteúdo da
+  // PRÓXIMA carta no meio da própria animação de saída dela.
+  const [exitingCard, setExitingCard] = useState<TaskInstance | null>(null);
   const startRef = useRef({ x: 0, y: 0 });
 
   const top = queue[0];
+  const displayed = exitingCard ?? top;
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (exit || !top) return;
@@ -83,22 +89,21 @@ export function TaskCardDeck({
   const onPointerCancel = (e: React.PointerEvent) => endDrag(e, false);
 
   const triggerExit = (action: Action) => {
+    if (!top) return;
+    setExitingCard(top);
     setExit(action);
+    // Dispara e não espera: a fila do pai já tira essa carta na hora
+    // (otimista) — se a API falhar de verdade, ele devolve a carta e
+    // mostra o erro. Aqui só cuidamos da animação local.
+    void onDecide(top.taskId, action);
     setTimeout(() => {
-      // Só destrava a carta (permite novo toque/arrasto) depois que a
-      // decisão realmente terminou no servidor — antes disso, exit
-      // continua truthy e os handlers acima (onPointerDown, botões)
-      // ignoram qualquer nova interação. Sem esse await, a carta
-      // reaparecia visualmente antes da resposta chegar e um segundo
-      // toque nessa janela mandava a mesma decisão duas vezes.
-      void onDecide(top.taskId, action).then(() => {
-        setExit(null);
-        setDrag({ x: 0, y: 0 });
-      });
+      setExit(null);
+      setExitingCard(null);
+      setDrag({ x: 0, y: 0 });
     }, 240);
   };
 
-  if (!top) {
+  if (!displayed) {
     return (
       <Paper
         variant="outlined"
@@ -209,9 +214,9 @@ export function TaskCardDeck({
           <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
             <Chip
               label={
-                top.freq === "DAILY"
+                displayed.freq === "DAILY"
                   ? "Diária"
-                  : top.freq === "WEEKLY"
+                  : displayed.freq === "WEEKLY"
                     ? "Semanal"
                     : "Mensal"
               }
@@ -221,15 +226,15 @@ export function TaskCardDeck({
                 fontSize: 11,
                 fontWeight: 700,
                 bgcolor:
-                  top.freq === "DAILY"
+                  displayed.freq === "DAILY"
                     ? "#EEF2FF"
-                    : top.freq === "WEEKLY"
+                    : displayed.freq === "WEEKLY"
                       ? "#FEF3C7"
                       : "#F1F5F9",
                 color:
-                  top.freq === "DAILY"
+                  displayed.freq === "DAILY"
                     ? "#4F46E5"
-                    : top.freq === "WEEKLY"
+                    : displayed.freq === "WEEKLY"
                       ? "#D97706"
                       : "#475569",
               }}
@@ -244,7 +249,7 @@ export function TaskCardDeck({
                 variant="caption"
                 sx={{ fontWeight: 700, color: "#64748B", ml: 0.5 }}
               >
-                Esforço {top.weight}
+                Esforço {displayed.weight}
               </Typography>
             </Stack>
           </Stack>
@@ -268,7 +273,7 @@ export function TaskCardDeck({
                 lineHeight: 1.25,
               }}
             >
-              {top.name}
+              {displayed.name}
             </Typography>
           </Box>
 
@@ -285,14 +290,14 @@ export function TaskCardDeck({
               border: "1px solid #F1F5F9",
             }}
           >
-            <Avatar member={membersById[top.assignee]} size={24} />
+            <Avatar member={membersById[displayed.assignee]} size={24} />
             <Typography
               variant="body2"
               sx={{ fontSize: 13, color: "#475569", fontWeight: 600 }}
             >
               Sugestão:{" "}
               <Box component="span" sx={{ color: "#0F172A", fontWeight: 700 }}>
-                {membersById[top.assignee]?.name ?? top.assignee}
+                {membersById[displayed.assignee]?.name ?? displayed.assignee}
               </Box>
             </Typography>
           </Stack>

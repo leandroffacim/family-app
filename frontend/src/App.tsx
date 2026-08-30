@@ -17,6 +17,7 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -28,6 +29,7 @@ import {
   ListChecks,
   LogOut,
   Plus,
+  RefreshCw,
   Sparkles,
   Sun,
   UserPlus,
@@ -87,6 +89,7 @@ export default function App() {
   const [pendingConfirmEmail, setPendingConfirmEmail] = useState("");
   const [prefillEmail, setPrefillEmail] = useState("");
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
@@ -167,6 +170,23 @@ export default function App() {
     }
   }
 
+  const refreshDeck = async () => {
+    setRefreshing(true);
+    setActionError(null);
+    try {
+      const deckRes = await api.getDeck();
+      setDeckQueue(deckRes.items);
+    } catch (error) {
+      setActionError(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível atualizar o baralho",
+      );
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   useEffect(() => {
     if (status === "authenticated") loadAll();
   }, [status]);
@@ -177,14 +197,19 @@ export default function App() {
   ) => {
     setActionError(null);
     const decided = deckQueue.find((item) => item.taskId === taskId);
+    // Otimista: tira a carta da fila já — não espera a viagem de rede
+    // pra próxima carta virar interativa. Se a API falhar, volta pro
+    // topo no catch (ver TaskCardDeck.tsx, que anima em cima de um
+    // snapshot local, então não depende de quando a fila muda aqui).
+    setDeckQueue((queue) => queue.filter((item) => item.taskId !== taskId));
     try {
       await api.decide(taskId, action);
-      setDeckQueue((queue) => queue.filter((item) => item.taskId !== taskId));
       if (action === "pass") setTasks((await api.listTasks()).items);
       // guarda a última decisão pra permitir "Desfazer" na hora, sem
       // precisar esperar o baralho de amanhã recriar a tarefa
       setLastDecision(decided ? { taskId, name: decided.name } : null);
     } catch (error) {
+      if (decided) setDeckQueue((queue) => [decided, ...queue]);
       setActionError(
         error instanceof Error
           ? error.message
@@ -609,16 +634,39 @@ export default function App() {
                           : `${deckQueue.length} ${deckQueue.length === 1 ? "tarefa pendente" : "tarefas pendentes"} no baralho.`}
                       </Typography>
                     </Box>
-                    <Chip
-                      label={`${deckQueue.length} restantes`}
-                      size="small"
-                      sx={{
-                        fontWeight: 800,
-                        bgcolor: deckQueue.length === 0 ? "#DCFCE7" : "#EEF2FF",
-                        color: deckQueue.length === 0 ? "#15803D" : "#4F46E5",
-                        px: 0.5,
-                      }}
-                    />
+                    <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                      <Chip
+                        label={`${deckQueue.length} restantes`}
+                        size="small"
+                        sx={{
+                          fontWeight: 800,
+                          bgcolor:
+                            deckQueue.length === 0 ? "#DCFCE7" : "#EEF2FF",
+                          color: deckQueue.length === 0 ? "#15803D" : "#4F46E5",
+                          px: 0.5,
+                        }}
+                      />
+                      <Tooltip title="Atualizar baralho">
+                        <IconButton
+                          size="small"
+                          onClick={refreshDeck}
+                          disabled={refreshing}
+                          aria-label="Atualizar baralho"
+                          sx={{
+                            color: "#64748B",
+                            bgcolor: "#F8FAFC",
+                            border: "1px solid #E2E8F0",
+                            "&:hover": { bgcolor: "#F1F5F9" },
+                          }}
+                        >
+                          {refreshing ? (
+                            <CircularProgress size={16} color="inherit" />
+                          ) : (
+                            <RefreshCw size={16} />
+                          )}
+                        </IconButton>
+                      </Tooltip>
+                    </Stack>
                   </Paper>
 
                   <TaskCardDeck
