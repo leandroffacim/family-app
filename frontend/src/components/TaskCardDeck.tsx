@@ -21,7 +21,7 @@ function StackCard({ depth }: { depth: number }) {
       sx={{
         position: "absolute",
         inset: 0,
-        borderRadius: 5,
+        borderRadius: 1.25,
         transform: `translateY(${-depth * 10}px) scale(${1 - depth * 0.045})`,
         opacity: 1 - depth * 0.3,
         bgcolor: "#FFFFFF",
@@ -109,7 +109,10 @@ export function TaskCardDeck({
         variant="outlined"
         sx={{
           height: 310,
-          borderRadius: 5,
+          width: "100%",
+          maxWidth: 420,
+          mx: "auto",
+          borderRadius: 1.25,
           borderStyle: "dashed",
           borderColor: "#CBD5E1",
           bgcolor: "#F8FAFC",
@@ -181,7 +184,15 @@ export function TaskCardDeck({
 
   return (
     <Stack spacing={2.5}>
-      <Box sx={{ position: "relative", height: 300 }}>
+      <Box
+        sx={{
+          position: "relative",
+          height: { xs: 300, sm: 340 },
+          width: "100%",
+          maxWidth: 420,
+          mx: "auto",
+        }}
+      >
         {queue[2] && <StackCard depth={2} />}
         {queue[1] && <StackCard depth={1} />}
 
@@ -195,7 +206,7 @@ export function TaskCardDeck({
           sx={{
             position: "absolute",
             inset: 0,
-            borderRadius: 5,
+            borderRadius: 1.25,
             bgcolor: "#FFFFFF",
             borderColor: "#E2E8F0",
             boxShadow:

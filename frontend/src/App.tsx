@@ -574,7 +574,6 @@ export default function App() {
           {!loading && loadError && (
             <Alert
               severity="error"
-              sx={{ borderRadius: 3 }}
               action={
                 <Button color="inherit" size="small" onClick={loadAll}>
                   Tentar novamente
@@ -589,7 +588,6 @@ export default function App() {
               {actionError && (
                 <Alert
                   severity="error"
-                  sx={{ borderRadius: 3 }}
                   onClose={() => setActionError(null)}
                 >
                   {actionError}
@@ -602,7 +600,7 @@ export default function App() {
                     variant="outlined"
                     sx={{
                       p: 2,
-                      borderRadius: 4,
+                      borderRadius: 1,
                       bgcolor: "#FFFFFF",
                       borderColor: "#E2E8F0",
                       display: "flex",
@@ -730,7 +728,7 @@ export default function App() {
                     variant="outlined"
                     sx={{
                       p: 1.5,
-                      borderRadius: 4,
+                      borderRadius: 0.75,
                       bgcolor: "#FFFFFF",
                       borderColor: "#E2E8F0",
                     }}
@@ -803,7 +801,7 @@ export default function App() {
                         variant="outlined"
                         sx={{
                           p: 4,
-                          borderRadius: 4,
+                          borderRadius: 1.25,
                           textAlign: "center",
                           bgcolor: "#FFFFFF",
                           borderColor: "#E2E8F0",
@@ -1010,7 +1008,7 @@ export default function App() {
                         variant="outlined"
                         sx={{
                           p: 4,
-                          borderRadius: 4,
+                          borderRadius: 1.25,
                           textAlign: "center",
                           bgcolor: "#FFFFFF",
                           borderColor: "#E2E8F0",
@@ -1071,7 +1069,7 @@ export default function App() {
                         display: "flex",
                         justifyContent: "center",
                         p: 3,
-                        borderRadius: 5,
+                        borderRadius: 1.25,
                         bgcolor: "#FFFFFF",
                         borderColor: "#E2E8F0",
                       }}
@@ -1114,7 +1112,7 @@ export default function App() {
                           alignItems: "center",
                           justifyContent: "space-between",
                           p: "12px 16px",
-                          borderRadius: 4,
+                          borderRadius: 1,
                           bgcolor: "#FFFFFF",
                           borderColor: "#E2E8F0",
                         }}
@@ -1220,7 +1218,7 @@ export default function App() {
             "& .MuiBottomNavigationAction-root": {
               minWidth: 0,
               py: 1,
-              borderRadius: 3,
+              borderRadius: 1,
               mx: { xs: 0, sm: 0.5 },
               color: "#64748B",
               transition: "all 0.2s ease-in-out",
@@ -1317,7 +1315,6 @@ export default function App() {
               {actionError && (
                 <Alert
                   severity="error"
-                  sx={{ borderRadius: 3 }}
                   onClose={() => setActionError(null)}
                 >
                   {actionError}
@@ -1455,7 +1452,6 @@ export default function App() {
               {actionError && (
                 <Alert
                   severity="error"
-                  sx={{ borderRadius: 3 }}
                   onClose={() => setActionError(null)}
                 >
                   {actionError}
@@ -1573,7 +1569,6 @@ export default function App() {
               {actionError && (
                 <Alert
                   severity="error"
-                  sx={{ borderRadius: 3 }}
                   onClose={() => setActionError(null)}
                 >
                   {actionError}

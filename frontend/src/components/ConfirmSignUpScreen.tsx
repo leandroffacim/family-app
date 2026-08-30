@@ -84,7 +84,7 @@ export function ConfirmSignUpScreen({
         sx={{
           width: "100%",
           maxWidth: 400,
-          borderRadius: 6,
+          borderRadius: 1.5,
           p: { xs: 3, sm: 4 },
           display: "flex",
           flexDirection: "column",
@@ -127,12 +127,12 @@ export function ConfirmSignUpScreen({
         </Stack>
 
         {error && (
-          <Alert severity="error" sx={{ borderRadius: 3 }}>
+          <Alert severity="error">
             {error}
           </Alert>
         )}
         {info && (
-          <Alert severity="success" sx={{ borderRadius: 3 }}>
+          <Alert severity="success">
             {info}
           </Alert>
         )}

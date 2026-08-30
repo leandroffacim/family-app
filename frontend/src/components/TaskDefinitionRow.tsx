@@ -24,7 +24,7 @@ export function TaskDefinitionRow({
         justifyContent: "space-between",
         gap: 1.5,
         p: "14px 16px",
-        borderRadius: 4,
+        borderRadius: 1,
         bgcolor: "#FFFFFF",
         borderColor: "#E2E8F0",
         transition: "all 0.2s ease-in-out",

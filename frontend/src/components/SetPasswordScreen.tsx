@@ -59,7 +59,7 @@ export function SetPasswordScreen() {
         sx={{
           width: "100%",
           maxWidth: 400,
-          borderRadius: 6,
+          borderRadius: 1.5,
           p: { xs: 3, sm: 4 },
           display: "flex",
           flexDirection: "column",
@@ -98,7 +98,7 @@ export function SetPasswordScreen() {
         </Stack>
 
         {(localError || error) && (
-          <Alert severity="error" sx={{ borderRadius: 3 }}>
+          <Alert severity="error">
             {localError ?? error}
           </Alert>
         )}

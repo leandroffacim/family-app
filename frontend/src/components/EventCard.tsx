@@ -18,7 +18,7 @@ export function EventCard({
         alignItems: "center",
         gap: 2,
         p: 2,
-        borderRadius: 4,
+        borderRadius: 1,
         bgcolor: "#FFFFFF",
         borderColor: "#E2E8F0",
         transition: "all 0.2s ease-in-out",
@@ -36,7 +36,7 @@ export function EventCard({
           py: 0.75,
           alignItems: "center",
           justifyContent: "center",
-          borderRadius: 3,
+          borderRadius: 0.75,
           bgcolor: "#EEF2FF",
           color: "#4F46E5",
         }}
