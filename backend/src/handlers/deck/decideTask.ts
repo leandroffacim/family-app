@@ -54,12 +54,22 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           ExpressionAttributeValues: {
             ":status": newStatus,
             ":completedBy": acting.memberId,
+            ":pending": "pending",
           },
-          ConditionExpression: "attribute_exists(PK)",
+          // Só decide uma carta que ainda está "pending" — sem isso,
+          // um "concluir" e um "passar" concorrentes na mesma carta (ou
+          // duas decisões atrasadas/retry) podiam pisar um no outro e
+          // deixar a instância num estado contraditório (ex: marcada
+          // como "done" depois de já ter sido passada pra outra
+          // pessoa). Mesmo raciocínio do bloqueio otimista do "passar".
+          ConditionExpression: "attribute_exists(PK) AND #s = :pending",
         }),
       );
     } catch {
-      return err(404, "Instância da tarefa não encontrada para hoje");
+      return err(
+        409,
+        "Não foi possível registrar a decisão (conflito ou instância inexistente)",
+      );
     }
     return ok({ status: newStatus, completedBy: acting.memberId });
   }
