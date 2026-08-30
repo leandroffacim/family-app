@@ -39,7 +39,7 @@ export function TaskCardDeck({
 }: {
   queue: TaskInstance[];
   membersById: Record<string, Member>;
-  onDecide: (taskId: string, action: Action) => void;
+  onDecide: (taskId: string, action: Action) => Promise<void>;
 }) {
   const [drag, setDrag] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
@@ -85,9 +85,16 @@ export function TaskCardDeck({
   const triggerExit = (action: Action) => {
     setExit(action);
     setTimeout(() => {
-      onDecide(top.taskId, action);
-      setExit(null);
-      setDrag({ x: 0, y: 0 });
+      // Só destrava a carta (permite novo toque/arrasto) depois que a
+      // decisão realmente terminou no servidor — antes disso, exit
+      // continua truthy e os handlers acima (onPointerDown, botões)
+      // ignoram qualquer nova interação. Sem esse await, a carta
+      // reaparecia visualmente antes da resposta chegar e um segundo
+      // toque nessa janela mandava a mesma decisão duas vezes.
+      void onDecide(top.taskId, action).then(() => {
+        setExit(null);
+        setDrag({ x: 0, y: 0 });
+      });
     }, 240);
   };
 

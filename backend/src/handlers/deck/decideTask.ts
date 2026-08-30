@@ -89,7 +89,16 @@ export const handler: APIGatewayProxyHandler = async (event) => {
               TableName: TABLE_NAME,
               Key: { PK: pk, SK: taskSK(taskId) },
               UpdateExpression: "SET currentIndex = :i",
-              ExpressionAttributeValues: { ":i": nextIndex },
+              // Bloqueio otimista: só avança se currentIndex ainda for o
+              // valor que acabamos de ler. Se duas decisões concorrentes
+              // (retry de rede, app aberto em 2 aparelhos) chegarem quase
+              // juntas, a segunda falha aqui em vez de avançar o rodízio
+              // duas vezes e pular uma pessoa da fila.
+              ConditionExpression: "currentIndex = :expectedCurrent",
+              ExpressionAttributeValues: {
+                ":i": nextIndex,
+                ":expectedCurrent": currentIndex,
+              },
             },
           },
           {
