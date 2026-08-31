@@ -27,7 +27,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     parsedBody = bodySchema.parse(JSON.parse(event.body ?? "{}"));
   } catch {
-    return err(400, "body inválido: esperado { action: 'done' | 'pass' | 'defer' }");
+    return err(
+      400,
+      "body inválido: esperado { action: 'done' | 'pass' | 'defer' }",
+    );
   }
 
   let acting;
@@ -134,7 +137,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }),
     );
   } catch {
-    return err(409, "Não foi possível passar a tarefa (conflito ou instância inexistente)");
+    return err(
+      409,
+      "Não foi possível passar a tarefa (conflito ou instância inexistente)",
+    );
   }
 
   return ok({ status: "passed", nextAssignee, passedBy: acting.memberId });
