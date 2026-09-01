@@ -110,8 +110,8 @@ T8, T9, T10
 
 **Done when**:
 
-- [ ] `export const AVATAR_COLORS = [...]` added to `frontend/src/types.ts`, values identical to `backend/src/lib/types.ts`
-- [ ] `cd frontend && npm run build` passes (typecheck + vite build)
+- [x] `export const AVATAR_COLORS = [...]` added to `frontend/src/types.ts`, values identical to `backend/src/lib/types.ts`
+- [x] `cd frontend && npm run build` passes (typecheck + vite build)
 
 **Tests**: none
 **Gate**: build (`cd frontend && npm run build`)
