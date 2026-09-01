@@ -30,9 +30,9 @@ import {
   LogOut,
   Plus,
   RefreshCw,
+  Settings,
   Sparkles,
   Sun,
-  UserCircle,
   UserPlus,
   Users,
   X,
@@ -555,7 +555,7 @@ export default function App() {
                   "&:hover": { color: "#4F46E5", bgcolor: "#EEF2FF" },
                 }}
               >
-                <UserCircle size={16} />
+                <Settings size={16} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Sair">
@@ -689,7 +689,7 @@ export default function App() {
                   },
                 }}
               >
-                <UserCircle size={18} />
+                <Settings size={18} />
               </IconButton>
               <IconButton
                 onClick={logout}
