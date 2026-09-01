@@ -162,11 +162,11 @@ T8, T9, T10
 
 **Done when**:
 
-- [ ] Handler calls `assertFamilyAccess(event, familyId)` and uses only its returned `memberId` as the update target (never path/body)
-- [ ] Zod schema requires at least one of `name` (1-50 chars after trim) / `color` (must be one of `AVATAR_COLORS`); rejects with `400` otherwise
-- [ ] Valid request runs `UpdateCommand` on `MEMBER#{memberId}` with `attribute_exists(PK)` and returns `200` with the updated fields
-- [ ] Unit tests written in `backend/src/handlers/members/__tests__/updateProfile.test.ts` (mocking `ddb`), covering: successful name update, successful color update, empty-name rejection (PROFILE-03), invalid-color rejection (PROFILE-04), target always derived from token even if a different `memberId` is sent in the body (PROFILE-05)
-- [ ] `cd backend && npm test` passes, test count increases by at least 5
+- [x] Handler calls `assertFamilyAccess(event, familyId)` and uses only its returned `memberId` as the update target (never path/body)
+- [x] Zod schema requires at least one of `name` (1-50 chars after trim) / `color` (must be one of `AVATAR_COLORS`); rejects with `400` otherwise
+- [x] Valid request runs `UpdateCommand` on `MEMBER#{memberId}` with `attribute_exists(PK)` and returns `200` with the updated fields
+- [x] Unit tests written in `backend/src/handlers/members/__tests__/updateProfile.test.ts` (mocking `ddb`), covering: successful name update, successful color update, empty-name rejection (PROFILE-03), invalid-color rejection (PROFILE-04), target always derived from token even if a different `memberId` is sent in the body (PROFILE-05)
+- [x] `cd backend && npm test` passes, test count increases by at least 5
 
 **Tests**: unit
 **Gate**: quick (`cd backend && npm test`)
