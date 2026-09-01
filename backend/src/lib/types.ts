@@ -2,6 +2,17 @@ export type TaskFrequency = "DAILY" | "WEEKLY" | "MONTHLY";
 export type InstanceStatus = "pending" | "done" | "passed" | "deferred";
 export type TaskWeight = 1 | 2 | 3;
 
+export const AVATAR_COLORS = [
+  "#4F46E5",
+  "#EF4444",
+  "#F59E0B",
+  "#10B981",
+  "#0EA5E9",
+  "#8B5CF6",
+  "#EC4899",
+  "#64748B",
+] as const;
+
 export interface Member {
   id: string;
   name: string;
