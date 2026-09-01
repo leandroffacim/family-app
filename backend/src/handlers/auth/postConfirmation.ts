@@ -77,6 +77,7 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
               email: ownerEmail,
               name: ownerEmail.split("@")[0] || "Dono",
               status: "ACTIVE",
+              isOwner: true,
             },
           },
         },

@@ -135,10 +135,10 @@ T8, T9, T10
 
 **Done when**:
 
-- [ ] The owner `Put` item (`SK: memberSK("owner")`) includes `isOwner: true`
-- [ ] The invited-member branch (existing `UpdateCommand` earlier in the same handler) is untouched and does NOT set `isOwner`
-- [ ] Unit tests written in `backend/src/handlers/auth/__tests__/postConfirmation.test.ts` (mocking `ddb.send` and the Cognito client, same style as `lib/__tests__/auth.test.ts`) asserting: (a) new-family signup writes `isOwner: true` on the owner item, (b) invited-member confirmation path never sets `isOwner`
-- [ ] `cd backend && npm test` passes, test count increases by at least 2
+- [x] The owner `Put` item (`SK: memberSK("owner")`) includes `isOwner: true`
+- [x] The invited-member branch (existing `UpdateCommand` earlier in the same handler) is untouched and does NOT set `isOwner`
+- [x] Unit tests written in `backend/src/handlers/auth/__tests__/postConfirmation.test.ts` (mocking `ddb.send` and the Cognito client, same style as `lib/__tests__/auth.test.ts`) asserting: (a) new-family signup writes `isOwner: true` on the owner item, (b) invited-member confirmation path never sets `isOwner`
+- [x] `cd backend && npm test` passes, test count increases by at least 2
 
 **Tests**: unit
 **Gate**: quick (`cd backend && npm test`)
