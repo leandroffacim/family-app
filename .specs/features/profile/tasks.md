@@ -301,11 +301,11 @@ T8, T9, T10
 
 **Done when**:
 
-- [ ] Component signature: `<ProfileScreen member={Member} onClose={() => void} onSaved={(m: Member) => void} onAccountDeleted={() => void} />`
-- [ ] Shows current `name`/`color`, lets the user edit both, disables the save button while the update call is pending (PROFILE-06)
-- [ ] On save failure, keeps the entered values in the form (does not reset) and shows an inline error
-- [ ] Delete-account action requires an explicit confirmation step before calling `api.deleteAccount()`; on success calls `onAccountDeleted()`
-- [ ] `cd frontend && npm run build` passes
+- [x] Component signature: `<ProfileScreen member={Member} onClose={() => void} onSaved={(m: Member) => void} onAccountDeleted={() => void} />`
+- [x] Shows current `name`/`color`, lets the user edit both, disables the save button while the update call is pending (PROFILE-06)
+- [x] On save failure, keeps the entered values in the form (does not reset) and shows an inline error
+- [x] Delete-account action requires an explicit confirmation step before calling `api.deleteAccount()`; on success calls `onAccountDeleted()`
+- [x] `cd frontend && npm run build` passes
 
 **Tests**: none
 **Gate**: build (`cd frontend && npm run build`)
