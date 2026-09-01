@@ -217,13 +217,13 @@ T8, T9, T10
 
 **Done when**:
 
-- [ ] Handler calls `assertFamilyAccess`, then `GetCommand MEMBER#{memberId}`; missing item → skip straight to the idempotent-success path (still attempts Cognito delete, then returns `204`)
-- [ ] If `item.isOwner === true` → `403` before any Query/Cognito/Dynamo mutation (PROFILE-08)
-- [ ] Otherwise, `Query` on `TASK#` (`contains(rotationOrder, :m)`) and `EVENT#` (`contains(#mem, :m)`) prefixes; any match → `409` (PROFILE-09)
-- [ ] Otherwise: `AdminDeleteUserCommand` (catch `UserNotFoundException`, ignore — PROFILE-10), then `DeleteCommand MEMBER#{memberId}` (no condition, naturally idempotent), return `204`
-- [ ] DynamoDB delete failure after a successful Cognito delete returns `500` and never re-creates the Cognito user (PROFILE-11)
-- [ ] Unit tests written in `backend/src/handlers/members/__tests__/deleteAccount.test.ts` (mocking `ddb` and the Cognito client) covering: happy-path deletion, owner rejection (`403`), task-referenced rejection (`409`), event-referenced rejection (`409`), repeated/idempotent deletion (`204`), Dynamo-failure-after-Cognito-success (`500`, no Cognito re-creation attempted)
-- [ ] `cd backend && npm test` passes, test count increases by at least 6
+- [x] Handler calls `assertFamilyAccess`, then `GetCommand MEMBER#{memberId}`; missing item → skip straight to the idempotent-success path (still attempts Cognito delete, then returns `204`)
+- [x] If `item.isOwner === true` → `403` before any Query/Cognito/Dynamo mutation (PROFILE-08)
+- [x] Otherwise, `Query` on `TASK#` (`contains(rotationOrder, :m)`) and `EVENT#` (`contains(#mem, :m)`) prefixes; any match → `409` (PROFILE-09)
+- [x] Otherwise: `AdminDeleteUserCommand` (catch `UserNotFoundException`, ignore — PROFILE-10), then `DeleteCommand MEMBER#{memberId}` (no condition, naturally idempotent), return `204`
+- [x] DynamoDB delete failure after a successful Cognito delete returns `500` and never re-creates the Cognito user (PROFILE-11)
+- [x] Unit tests written in `backend/src/handlers/members/__tests__/deleteAccount.test.ts` (mocking `ddb` and the Cognito client) covering: happy-path deletion, owner rejection (`403`), task-referenced rejection (`409`), event-referenced rejection (`409`), repeated/idempotent deletion (`204`), Dynamo-failure-after-Cognito-success (`500`, no Cognito re-creation attempted)
+- [x] `cd backend && npm test` passes, test count increases by at least 6
 
 **Tests**: unit
 **Gate**: quick (`cd backend && npm test`)
