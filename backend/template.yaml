@@ -391,6 +391,29 @@ Resources:
         Target: es2022
         EntryPoints: [inviteMember.ts]
 
+  UpdateProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: UPDATE-PROFILE
+      CodeUri: src/handlers/members/
+      Handler: updateProfile.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FamilyTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /families/{familyId}/members/me
+            Method: PATCH
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [updateProfile.ts]
+
   # ---------- Agenda ----------
 
   ListEventsFunction:

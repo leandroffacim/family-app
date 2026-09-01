@@ -190,10 +190,10 @@ T8, T9, T10
 
 **Done when**:
 
-- [ ] New `UpdateProfileFunction` resource added under the `# ---------- Membros ----------` section, `CodeUri: src/handlers/members/`, `Handler: updateProfile.handler`
-- [ ] `Policies: [DynamoDBCrudPolicy]` scoped to `FamilyTable`
-- [ ] `Events.Api` set to `Path: /families/{familyId}/members/me`, `Method: PATCH`
-- [ ] `cd backend && sam build` completes without error
+- [x] New `UpdateProfileFunction` resource added under the `# ---------- Membros ----------` section, `CodeUri: src/handlers/members/`, `Handler: updateProfile.handler`
+- [x] `Policies: [DynamoDBCrudPolicy]` scoped to `FamilyTable`
+- [x] `Events.Api` set to `Path: /families/{familyId}/members/me`, `Method: PATCH`
+- [x] `cd backend && sam build` completes without error
 
 **Tests**: none
 **Gate**: build (`cd backend && sam build`)
