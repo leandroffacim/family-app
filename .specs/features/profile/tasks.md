@@ -247,11 +247,11 @@ T8, T9, T10
 
 **Done when**:
 
-- [ ] New `DeleteAccountFunction` resource added under `# ---------- Membros ----------`, `CodeUri: src/handlers/members/`, `Handler: deleteAccount.handler`
-- [ ] `Environment.Variables.USER_POOL_ID: !Ref FamilyUserPool` set
-- [ ] `Policies: [DynamoDBCrudPolicy, Statement: [cognito-idp:AdminDeleteUser scoped to !GetAtt FamilyUserPool.Arn]]`
-- [ ] `Events.Api` set to `Path: /families/{familyId}/members/me`, `Method: DELETE`
-- [ ] `cd backend && sam build` completes without error
+- [x] New `DeleteAccountFunction` resource added under `# ---------- Membros ----------`, `CodeUri: src/handlers/members/`, `Handler: deleteAccount.handler`
+- [x] `Environment.Variables.USER_POOL_ID: !Ref FamilyUserPool` set
+- [x] `Policies: [DynamoDBCrudPolicy, Statement: [cognito-idp:AdminDeleteUser scoped to !GetAtt FamilyUserPool.Arn]]`
+- [x] `Events.Api` set to `Path: /families/{familyId}/members/me`, `Method: DELETE`
+- [x] `cd backend && sam build` completes without error
 
 **Tests**: none
 **Gate**: build (`cd backend && sam build`)

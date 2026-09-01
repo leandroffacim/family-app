@@ -414,6 +414,36 @@ Resources:
         Target: es2022
         EntryPoints: [updateProfile.ts]
 
+  DeleteAccountFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: DELETE-ACCOUNT
+      CodeUri: src/handlers/members/
+      Handler: deleteAccount.handler
+      Environment:
+        Variables:
+          USER_POOL_ID: !Ref FamilyUserPool
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FamilyTable
+        - Statement:
+            - Effect: Allow
+              Action: cognito-idp:AdminDeleteUser
+              Resource: !GetAtt FamilyUserPool.Arn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /families/{familyId}/members/me
+            Method: DELETE
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints: [deleteAccount.ts]
+
   # ---------- Agenda ----------
 
   ListEventsFunction:
