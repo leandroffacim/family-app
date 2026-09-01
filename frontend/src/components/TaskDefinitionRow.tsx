@@ -20,9 +20,10 @@ export function TaskDefinitionRow({
       variant="outlined"
       sx={{
         display: "flex",
-        alignItems: "center",
+        flexDirection: { xs: "column", sm: "row" },
+        alignItems: { xs: "flex-start", sm: "center" },
         justifyContent: "space-between",
-        gap: 1.5,
+        gap: { xs: 1, sm: 1.5 },
         p: "14px 16px",
         borderRadius: 1,
         bgcolor: "#FFFFFF",
@@ -35,7 +36,7 @@ export function TaskDefinitionRow({
         },
       }}
     >
-      <Box sx={{ flex: 1, minWidth: 0 }}>
+      <Box sx={{ flex: 1, minWidth: 0, width: { xs: "100%", sm: "auto" } }}>
         <Typography
           noWrap
           sx={{ fontWeight: 700, fontSize: 15, color: "#0F172A" }}
@@ -94,18 +95,26 @@ export function TaskDefinitionRow({
           py: 0.5,
           borderRadius: 99,
           border: "1px solid #F1F5F9",
+          maxWidth: "100%",
+          minWidth: 0,
         }}
       >
         <Typography
           variant="caption"
-          sx={{ fontSize: 11, fontWeight: 600, color: "#64748B" }}
+          sx={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: "#64748B",
+            flexShrink: 0,
+          }}
         >
           Vez de:
         </Typography>
         <Avatar member={assignedMember} size={24} showBorder={false} />
         <Typography
           variant="body2"
-          sx={{ fontSize: 12, fontWeight: 700, color: "#0F172A" }}
+          noWrap
+          sx={{ fontSize: 12, fontWeight: 700, color: "#0F172A", minWidth: 0 }}
         >
           {assignedMember?.name ?? "Ninguém"}
         </Typography>

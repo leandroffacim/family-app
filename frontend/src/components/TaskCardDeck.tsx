@@ -111,7 +111,7 @@ export function TaskCardDeck({
           height: 310,
           width: "100%",
           maxWidth: 420,
-          mx: "auto",
+          alignSelf: "center",
           borderRadius: 1.25,
           borderStyle: "dashed",
           borderColor: "#CBD5E1",
@@ -190,7 +190,7 @@ export function TaskCardDeck({
           height: { xs: 300, sm: 340 },
           width: "100%",
           maxWidth: 420,
-          mx: "auto",
+          alignSelf: "center",
         }}
       >
         {queue[2] && <StackCard depth={2} />}

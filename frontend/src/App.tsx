@@ -414,27 +414,158 @@ export default function App() {
       sx={{
         minHeight: "100dvh",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        p: { xs: 0, sm: 2.5 },
-        bgcolor: { xs: "#F8FAFC", sm: "#CBD5E1" },
+        bgcolor: "#F8FAFC",
       }}
     >
-      <Paper
-        elevation={0}
+      <Box
+        component="nav"
+        aria-label="Navegação principal"
         sx={{
-          width: "min(1080px, 100%)",
-          height: { xs: "100dvh", sm: "min(880px, calc(100dvh - 40px))" },
+          display: { xs: "none", sm: "flex" },
+          flexDirection: "column",
+          width: 252,
+          flexShrink: 0,
+          height: "100dvh",
+          position: "sticky",
+          top: 0,
+          bgcolor: "#FFFFFF",
+          borderRight: "1px solid #E2E8F0",
+          p: 2.5,
+        }}
+      >
+        <Stack
+          direction="row"
+          spacing={1.25}
+          sx={{ alignItems: "center", px: 0.5, mb: 3 }}
+        >
+          <Box
+            sx={{
+              width: 34,
+              height: 34,
+              borderRadius: 2,
+              background: "linear-gradient(135deg, #1E1B4B 0%, #4338CA 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <HeartHandshake size={18} color="#A5B4FC" />
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography
+              variant="overline"
+              sx={{
+                display: "block",
+                color: "#94A3B8",
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: 1,
+                lineHeight: 1,
+              }}
+            >
+              SISTEMA FAMILIAR
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              noWrap
+              sx={{ fontSize: 16, color: "#0F172A" }}
+            >
+              Família
+            </Typography>
+          </Box>
+        </Stack>
+
+        <Stack spacing={0.5} sx={{ flex: 1 }}>
+          {tabItems.map(({ id, label, icon: Icon }) => {
+            const selected = tab === id;
+            return (
+              <Button
+                key={id}
+                onClick={() => setTab(id)}
+                startIcon={<Icon size={19} strokeWidth={selected ? 2.5 : 2} />}
+                sx={{
+                  justifyContent: "flex-start",
+                  px: 1.5,
+                  py: 1.1,
+                  borderRadius: 2.5,
+                  fontSize: 14,
+                  color: selected ? "#4F46E5" : "#475569",
+                  bgcolor: selected ? "#EEF2FF" : "transparent",
+                  "&:hover": { bgcolor: selected ? "#E0E7FF" : "#F1F5F9" },
+                }}
+              >
+                {label}
+              </Button>
+            );
+          })}
+        </Stack>
+
+        <Stack spacing={1.5}>
+          {!!family && family.streak > 0 && (
+            <Chip
+              size="small"
+              icon={<Flame size={14} color="#F59E0B" />}
+              label={`${family.streak} ${family.streak === 1 ? "dia" : "dias"} de sequência`}
+              sx={{
+                justifyContent: "flex-start",
+                bgcolor: "#FEF3C7",
+                color: "#B45309",
+                fontWeight: 800,
+                fontSize: 11.5,
+                border: "1px solid #FDE68A",
+                "& .MuiChip-icon": { color: "#F59E0B" },
+              }}
+            />
+          )}
+          <Stack
+            direction="row"
+            spacing={1.25}
+            sx={{
+              alignItems: "center",
+              p: 1,
+              borderRadius: 2.5,
+              border: "1px solid #E2E8F0",
+            }}
+          >
+            {memberId && membersById[memberId] && (
+              <Avatar member={membersById[memberId]} size={34} showBorder />
+            )}
+            <Typography
+              noWrap
+              sx={{
+                flex: 1,
+                fontWeight: 700,
+                fontSize: 13.5,
+                color: "#0F172A",
+              }}
+            >
+              {(memberId && membersById[memberId]?.name) || "Você"}
+            </Typography>
+            <Tooltip title="Sair">
+              <IconButton
+                onClick={logout}
+                aria-label="Sair"
+                size="small"
+                sx={{
+                  color: "#64748B",
+                  "&:hover": { color: "#EF4444", bgcolor: "#FEF2F2" },
+                }}
+              >
+                <LogOut size={16} />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        </Stack>
+      </Box>
+
+      <Box
+        sx={{
+          flex: 1,
+          minWidth: 0,
           display: "flex",
           flexDirection: "column",
-          overflow: "hidden",
-          borderRadius: { xs: 0, sm: 6 },
-          border: { xs: 0, sm: "1px solid #E2E8F0" },
-          boxShadow: {
-            xs: "none",
-            sm: "0 25px 50px -12px rgba(15, 23, 42, 0.25)",
-          },
-          backgroundColor: "#F8FAFC",
+          height: "100dvh",
           position: "relative",
         }}
       >
@@ -459,7 +590,11 @@ export default function App() {
               <Stack
                 direction="row"
                 spacing={1}
-                sx={{ alignItems: "center", mb: 0.25 }}
+                sx={{
+                  alignItems: "center",
+                  mb: 0.25,
+                  display: { xs: "flex", sm: "none" },
+                }}
               >
                 <Box
                   sx={{
@@ -503,7 +638,11 @@ export default function App() {
               </Typography>
             </Box>
 
-            <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
+            <Stack
+              direction="row"
+              spacing={1.5}
+              sx={{ alignItems: "center", display: { xs: "flex", sm: "none" } }}
+            >
               {!!family && family.streak > 0 && (
                 <Chip
                   size="small"
@@ -549,9 +688,10 @@ export default function App() {
             display: "flex",
             flexDirection: "column",
             gap: 2.5,
-            width: "min(100%, 860px)",
+            width: "100%",
+            maxWidth: { xs: "100%", sm: 720, md: 960, lg: 1120 },
             alignSelf: "center",
-            p: { xs: 2, sm: "24px 28px 32px" },
+            p: { xs: 2, sm: 3, md: "28px 32px 40px" },
           }}
         >
           {loading && (
@@ -586,10 +726,7 @@ export default function App() {
           {!loading && !loadError && (
             <>
               {actionError && (
-                <Alert
-                  severity="error"
-                  onClose={() => setActionError(null)}
-                >
+                <Alert severity="error" onClose={() => setActionError(null)}>
                   {actionError}
                 </Alert>
               )}
@@ -632,7 +769,11 @@ export default function App() {
                           : `${deckQueue.length} ${deckQueue.length === 1 ? "tarefa pendente" : "tarefas pendentes"} no baralho.`}
                       </Typography>
                     </Box>
-                    <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ alignItems: "center" }}
+                    >
                       <Chip
                         label={`${deckQueue.length} restantes`}
                         size="small"
@@ -1179,13 +1320,10 @@ export default function App() {
             onClick={openSheet}
             sx={{
               position: "absolute",
-              right: {
-                xs: 20,
-                sm: "max(32px, calc((100% - 860px) / 2 + 16px))",
-              },
+              right: { xs: 20, sm: 32 },
               bottom: {
                 xs: "calc(76px + env(safe-area-inset-bottom))",
-                sm: 24,
+                sm: 32,
               },
               zIndex: 10,
               bgcolor: "#4F46E5",
@@ -1206,6 +1344,7 @@ export default function App() {
           value={tab}
           onChange={(_, nextTab: Tab) => setTab(nextTab)}
           sx={{
+            display: { xs: "flex", sm: "none" },
             flexShrink: 0,
             minHeight: {
               xs: "calc(64px + env(safe-area-inset-bottom))",
@@ -1242,7 +1381,7 @@ export default function App() {
             />
           ))}
         </BottomNavigation>
-      </Paper>
+      </Box>
 
       <Drawer
         anchor="bottom"
@@ -1313,10 +1452,7 @@ export default function App() {
           {sheetType === "task" ? (
             <Stack spacing={2}>
               {actionError && (
-                <Alert
-                  severity="error"
-                  onClose={() => setActionError(null)}
-                >
+                <Alert severity="error" onClose={() => setActionError(null)}>
                   {actionError}
                 </Alert>
               )}
@@ -1450,10 +1586,7 @@ export default function App() {
           ) : sheetType === "event" ? (
             <Stack spacing={2}>
               {actionError && (
-                <Alert
-                  severity="error"
-                  onClose={() => setActionError(null)}
-                >
+                <Alert severity="error" onClose={() => setActionError(null)}>
                   {actionError}
                 </Alert>
               )}
@@ -1550,9 +1683,7 @@ export default function App() {
                 size="large"
                 onClick={addEvent}
                 disabled={
-                  creatingEvent ||
-                  !newEventTitle.trim() ||
-                  !newEventTime.trim()
+                  creatingEvent || !newEventTitle.trim() || !newEventTime.trim()
                 }
                 startIcon={
                   creatingEvent ? (
@@ -1567,10 +1698,7 @@ export default function App() {
           ) : (
             <Stack spacing={2}>
               {actionError && (
-                <Alert
-                  severity="error"
-                  onClose={() => setActionError(null)}
-                >
+                <Alert severity="error" onClose={() => setActionError(null)}>
                   {actionError}
                 </Alert>
               )}
