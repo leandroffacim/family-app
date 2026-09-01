@@ -329,10 +329,10 @@ T8, T9, T10
 
 **Done when**:
 
-- [ ] New icon in the `AppBar` opens `ProfileScreen` with `member={membersById[memberId]}`
-- [ ] `onSaved` updates the local `members` state so avatars refresh everywhere without a manual reload (PROFILE-02)
-- [ ] `onAccountDeleted` calls `useAuth().logout()` and returns to the login screen immediately, without waiting for a `401` (PROFILE-12)
-- [ ] `cd frontend && npm run build` passes
+- [x] New icon in the `AppBar` opens `ProfileScreen` with `member={membersById[memberId]}`
+- [x] `onSaved` updates the local `members` state so avatars refresh everywhere without a manual reload (PROFILE-02)
+- [x] `onAccountDeleted` calls `useAuth().logout()` and returns to the login screen immediately, without waiting for a `401` (PROFILE-12)
+- [x] `cd frontend && npm run build` passes
 
 **Tests**: none
 **Gate**: build (`cd frontend && npm run build`)

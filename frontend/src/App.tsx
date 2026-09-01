@@ -32,6 +32,7 @@ import {
   RefreshCw,
   Sparkles,
   Sun,
+  UserCircle,
   UserPlus,
   Users,
   X,
@@ -44,6 +45,7 @@ import { Avatar } from "./components/Avatar";
 import { ConfirmSignUpScreen } from "./components/ConfirmSignUpScreen";
 import { EventCard } from "./components/EventCard";
 import { LoginScreen } from "./components/LoginScreen";
+import { ProfileScreen } from "./components/ProfileScreen";
 import { SetPasswordScreen } from "./components/SetPasswordScreen";
 import { SignUpScreen } from "./components/SignUpScreen";
 import { TaskCardDeck } from "./components/TaskCardDeck";
@@ -112,6 +114,7 @@ export default function App() {
   });
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetType, setSheetType] = useState<SheetType>("task");
+  const [profileOpen, setProfileOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteMemberId, setInviteMemberId] = useState("");
   const [inviting, setInviting] = useState(false);
@@ -542,6 +545,19 @@ export default function App() {
             >
               {(memberId && membersById[memberId]?.name) || "Você"}
             </Typography>
+            <Tooltip title="Meu perfil">
+              <IconButton
+                onClick={() => setProfileOpen(true)}
+                aria-label="Meu perfil"
+                size="small"
+                sx={{
+                  color: "#64748B",
+                  "&:hover": { color: "#4F46E5", bgcolor: "#EEF2FF" },
+                }}
+              >
+                <UserCircle size={16} />
+              </IconButton>
+            </Tooltip>
             <Tooltip title="Sair">
               <IconButton
                 onClick={logout}
@@ -661,6 +677,20 @@ export default function App() {
               {memberId && membersById[memberId] && (
                 <Avatar member={membersById[memberId]} size={36} showBorder />
               )}
+              <IconButton
+                onClick={() => setProfileOpen(true)}
+                aria-label="Meu perfil"
+                sx={{
+                  color: "#CBD5E1",
+                  bgcolor: "rgba(255,255,255,0.1)",
+                  "&:hover": {
+                    bgcolor: "rgba(255,255,255,0.2)",
+                    color: "#FFFFFF",
+                  },
+                }}
+              >
+                <UserCircle size={18} />
+              </IconButton>
               <IconButton
                 onClick={logout}
                 aria-label="Sair"
@@ -1800,6 +1830,25 @@ export default function App() {
         message={inviteSuccess ?? ""}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       />
+
+      {profileOpen && memberId && membersById[memberId] && (
+        <ProfileScreen
+          member={membersById[memberId]}
+          onClose={() => setProfileOpen(false)}
+          onSaved={(updated) => {
+            setMembers((current) =>
+              current.map((member) =>
+                member.id === updated.id ? updated : member,
+              ),
+            );
+            setProfileOpen(false);
+          }}
+          onAccountDeleted={() => {
+            setProfileOpen(false);
+            logout();
+          }}
+        />
+      )}
     </Box>
   );
 }
