@@ -100,4 +100,17 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+
+  // SPEC_DEVIATION: backend echoes { memberId, name?, color? } (not a full
+  // Member with `id`), so callers merge the response into the local member.
+  updateProfile: (payload: { name?: string; color?: string }) =>
+    request<{ memberId: string; name?: string; color?: string }>(
+      "/members/me",
+      {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      },
+    ),
+
+  deleteAccount: () => request<void>("/members/me", { method: "DELETE" }),
 };

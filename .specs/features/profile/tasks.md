@@ -275,9 +275,9 @@ T8, T9, T10
 
 **Done when**:
 
-- [ ] `api.updateProfile(payload: { name?: string; color?: string }) => request<Member>("/members/me", { method: "PATCH", body: JSON.stringify(payload) })` added
-- [ ] `api.deleteAccount() => request<void>("/members/me", { method: "DELETE" })` added
-- [ ] `cd frontend && npm run build` passes
+- [x] `api.updateProfile(payload: { name?: string; color?: string }) => request<Member>("/members/me", { method: "PATCH", body: JSON.stringify(payload) })` added
+- [x] `api.deleteAccount() => request<void>("/members/me", { method: "DELETE" })` added
+- [x] `cd frontend && npm run build` passes
 
 **Tests**: none
 **Gate**: build (`cd frontend && npm run build`)
